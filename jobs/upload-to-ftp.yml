@@ -33,7 +33,7 @@ jobs:
       credentialsOption: 'inputs'
       serverUrl: '${{ parameters.ftpUrl }}'
       username: '${{ parameters.ftpUser }}'
-      password: '${{ parameters.ftpPassword'
+      password: '${{ parameters.ftpPassword }}'
       rootDirectory: '$(Build.ArtifactStagingDirectory)/build'
       remoteDirectory: '${{ parameters.ftpDirectory }}'
     displayName: 'Upload ${{ parameters.artifactName }} to FTP'
