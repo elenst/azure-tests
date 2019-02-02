@@ -4,7 +4,7 @@
 # 1) Hard default values of X and extraX parameters are set here, they
 #    can be overridden by the template call;
 # 2) If option 'X' is defined in the environment, the value of 'X'
-#    is assigned to it, regardless the 
+#    is assigned to it, regardless the value of the parameter;
 # 3) The value of 'extraX', if set, is added at the end of 'X'
 # 4) Values of 'cmakeBuildType' and 'cmakeWithASAN', if set, are added
 #    at the end of 'cmakeOptions'
@@ -13,31 +13,28 @@
 parameters:
   vmImage: 'Ubuntu 16.04'
   name: 'setenv'
+  taskname: 'vars'
 
-  defServerBranch: '10.4'
-  defRQGBranch: 'elenst-dev'
-  defToolboxBranch: 'master'
+  serverBranch: '10.4'
+  rqgBranch: 'elenst-dev'
+  toolboxBranch: 'master'
   
-  defCmakeOptions: ''
-  defCmakeBuildType: ''
-  defCmakeWithASAN: ''
+  cmakeOptions: ''
+  cmakeBuildType: 'Debug'
+  cmakeWithASAN: 'NO'
 
-  defRQGOptions: ''
-  defMySQLdOptions: ''
+  rqgOptions: ''
+  mysqldOptions: ''
 
   extraCmakeOptions: ''
-  extraRQGOptions: ''
-  extraMySQLdOptions: ''
+  extraRqgOptions: ''
+  extraMysqldOptions: ''
 
-  defBaseDir: $(HOME)/server
-  defToolboxDir: $(HOME)/mariadb-toolbox
-  defRQGHome: $(HOME)/rqg
-  defLogDir: $(HOME)/logs
+  baseDir: $(HOME)/server
+  toolboxDir: $(HOME)/mariadb-toolbox
+  rqgHome: $(HOME)/rqg
+  logDir: $(HOME)/logs
   
-  opt1: 'foo'
-  opt2: 'bar'
-  opt3: ''
-
 jobs:
 
 - job: ${{ parameters.name }}
@@ -46,27 +43,39 @@ jobs:
 
   steps:
     - script: |
-        echo opt1: ${OPT1:-$OOPT1} and again ${OPT1-$OOPT1}
-        echo opt2: ${OPT2:-$OOPT2} and again ${OPT2-$OOPT2}
-        echo opt3: ${OPT3:-$OOPT3} and again ${OPT3-$OOPT3}
-        printenv
-      name: vars
+        echo "##vso[task.setvariable variable=serverBranch;isOutput=true]${SERVERBRANCH:-$PAR_SERVER_BRANCH}"
+        echo "##vso[task.setvariable variable=rqgBranch;isOutput=true]${RQGBRANCH:-$PAR_RQG_BRANCH}"
+        echo "##vso[task.setvariable variable=toolboxBranch;isOutput=true]${TOOLBOXBRANCH:-$PAR_TOOLBOX_BRANCH}"
+        echo "##vso[task.setvariable variable=baseDir;isOutput=true]${BASEDIR:-$PAR_BASEDIR}"
+        echo "##vso[task.setvariable variable=toolboxDir;isOutput=true]${TOOLBOXDIR:-$PAR_TOOLBOX_DIR}"
+        echo "##vso[task.setvariable variable=rqgHome;isOutput=true]${RQGHOME:-$PAR_RQG_HOME}"
+        echo "##vso[task.setvariable variable=logDIr;isOutput=true]${LOGDIR:-$LOGDIR}"
+        extra_cmake_options=${EXTRACMAKEOPTIONS:-$PAR_EXTRA_CMAKE_OPTIONS}
+        cmake_build_type=${CMAKEBUILDTYPE:-$PAR_CMAKE_BUILD_TYPE}
+        if [ -n "$cmake_build_type" ] ; then
+          cmake_extra_options="$cmake_extra_options -DCMAKE_BUILD_TYPE=$cmake_build_type"
+        fi
+        cmake_with_asan=${CMAKEWITHASAN:-$PAR_CMAKE_WITH_ASAN}
+        if [ -n "$cmake_with_asan" ] ; then
+          cmake_extra_options="$cmake_extra_options -DWITH_ASAN=$cmake_with_asan"
+        fi
+        echo "##vso[task.setvariable variable=cmakeOptions;isOutput=true]${CMAKEOPTIONS:-$PAR_CMAKE_OPTIONS} $extra_cmake_options"
+        echo "##vso[task.setvariable variable=rqgOptions;isOutput=true]${RQGOPTIONS:-$PAR_RQG_OPTIONS} {EXTRARQGOPTIONS:-$PAR_EXTRA_RQG_OPTIONS}"
+        echo "##vso[task.setvariable variable=mysqldOptions;isOutput=true]${MYSQLDOPTIONS:-$PAR_MYSQLD_OPTIONS} {EXTRAMYSQLDOPTIONS:-$PAR_EXTRA_MYSQLD_OPTIONS}"
+      name: ${{ parameters.taskname }}
       env:
-        DEF_SERVER_BRANCH: ${{ parameters.defServerBranch }}
-        DEF_RQG_BRANCH: ${{ parameters.defRQGBranch }}
-        DEF_TOOLBOX_BRANCH: ${{ parameters.defToolboxBranch }}
-        DEF_CMAKE_BUILD_TYPE: ${{ parameters.defCmakeBuildType }}
-        DEF_CMAKE_WITH_ASAN: ${{ parameters.defCmakeWithASAN }}
-        DEF_CMAKE_OPTIONS: ${{ parameters.defCmakeOptions }}
-        DEF_RQG_OPTIONS: ${{ parameters.defRQGOptions }}
-        DEF_MYSQLD_OPTIONS: ${{ parameters.defMySQLdOptions }}
-        EXTRA_CMAKE_OPTIONS: ${{ parameters.extraCmakeOptions }}
-        EXTRA_RQG_OPTIONS: ${{ parameters.extraRQGOptions }}
-        EXTRA_MYSQLD_OPTIONS: ${{ parameters.extraMySQLdOptions }}
-        DEF_BASEDIR: ${{ parameters.defBaseDir }}
-        DEF_TOOLBOX_DIR: ${{ parameters.defToolboxDir }}
-        DEF_RQG_HOME: ${{ parameters.defRQGHome }}
-        DEF_LOGDIR: ${{ parameters.defLogDir }}
-        OOPT1: ${{ parameters.opt1 }}
-        OOPT2: ${{ parameters.opt2 }}
-        OOPT3: ${{ parameters.opt3 }}
+        PAR_SERVER_BRANCH: ${{ parameters.serverBranch }}
+        PAR_RQG_BRANCH: ${{ parameters.rqgBranch }}
+        PAR_TOOLBOX_BRANCH: ${{ parameters.toolboxBranch }}
+        PAR_CMAKE_BUILD_TYPE: ${{ parameters.cmakeBuildType }}
+        PAR_CMAKE_WITH_ASAN: ${{ parameters.cmakeWithASAN }}
+        PAR_CMAKE_OPTIONS: ${{ parameters.cmakeOptions }}
+        PAR_RQG_OPTIONS: ${{ parameters.rqgOptions }}
+        PAR_MYSQLD_OPTIONS: ${{ parameters.mysqldOptions }}
+        PAR_BASEDIR: ${{ parameters.baseDir }}
+        PAR_TOOLBOX_DIR: ${{ parameters.toolboxDir }}
+        PAR_RQG_HOME: ${{ parameters.rqgHome }}
+        PAR_LOGDIR: ${{ parameters.logDir }}
+        PAR_EXTRA_CMAKE_OPTIONS: ${{ parameters.extraCmakeOptions }}
+        PAR_EXTRA_RQG_OPTIONS: ${{ parameters.extraRqgOptions }}
+        PAR_EXTRA_MYSQLD_OPTIONS: ${{ parameters.extraMysqldOptions }}

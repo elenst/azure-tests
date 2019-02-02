@@ -25,7 +25,23 @@ jobs:
 #jobs:
 - template: jobs/setenv.yml
   parameters:
-    opt1: 'xxx'
+    name: setenv
+    taskname: env
+
+- job: check
+  dependsOn: setenv
+  steps:
+  - script: |
+      echo serverBranch: $(setenv.env.serverBranch)
+      echo rqgBranch: $(setenv.env.rqgBranch)
+      echo toolboxBranch: $(setenv.env.toolboxBranch)
+      echo cmakeOptions: $(setenv.env.cmakeOptions)
+      echo rqgOptions: $(setenv.env.rqgOptions)
+      echo mysqldOptions: $(setenv.env.mysqldOptions)
+      echo baseDir: $(setenv.env.baseDir)
+      echo toolboxDir: $(setenv.env.toolboxDir)
+      echo rqgHome: $(setenv.env.rqgHome)
+      echo logDir: $(setenv.env.logDir)
 
 
 #jobs:
