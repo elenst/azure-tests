@@ -4,7 +4,7 @@
 
 parameters:
   vmImage: 'Ubuntu 16.04'
-  name: 'Download_or_Build'
+  name: 'Download_or_Build_Server'
   condition: succeeded()
   serverBranch: ''
   serverRevision: ''
@@ -31,14 +31,19 @@ jobs:
 
   steps:
 
+  - template: ../steps/env.yml
+    parameters:
+      ${{ each pair in parameters }}:
+        ${{ if ne(pair.key, 'name') }}:
+          ${{ pair.key }}: ${{ pair.value }}
+      name: 'vars'
+
   # Make sure that required parameters are defined
   - bash: |
-      echo "SERVER_BRANCH: $SERVER_BRANCH"
       if [ -z "$SERVER_BRANCH" ]; then
         echo "##vso[task.complete result=Failed]Missing template parameter \"serverBranch\""
       fi
     env:
-      SERVER_BRANCH: '${{ parameters.serverBranch }}'
     displayName: Check for required parameters
 
   # If server revision is not defined, find the head revision
@@ -51,7 +56,7 @@ jobs:
       echo Head revision for branch $SERVER_BRANCH: $rev
       echo "##vso[task.setvariable variable=headRevision]$rev"
     env:
-      SERVER_BRANCH: '${{ parameters.serverBranch }}'
+      SERVER_BRANCH: $(vars.serverBranch)
       SERVER_REPO: '${{ parameters.serverRepo }}'
     displayName: Get head revision
     condition: and(succeeded(), eq( '${{ parameters.serverRevision }}', ''))
@@ -76,9 +81,9 @@ jobs:
       fi
     env:
       FTP_DOWNLOAD: '${{ parameters.ftpDownload }}'
-      SERVER_BRANCH: '${{ parameters.serverBranch }}'
+      SERVER_BRANCH: $(vars.serverBranch)
       SERVER_REVISION: '${{ parameters.serverRevision }}'
-      CMAKE_OPTIONS: '${{ parameters.cmakeOptions }}'
+      CMAKE_OPTIONS: $(vars.cmakeOptions)
     displayName: Download bintar from FTP
     name: download_bintar
     condition: succeeded()
@@ -106,11 +111,11 @@ jobs:
       cd $srcdir
       echo $SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $BASEDIR/server.version
     env:
-      BASEDIR: '${{ parameters.serverBasedir }}'
+      BASEDIR: $(vars.baseDir)
       SERVER_REVISION: '${{ parameters.serverRevision }}'
-      SERVER_BRANCH: '${{ parameters.serverBranch }}'
+      SERVER_BRANCH: $(vars.serverBranch)
       SERVER_REPO: '${{ parameters.serverRepo }}'
-      CMAKE_OPTIONS: '${{ parameters.cmakeOptions }}'
+      CMAKE_OPTIONS: $(vars.cmakeOptions)
       LIBRARIES: '${{ parameters.buildLibraries }}'
       EXTRA_LIBRARIES: '${{ parameters.extraLibraries }}'
     condition: and(succeeded(), ne(variables['download_bintar.oldBuild'], 'true'))
