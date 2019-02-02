@@ -50,6 +50,7 @@ jobs:
         echo opt1: $(opt1) opt2: $(opt2) opt3: $(opt3) opt4: $(opt4)
         echo "opt1: $OOPT1 opt2: $OOPT2 opt3: $OOPT3"
         echo opt3: ${{ coalesce(parameters.opt3, variables['opt3']) }}
+        echo opt3 again: ${OOPT3-OPT3}
         printenv
       name: vars
       env:
@@ -70,4 +71,4 @@ jobs:
         DEF_LOGDIR: ${{ parameters.defLogDir }}
         OOPT1: ${{ parameters.opt1 }}
         OOPT2: ${{ parameters.opt2 }}
-        OOPT3: coalesce(${{ parameters.opt3 }}, $(opt3))
+        OOPT3: ${{ parameters.opt3 }}
