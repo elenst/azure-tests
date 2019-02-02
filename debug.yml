@@ -74,3 +74,4 @@ jobs:
 #    condition: false
     dependencies:
     - 'Download_or_Build_Server'
+    condition: and(succeeded(), ne(dependencies.Download_or_Build_Server.outputs['download_bintar.buildFromFTP'], 'true'))
