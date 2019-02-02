@@ -44,7 +44,7 @@ jobs:
         echo ##vso[task.complete result=Failed;]Could not find head revision for branch $SERVER_BRANCH
       fi
       echo Head revision for branch $SERVER_BRANCH: $rev
-      echo ##vso[task.setvariable variable=headRevision]$rev
+      echo ##vso[task.setvariable variable=headRevision;isOutput=true]$rev
     env:
       SERVER_BRANCH: '${{ parameters.serverBranch }}'
       SERVER_REPO: '${{ parameters.serverRepo }}'
@@ -56,8 +56,8 @@ jobs:
   # has already been built and stored
   - bash: |
       if [ -z "$SERVER_REVISION" ] ; then
-        echo Setting revision to $(headRevision)
-        SERVER_REVISION=$(headRevision)
+        echo Setting revision to $(head_revision.headRevision)
+        SERVER_REVISION=$(head_revision.headRevision)
         echo "Revision set to $SERVER_REVISION"
       fi
       cmake_options_hash=`echo "$CMAKE_OPTIONS" | md5sum | awk '{print $1}'`
@@ -84,7 +84,7 @@ jobs:
       builddir=$HOME/out-of-source
       
       # In case of head revision, we don't need to clone the whole history
-      if [ -z "$SERVER_REVISION" ] || [ "$(headRevision)" == "$SERVER_REVISION" ] ; then
+      if [ -z "$SERVER_REVISION" ] || [ "$(head_revision.headRevision)" == "$SERVER_REVISION" ] ; then
         git clone $SERVER_REPO --depth=1 --branch=$SERVER_BRANCH $HOME/src
       else
         git clone $SERVER_REPO --branch=$SERVER_BRANCH $HOME/src
