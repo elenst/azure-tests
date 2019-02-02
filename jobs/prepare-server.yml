@@ -75,7 +75,7 @@ jobs:
       SERVER_BRANCH: '${{ parameters.serverBranch }}'
       SERVER_REVISION: '${{ parameters.serverRevision }}'
       CMAKE_OPTIONS: '${{ parameters.cmakeOptions }}'
-      HEADREVISION: '$(headRevision)'
+      HEADREVISION: $(headRevision)
     displayName: Download bintar from FTP
     name: download_bintar
 
@@ -109,7 +109,7 @@ jobs:
       CMAKE_OPTIONS: '${{ parameters.cmakeOptions }}'
       LIBRARIES: '${{ parameters.buildLibraries }}'
       EXTRA_LIBRARIES: '${{ parameters.extraLibraries }}'
-      HEADREVISION: '$(headRevision)'
+      HEADREVISION: $(headRevision)
     condition: ne(variables['download_bintar.oldBuild'], 'true')
     displayName: 'Clone and build server'
     name: build_server
