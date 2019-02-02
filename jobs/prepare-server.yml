@@ -56,7 +56,7 @@ jobs:
   # has already been built and stored
   - bash: |
       if [ -z "$SERVER_REVISION" ] ; then
-        echo "Setting revision to $(head_revision.revno)"
+        echo "Setting revision to $(headRevision)"
         SERVER_REVISION=$(headRevision)
         echo "Revision set to $SERVER_REVISION"
       fi
