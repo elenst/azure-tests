@@ -56,7 +56,7 @@ jobs:
   # has already been built and stored
   - bash: |
       if [ -z "$SERVER_REVISION" ] ; then
-        SERVER_REVISION=$HEAD_REVISION
+        SERVER_REVISION=$(head_revision.revno)
       fi
       cmake_options_hash=`echo "$CMAKE_OPTIONS" | md5sum | awk '{print $1}'`
       filename=build-$SERVER_BRANCH-$SERVER_REVISION-$cmake_options_hash
@@ -72,7 +72,6 @@ jobs:
       FTP_DOWNLOAD: '${{ parameters.ftpDownload }}'
       SERVER_BRANCH: '${{ parameters.serverBranch }}'
       SERVER_REVISION: '${{ parameters.serverRevision }}'
-      HEAD_REVISION: $(head_revision.revno)
       CMAKE_OPTIONS: '${{ parameters.cmakeOptions }}'
     displayName: Download bintar from FTP
     name: download_bintar
@@ -83,11 +82,11 @@ jobs:
       builddir=$HOME/out-of-source
       
       # In case of head revision, we don't need to clone the whole history
-      if [ -z "$SERVER_REVISION" ] || [ "$HEAD_REVISION" == "$SERVER_REVISION" ] ; then
+      if [ -z "$SERVER_REVISION" ] || [ "$(head_revision.revno)" == "$SERVER_REVISION" ] ; then
         git clone $SERVER_REPO --depth=1 --branch=$SERVER_BRANCH $HOME/src
       else
         git clone $SERVER_REPO --branch=$SERVER_BRANCH $HOME/src
-        cd $(HEAD)/src
+        cd $(HOME)/src
         git checkout $SERVER_REVISION
       fi
       sudo apt-get update
@@ -101,7 +100,6 @@ jobs:
       echo $SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $BASEDIR/server.version
     env:
       BASEDIR: '${{ parameters.serverBasedir }}'
-      HEAD_REVISION: $(head_revision.revno)
       SERVER_REVISION: '${{ parameters.serverRevision }}'
       SERVER_BRANCH: '${{ parameters.serverBranch }}'
       SERVER_REPO: '${{ parameters.serverRepo }}'
