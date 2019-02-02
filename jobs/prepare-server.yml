@@ -119,7 +119,7 @@ jobs:
       CMAKE_OPTIONS: $(vars.cmakeOptions)
       LIBRARIES: '${{ parameters.buildLibraries }}'
       EXTRA_LIBRARIES: '${{ parameters.extraLibraries }}'
-    condition: and(succeeded(), ne(variables['download_bintar.oldBuild'], 'true'))
+    condition: and(succeeded(), ne(variables['oldBuild'], 'true'))
     displayName: 'Clone and build server'
     name: build_server
 
@@ -133,7 +133,7 @@ jobs:
       archiveFile:  $(Build.ArtifactStagingDirectory)/$(bintarName).tar.gz
     displayName: 'Create bintar'
     name: create_bintar
-    condition: and(succeeded(), ne(variables['download_bintar.oldBuild'], 'true'))
+    condition: and(succeeded(), ne(variables['oldBuild'], 'true'))
 
   # Store bintar as a build artifact
   # (in any case, be it downloaded or freshly built)
