@@ -5,6 +5,7 @@
 parameters:
   vmImage: 'Ubuntu 16.04'
   name: 'Download_or_Build'
+  condition: succeeded()
   serverBranch: ''
   serverRevision: ''
   serverRepo: 'https://github.com/MariaDB/server'
@@ -24,6 +25,7 @@ jobs:
 - job: ${{ parameters.name }}
   pool:
     vmImage: ${{ parameters.vmImage }}
+  condition: ${{ parameters.condition }}
 
   dependsOn: ${{ parameters.dependencies }}
 

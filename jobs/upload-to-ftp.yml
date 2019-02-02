@@ -5,6 +5,7 @@
 parameters:
   vmImage: 'Ubuntu 16.04'
   name: 'Upload_to_FTP'
+  condition: succeeded()
   ftpUrl: 'ftp://perro.askmonty.org'
   ftpDirectory: '/private/azure'
   ftpUser: 'anonymous'
@@ -20,6 +21,7 @@ jobs:
 - job: ${{ parameters.name }}
   pool:
     vmImage: ${{ parameters.vmImage }}
+  condition: ${{ parameters.condition }}
 
   dependsOn: ${{ parameters.dependencies }}
 
