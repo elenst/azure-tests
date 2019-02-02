@@ -27,6 +27,7 @@ jobs:
   parameters:
     name: setenv
     taskname: env
+    rqgOptions: '--duration=300'
 
 - job: check
   dependsOn: setenv
