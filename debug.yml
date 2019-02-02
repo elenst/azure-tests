@@ -3,7 +3,7 @@
 trigger: none
 
 variables:
-  serverBranch: coalesce('$(serverBranch)','10.4')
+  serverBranch: ''
 
 jobs:
 - template: jobs/prepare-server.yml
