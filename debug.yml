@@ -3,14 +3,14 @@
 trigger: none
 
 variables:
-  serverBranch: coalesce($(serverBranch),'10.4')
+  serverBranch: coalesce('$(serverBranch)','10.4')
 
 jobs:
 - template: jobs/prepare-server.yml
   parameters:
     name: 'Download_or_Build_Server'
     serverBranch: $(serverBranch)
-    cmakeOptions: '-DPLUGIN_CASSANDRA=NO -DPLUGIN_CONNECT=NO -DPLUGIN_FEDERATED=NO -DPLUGIN_FEDERATEDX=NO -DPLUGIN_MROONGA=NO -DPLUGIN_ROCKSDB=NO -DPLUGIN_SPHINX=NO -DPLUGIN_SPIDER=NO -DPLUGIN_TOKUDB=NO -DWITH_MARIABACKUP=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_ASAN=NO
+    cmakeOptions: '-DPLUGIN_CASSANDRA=NO -DPLUGIN_CONNECT=NO -DPLUGIN_FEDERATED=NO -DPLUGIN_FEDERATEDX=NO -DPLUGIN_MROONGA=NO -DPLUGIN_ROCKSDB=NO -DPLUGIN_SPHINX=NO -DPLUGIN_SPIDER=NO -DPLUGIN_TOKUDB=NO -DWITH_MARIABACKUP=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_ASAN=NO'
 
 - template: jobs/upload-to-ftp.yml
   parameters:
