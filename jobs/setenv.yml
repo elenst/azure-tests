@@ -45,7 +45,8 @@ jobs:
   - template: ../steps/env.yml
     parameters:
       ${{ each pair in parameters }}:
-        ${{ pair.key }}: ${{ pair.value }}
+        ${{ if ne(pair.key, 'name') }}:
+          ${{ pair.key }}: ${{ pair.value }}
       name: ${{ parameters.taskname }}
   - script: printenv
     displayName: 'Print environment'
