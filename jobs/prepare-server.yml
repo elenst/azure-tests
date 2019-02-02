@@ -51,15 +51,12 @@ jobs:
     displayName: Get head revision
     condition: eq( '${{ parameters.serverRevision }}', '')
 
-  - script: echo "In script:" $(headRevision)
-  - bash: echo "In bash:" "$(headRevision)"
-
   # Check if the server with this revision and cmake options
   # has already been built and stored
   - bash: |
       if [ -z "$SERVER_REVISION" ] ; then
-        echo Setting revision to $(head_revision.headRevision)
-        SERVER_REVISION=$(head_revision.headRevision)
+        echo Setting revision to $(headRevision)
+        SERVER_REVISION=$(headRevision)
         echo "Revision set to $SERVER_REVISION"
       fi
       cmake_options_hash=`echo "$CMAKE_OPTIONS" | md5sum | awk '{print $1}'`
@@ -86,7 +83,7 @@ jobs:
       builddir=$HOME/out-of-source
       
       # In case of head revision, we don't need to clone the whole history
-      if [ -z "$SERVER_REVISION" ] || [ "$(head_revision.headRevision)" == "$SERVER_REVISION" ] ; then
+      if [ -z "$SERVER_REVISION" ] || [ "$(headRevision)" == "$SERVER_REVISION" ] ; then
         git clone $SERVER_REPO --depth=1 --branch=$SERVER_BRANCH $HOME/src
       else
         git clone $SERVER_REPO --branch=$SERVER_BRANCH $HOME/src
