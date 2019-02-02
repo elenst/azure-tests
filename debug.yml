@@ -23,12 +23,9 @@ jobs:
     taskname: env
     rqgOptions: '--duration=300'
 
-- job: check
+- job: check_after_job
   dependsOn: setenv
   steps:
-  - template: steps/env.yml
-    parameters:
-      taskname: 'env'
   - script: |
       echo serverBranch: $(serverBranch)
       echo rqgBranch: $(rqgBranch)
@@ -52,9 +49,11 @@ jobs:
     rqgHome: $[ dependencies.setenv.outputs['env.rqgHome' ] ]
     logDir: $[ dependencies.setenv.outputs['env.logDir' ] ]
 
-- job: check2
+- job: check_after_task
   steps:
   - template: steps/env.yml
+    parameters:
+      name: env
   - script: |
       echo serverBranch: $(serverBranch)
       echo rqgBranch: $(rqgBranch)
