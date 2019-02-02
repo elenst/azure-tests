@@ -44,7 +44,7 @@ jobs:
   steps:
   - template: ../steps/env.yml
     parameters:
-    ${{ each pair in parameters }}:
-      ${{ pair.key }}: ${{ pair.value }}
+      ${{ each pair in parameters }}:
+        ${{ pair.key }}: ${{ pair.value }}
   - script: printenv
     displayName: 'Print environment'
