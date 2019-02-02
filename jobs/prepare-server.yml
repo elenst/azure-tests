@@ -1,6 +1,5 @@
 ########################################################################
-# Jobs to upload/download MariaDB server binaries to/from FTP,
-# clone code, build server, etc.
+# Job to download MariaDB server binaries from FTP or build from sources
 ########################################################################
 
 parameters:
@@ -9,7 +8,6 @@ parameters:
   serverRevision: ''
   serverRepo: 'https://github.com/MariaDB/server'
   cmakeOptions: ''
-  ftpUpload: 'ftp://ftp.askmonty.org/private/azure'
   ftpDownload: 'ftp://ftp.askmonty.org/public/azure'
   serverBasedir: $(HOME)/server
   buildLibraries: 'apt-utils build-essential cmake python-dev sudo git devscripts equivs libcurl4-openssl-dev ccache python3 python3-pip curl libssl-dev libzstd-dev libevent-dev dpatch gawk gdb libboost-dev libcrack2-dev libjudy-dev libnuma-dev libsnappy-dev libxml2-dev unixodbc-dev uuid-dev fakeroot iputils-ping libncurses5-dev libbison-dev'
