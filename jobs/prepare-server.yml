@@ -51,7 +51,10 @@ jobs:
     name: head_revision
     displayName: Get head revision
     condition: eq( '${{ parameters.serverRevision }}', '')
-    
+
+  - script: echo "In script:" $(head_revision.headRevision)
+  - bash: echo "In bash:" $(head_revision.headRevision)
+
   # Check if the server with this revision and cmake options
   # has already been built and stored
   - bash: |
