@@ -68,4 +68,4 @@ jobs:
         DEF_LOGDIR: ${{ parameters.defLogDir }}
         OOPT1: ${{ parameters.opt1 }}
         OOPT2: ${{ parameters.opt2 }}
-        OOPT3: ${{ parameters.opt3 }}
+        OOPT3: coalesce(${{ parameters.opt3 }}, $(opt3))
