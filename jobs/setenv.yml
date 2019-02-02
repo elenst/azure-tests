@@ -41,6 +41,7 @@ jobs:
 - job: ${{ parameters.name }}
   pool:
     vmImage: ${{ parameters.vmImage }}
+  condition: ${{ parameters.condition }}
 
   steps:
   - template: ../steps/env.yml
