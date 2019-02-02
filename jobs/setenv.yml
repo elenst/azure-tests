@@ -1,10 +1,10 @@
 ########################################################################
 # Manually coalesce environment/default variables
 # The variables are processed in the following way. For any option X,
-# 1) Default values of defX and extraX parameters are set here, they can
-#    be overridden by the template call;
-# 2) If option 'X' is not defined in the environemnt, the value of 'defX'
-#    is assigned to it;
+# 1) Hard default values of X and extraX parameters are set here, they
+#    can be overridden by the template call;
+# 2) If option 'X' is defined in the environment, the value of 'X'
+#    is assigned to it, regardless the 
 # 3) The value of 'extraX', if set, is added at the end of 'X'
 # 4) Values of 'cmakeBuildType' and 'cmakeWithASAN', if set, are added
 #    at the end of 'cmakeOptions'
@@ -46,11 +46,9 @@ jobs:
 
   steps:
     - script: |
-        echo "opt1: $OPT1 opt2: $OPT2 opt3: $OPT3 opt4: $OPT4"
-        echo opt1: $(opt1) opt2: $(opt2) opt3: $(opt3) opt4: $(opt4)
-        echo "opt1: $OOPT1 opt2: $OOPT2 opt3: $OOPT3"
-        echo opt3: ${{ coalesce(parameters.opt3, variables['opt3']) }}
-        echo opt3 again: ${OOPT3:-$OPT3}
+        echo opt1: ${OPT1:-$OOPT1} and again ${OPT1-$OOPT1}
+        echo opt2: ${OPT2:-$OOPT2} and again ${OPT2-$OOPT2}
+        echo opt3: ${OPT3:-$OOPT3} and again ${OPT3-$OOPT3}
         printenv
       name: vars
       env:
