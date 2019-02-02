@@ -4,6 +4,7 @@
 
 parameters:
   vmImage: 'Ubuntu 16.04'
+  name: 'Download_or_Build'
   serverBranch: ''
   serverRevision: ''
   serverRepo: 'https://github.com/MariaDB/server'
@@ -12,6 +13,7 @@ parameters:
   serverBasedir: $(HOME)/server
   buildLibraries: 'apt-utils build-essential cmake python-dev sudo git devscripts equivs libcurl4-openssl-dev ccache python3 python3-pip curl libssl-dev libzstd-dev libevent-dev dpatch gawk gdb libboost-dev libcrack2-dev libjudy-dev libnuma-dev libsnappy-dev libxml2-dev unixodbc-dev uuid-dev fakeroot iputils-ping libncurses5-dev libbison-dev'
   extraLibraries: ''
+  dependencies: []
 
 jobs:
 
@@ -19,9 +21,11 @@ jobs:
 # Try to download the server from FTP;
 # if not found, then clone and build
 
-- job: Download_or_Build
+- job: ${{ parameters.name }}
   pool:
     vmImage: ${{ parameters.vmImage }}
+
+  dependsOn: ${{ parameters.dependencies }}
 
   steps:
 
@@ -117,8 +121,8 @@ jobs:
       archiveType: 'tar'
       tarCompression: 'gz'
       archiveFile:  $(Build.ArtifactStagingDirectory)/$(bintarName).tar.gz
-    displayName: 'Archive build'
-    name: archive_build
+    displayName: 'Create bintar'
+    name: create_bintar
     condition: ne(variables['download_bintar.oldBuild'], 'true')
 
   # Store bintar as a build artifact
@@ -127,4 +131,4 @@ jobs:
     inputs:
       pathtoPublish: $(Build.ArtifactStagingDirectory)
       artifactName: 'build'
-    displayName: 'Store build'
+    displayName: 'Store build artifact'

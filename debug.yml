@@ -5,7 +5,11 @@ trigger: none
 jobs:
 - template: jobs/prepare-server.yml
   parameters:
+    name: 'Upload_or_Build_Server'
     serverBranch: '10.4'
     cmakeOptions: '-DCMAKE_BUILD_TYPE=Debug -DPLUGIN_ROCKSDB=NO -DPLUGIN_SPHINX=NO -DPLUGIN_SPIDER=NO -DPLUGIN_MROONGA=NO -DPLUGIN_TOKUDB=NO -DPLUGIN_FEDERATEDX=NO -DPLUGIN_CONNECT=NO -DPLUGIN_FEDERATED=NO -DWITH_MARIABACKUP=OFF'
 
 - template: jobs/upload-to-ftp.yml
+  parameters:
+    dependencies:
+    - 'Upload_or_Build_Server'
