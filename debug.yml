@@ -22,7 +22,7 @@ jobs:
 #      OOPT3: $(opt3)
 #      OOPT4: $(opt4)
 
-jobs:
+#jobs:
 - template: jobs/setenv.yml
   parameters:
     opt1: 'xxx'
