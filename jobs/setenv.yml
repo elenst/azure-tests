@@ -43,4 +43,6 @@ jobs:
 
   steps:
   - template: ../steps/env.yml
+    parameters:
+    - taskname: 'env'
   - script: printenv
