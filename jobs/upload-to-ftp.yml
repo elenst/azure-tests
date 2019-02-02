@@ -5,7 +5,7 @@
 parameters:
   vmImage: 'Ubuntu 16.04'
   name: 'Upload_to_FTP'
-  ftpUrl: 'ftp://ftp.askmonty.org'
+  ftpUrl: 'ftp://perro.askmonty.org'
   ftpDirectory: '/private/azure'
   ftpUser: 'anonymous'
   ftpPassword: 'foo'
