@@ -1,0 +1,38 @@
+########################################################################
+# Job to upload a build artifact to FTP
+########################################################################
+
+parameters:
+  vmImage: 'Ubuntu 16.04'
+  ftpUrl: 'ftp://ftp.askmonty.org'
+  ftpDirectory: '/private/azure'
+  ftpUser: 'anonymouos'
+  ftpPassword: 'foo'
+  artifactName: 'build'
+
+jobs:
+
+#-----------------------------------------------------------------------
+# Publish a build artifact to FTP
+
+- job: Upload_Artifact_to_FTP
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+
+  steps:
+
+  # Get the artifact from build artifacts
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      artifactName: ${{ parameters.artifactName }}
+      downloadPath: $(Build.ArtifactStagingDirectory)
+
+  # Upload to FTP
+  - task: FtpUpload@1
+    inputs:
+      credentialsOption: 'inputs'
+      serverUrl: '${{ parameters.ftpUrl }}'
+      username: '${{ parameters.ftpUser }}'
+      password: '${{ parameters.ftpPassword'
+      rootDirectory: '$(Build.ArtifactStagingDirectory)/build'
+      remoteDirectory: '${{ parameters.ftpDirectory }}'
