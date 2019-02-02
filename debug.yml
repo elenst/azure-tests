@@ -55,16 +55,16 @@ jobs:
     parameters:
       name: env
   - script: |
-      echo serverBranch: $(serverBranch)
-      echo rqgBranch: $(rqgBranch)
-      echo toolboxBranch: $(toolboxBranch)
-      echo cmakeOptions: $(cmakeOptions)
-      echo rqgOptions: $(rqgOptions)
-      echo mysqldOptions: $(mysqldOptions)
-      echo baseDir: $(baseDir)
-      echo toolboxDir: $(toolboxDir)
-      echo rqgHome: $(rqgHome)
-      echo logDir: $(logDir)
+      echo serverBranch: $(env.serverBranch)
+      echo rqgBranch: $(env.rqgBranch)
+      echo toolboxBranch: $(env.toolboxBranch)
+      echo cmakeOptions: $(env.cmakeOptions)
+      echo rqgOptions: $(env.rqgOptions)
+      echo mysqldOptions: $(env.mysqldOptions)
+      echo baseDir: $(env.baseDir) $(env.BASEDIR) $ENV_BASEDIR
+      echo toolboxDir: $(env.toolboxDir)
+      echo rqgHome: $(env.rqgHome)
+      echo logDir: $(env.logDir)
 
 
 #jobs:
