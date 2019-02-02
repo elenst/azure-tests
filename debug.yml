@@ -1,0 +1,8 @@
+# Test different steps and configurations without running big jobs
+
+trigger: none
+
+jobs:
+- template: jobs/prepare-server.yml
+  parameters:
+    serverBranch: '10.4'
