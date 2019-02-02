@@ -51,7 +51,7 @@ jobs:
       SERVER_BRANCH: '${{ parameters.serverBranch }}'
       SERVER_REPO: '${{ parameters.serverRepo }}'
     displayName: Get head revision
-    condition: eq( '${{ parameters.serverRevision }}', '')
+    condition: and(succeeded(), eq( '${{ parameters.serverRevision }}', ''))
 
   # Check if the server with this revision and cmake options
   # has already been built and stored
@@ -78,6 +78,7 @@ jobs:
       CMAKE_OPTIONS: '${{ parameters.cmakeOptions }}'
     displayName: Download bintar from FTP
     name: download_bintar
+    condition: succeeded()
 
   # If bintar was not found, install libraries, clone and build server
   - bash: |
@@ -109,7 +110,7 @@ jobs:
       CMAKE_OPTIONS: '${{ parameters.cmakeOptions }}'
       LIBRARIES: '${{ parameters.buildLibraries }}'
       EXTRA_LIBRARIES: '${{ parameters.extraLibraries }}'
-    condition: ne(variables['download_bintar.oldBuild'], 'true')
+    condition: and(succeeded(), ne(variables['download_bintar.oldBuild'], 'true'))
     displayName: 'Clone and build server'
     name: build_server
 
@@ -123,7 +124,7 @@ jobs:
       archiveFile:  $(Build.ArtifactStagingDirectory)/$(bintarName).tar.gz
     displayName: 'Create bintar'
     name: create_bintar
-    condition: ne(variables['download_bintar.oldBuild'], 'true')
+    condition: and(succeeded(), ne(variables['download_bintar.oldBuild'], 'true'))
 
   # Store bintar as a build artifact
   # (in any case, be it downloaded or freshly built)
@@ -132,3 +133,4 @@ jobs:
       pathtoPublish: $(Build.ArtifactStagingDirectory)
       artifactName: 'build'
     displayName: 'Store build artifact'
+    condition: succeeded()
