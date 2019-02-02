@@ -31,6 +31,7 @@ jobs:
 
   # Make sure that required parameters are defined
   - bash: |
+      echo "SERVER_BRANCH: $SERVER_BRANCH"
       if [ -z "$SERVER_BRANCH" ]; then
         echo "##vso[task.complete result=Failed]Missing template parameter \"serverBranch\""
       fi
