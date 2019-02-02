@@ -41,7 +41,7 @@ jobs:
     serverBranch: $[ dependencies.setenv.outputs['env.serverBranch' ] ]
     rqgBranch: $[ dependencies.setenv.outputs['env.rqgBranch' ] ]
     toolboxBranch: $[ dependencies.setenv.outputs['env.toolboxBranch' ] ]
-    cmakeOptions: $[ dependencies.setenv.outputs['env.rqgBranch' ] ]
+    cmakeOptions: $[ dependencies.setenv.outputs['env.cmakeOptions' ] ]
     rqgOptions: $[ dependencies.setenv.outputs['env.rqgOptions' ] ]
     mysqldOptions: $[ dependencies.setenv.outputs['env.mysqldOptions' ] ]
     baseDir: $[ dependencies.setenv.outputs['env.baseDir' ] ]
