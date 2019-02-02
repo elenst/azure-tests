@@ -27,6 +27,8 @@ jobs:
   dependsOn: setenv
   steps:
   - template: steps/env.yml
+    parameters:
+      taskname: 'env'
   - script: |
       echo serverBranch: $(serverBranch)
       echo rqgBranch: $(rqgBranch)
