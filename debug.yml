@@ -26,6 +26,7 @@ jobs:
 - job: check
   dependsOn: setenv
   steps:
+  - template: steps/env.yml
   - script: |
       echo serverBranch: $(serverBranch)
       echo rqgBranch: $(rqgBranch)
@@ -37,26 +38,3 @@ jobs:
       echo toolboxDir: $(toolboxDir)
       echo rqgHome: $(rqgHome)
       echo logDir: $(logDir)
-  variables:
-    serverBranch: $[ dependencies.setenv.outputs['env.serverBranch' ] ]
-    rqgBranch: $[ dependencies.setenv.outputs['env.rqgBranch' ] ]
-    toolboxBranch: $[ dependencies.setenv.outputs['env.toolboxBranch' ] ]
-    cmakeOptions: $[ dependencies.setenv.outputs['env.cmakeOptions' ] ]
-    rqgOptions: $[ dependencies.setenv.outputs['env.rqgOptions' ] ]
-    mysqldOptions: $[ dependencies.setenv.outputs['env.mysqldOptions' ] ]
-    baseDir: $[ dependencies.setenv.outputs['env.baseDir' ] ]
-    toolboxDir: $[ dependencies.setenv.outputs['env.toolboxDir' ] ]
-    rqgHome: $[ dependencies.setenv.outputs['env.rqgHome' ] ]
-    logDir: $[ dependencies.setenv.outputs['env.logDir' ] ]
-
-#jobs:
-#- template: jobs/prepare-server.yml
-#  parameters:
-#    name: 'Download_or_Build_Server'
-#    serverBranch: $(serverBranch)
-#    cmakeOptions: '-DPLUGIN_CASSANDRA=NO -DPLUGIN_CONNECT=NO -DPLUGIN_FEDERATED=NO -DPLUGIN_FEDERATEDX=NO -DPLUGIN_MROONGA=NO -DPLUGIN_ROCKSDB=NO -DPLUGIN_SPHINX=NO -DPLUGIN_SPIDER=NO #-DPLUGIN_TOKUDB=NO -DWITH_MARIABACKUP=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_ASAN=NO'
-
-#- template: jobs/upload-to-ftp.yml
-#  parameters:
-#    dependencies:
-#    - 'Download_or_Build_Server'
