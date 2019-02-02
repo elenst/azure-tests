@@ -4,15 +4,29 @@ trigger: none
 
 variables:
   serverBranch: coalesce('$(serverBranch)','10.4')
+  opt1: ''
+  opt2: 'foo'
+  opt3: 'bar'
 
 jobs:
-- template: jobs/prepare-server.yml
-  parameters:
-    name: 'Download_or_Build_Server'
-    serverBranch: $(serverBranch)
-    cmakeOptions: '-DPLUGIN_CASSANDRA=NO -DPLUGIN_CONNECT=NO -DPLUGIN_FEDERATED=NO -DPLUGIN_FEDERATEDX=NO -DPLUGIN_MROONGA=NO -DPLUGIN_ROCKSDB=NO -DPLUGIN_SPHINX=NO -DPLUGIN_SPIDER=NO -DPLUGIN_TOKUDB=NO -DWITH_MARIABACKUP=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_ASAN=NO'
+  job: test
+  - script: |
+      echo "opt1: $OPT1 opt2: $OPT2 opt3: $OPT3"
+      echo opt1: $(opt1) opt2: $(opt2) opt3: $(opt3)
+      echo "opt1: $OOPT1 opt2: $OOPT2 opt3: $OOPT3"
+    env:
+      OOPT1: $(opt1)
+      OOPT2: $(opt2)
+      OOPT3: $(opt3)
 
-- template: jobs/upload-to-ftp.yml
-  parameters:
-    dependencies:
-    - 'Download_or_Build_Server'
+#jobs:
+#- template: jobs/prepare-server.yml
+#  parameters:
+#    name: 'Download_or_Build_Server'
+#    serverBranch: $(serverBranch)
+#    cmakeOptions: '-DPLUGIN_CASSANDRA=NO -DPLUGIN_CONNECT=NO -DPLUGIN_FEDERATED=NO -DPLUGIN_FEDERATEDX=NO -DPLUGIN_MROONGA=NO -DPLUGIN_ROCKSDB=NO -DPLUGIN_SPHINX=NO -DPLUGIN_SPIDER=NO #-DPLUGIN_TOKUDB=NO -DWITH_MARIABACKUP=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_ASAN=NO'
+
+#- template: jobs/upload-to-ftp.yml
+#  parameters:
+#    dependencies:
+#    - 'Download_or_Build_Server'
