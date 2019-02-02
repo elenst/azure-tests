@@ -9,17 +9,24 @@ variables:
   opt3: 'bar'
 
 jobs:
-- job: test
-  steps: 
-  - script: |
-      echo "opt1: $OPT1 opt2: $OPT2 opt3: $OPT3 opt4: $OPT4"
-      echo opt1: $(opt1) opt2: $(opt2) opt3: $(opt3) opt4: $(opt4)
-      echo "opt1: $OOPT1 opt2: $OOPT2 opt3: $OOPT3 opt4: $OOPT4"
-    env:
-      OOPT1: $(opt1)
-      OOPT2: $(opt2)
-      OOPT3: $(opt3)
-      OOPT4: $(opt4)
+
+#- job: test
+#  steps: 
+#  - script: |
+#      echo "opt1: $OPT1 opt2: $OPT2 opt3: $OPT3 opt4: $OPT4"
+#      echo opt1: $(opt1) opt2: $(opt2) opt3: $(opt3) opt4: $(opt4)
+#      echo "opt1: $OOPT1 opt2: $OOPT2 opt3: $OOPT3 opt4: $OOPT4"
+#    env:
+#      OOPT1: $(opt1)
+#      OOPT2: $(opt2)
+#      OOPT3: $(opt3)
+#      OOPT4: $(opt4)
+
+jobs:
+- template: jobs/setenv.yml
+  parameters:
+    opt1: 'xxx'
+
 
 #jobs:
 #- template: jobs/prepare-server.yml

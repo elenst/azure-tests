@@ -1,0 +1,96 @@
+########################################################################
+# Manually coalesce environment/default variables
+# The variables are processed in the following way. For any option X,
+# 1) Default values of defX and extraX parameters are set here, they can
+#    be overridden by the template call;
+# 2) If option 'X' is not defined in the environemnt, the value of 'defX'
+#    is assigned to it;
+# 3) The value of 'extraX', if set, is added at the end of 'X'
+# 4) Values of 'cmakeBuildType' and 'cmakeWithASAN', if set, are added
+#    at the end of 'cmakeOptions'
+########################################################################
+
+parameters:
+  vmImage: 'Ubuntu 16.04'
+  name: 'setenv'
+
+  defServerBranch: '10.4'
+  defRQGBranch: 'elenst-dev'
+  defToolboxBranch: 'master'
+  
+  defCmakeOptions: ''
+  defCmakeBuildType: ''
+  defCmakeWithASAN: ''
+
+  defRQGOptions: ''
+  defMySQLdOptions: ''
+
+  extraCmakeOptions: ''
+  extraRQGOptions: ''
+  extraMySQLdOptions: ''
+
+  defBaseDir: $(HOME)/server
+  defToolboxDir: $(HOME)/mariadb-toolbox
+  defRQGHome: $(HOME)/rqg
+  defLogDir: $(HOME)/logs
+  
+  opt1: 'foo'
+  opt2: 'bar'
+  opt3: ''
+
+jobs:
+
+- job: ${{ parameters.name }}
+  pool:
+    vmImage: 'Ubuntu 16.04'
+
+  steps:
+    - script: |
+#        if [ -z "$SERVERBRANCH" ] ;   then server_branch=$DEFAULTSERVERBRANCH ;      else server_branch=$SERVERBRANCH ;      fi
+#        if [ -z "$RQGBRANCH" ] ;      then rqg_branch=$DEFAULTRQGBRANCH ;            else rqg_branch=$RQGBRANCH ;            fi
+#        if [ -z "$TOOLBOXBRANCH" ] ;  then toolbox_branch=$DEFAULTTOOLBOXBRANCH ;    else toolbox_branch=$TOOLBOXBRANCH ;    fi
+#        if [ -z "$CMAKEOPTIONS" ] ;   then cmake_options=$DEFAULTCMAKEOPTIONS ;      else cmake_options=$CMAKEOPTIONS ;      fi
+#        if [ -z "$CMAKEBUILDTYPE" ] ; then cmake_build_type=$DEFAULTCMAKEBUILDTYPE ; else cmake_build_type=$CMAKEBUILDTYPE ; fi
+#        if [ -z "$CMAKEWITHASAN" ] ;  then cmake_with_asan=$DEFAULTCMAKEWITHASAN ;   else cmake_with_asan=$CMAKEWITHASAN ;   fi
+#        if [ -z "$TESTDURATION" ] ;   then test_duration=$DEFAULTTESTDURATION ;      else test_duration=$TESTDURATION ;      fi
+#        if [ -z "$RQGOPTIONS" ] ;     then rqg_options=$DEFAULTRQGOPTIONS ;          else rqg_options=$RQGOPTIONS ;          fi
+#        if [ -z "$MYSQLDOPTIONS" ] ;  then mysqld_options=$DEFAULTMYSQLDOPTIONS ;    else mysqld_options=$MYSQLDOPTIONS ;    fi
+#        if [ -z "$THREADS" ] ;        then threads=$DEFAULTTHREADS ;                 else threads=$THREADS ;                 fi
+#        if [ -z "$REDEFINES" ] ;      then redefines=$DEFAULTREDEFINES ;             else redefines=$REDEFINES ;             fi
+#        echo "##vso[task.setvariable variable=serverBranch;isOutput=true]$server_branch"
+#        echo "##vso[task.setvariable variable=rqgBranch;isOutput=true]$rqg_branch"
+#        echo "##vso[task.setvariable variable=toolboxBranch;isOutput=true]$toolbox_branch"
+#        echo "##vso[task.setvariable variable=cmakeOptions;isOutput=true]$cmake_options"
+#        echo "##vso[task.setvariable variable=cmakeBuildType;isOutput=true]$cmake_build_type"
+#        echo "##vso[task.setvariable variable=cmakeWithASAN;isOutput=true]$cmake_with_asan"
+#        echo "##vso[task.setvariable variable=testDuration;isOutput=true]$test_duration"
+#        echo "##vso[task.setvariable variable=rqgOptions;isOutput=true]$rqg_options"
+#        echo "##vso[task.setvariable variable=mysqldOptions;isOutput=true]$mysqld_options"
+#        echo "##vso[task.setvariable variable=threads;isOutput=true]$threads"
+#        echo "##vso[task.setvariable variable=redefines;isOutput=true]$redefines"
+#        echo "##vso[task.setvariable variable=serverBranch;isOutput=true]${"
+
+      echo "opt1: $OPT1 opt2: $OPT2 opt3: $OPT3 opt4: $OPT4"
+      echo opt1: $(opt1) opt2: $(opt2) opt3: $(opt3) opt4: $(opt4)
+      echo "opt1: $OOPT1 opt2: $OOPT2 opt3: $OOPT3"
+
+      name: vars
+      env:
+        DEF_SERVER_BRANCH: ${{ parameters.defServerBranch }}
+        DEF_RQG_BRANCH: ${{ parameters.defRQGBranch }}
+        DEF_TOOLBOX_BRANCH: ${{ parameters.defToolboxBranch }}
+        DEF_CMAKE_BUILD_TYPE: ${{ parameters.defCmakeBuildType }}
+        DEF_CMAKE_WITH_ASAN: ${{ parameters.defCmakeWithASAN }}
+        DEF_CMAKE_OPTIONS: ${{ parameters.defCmakeOptions }}
+        DEF_RQG_OPTIONS: ${{ parameters.defRQGOptions }}
+        DEF_MYSQLD_OPTIONS: ${{ parameters.defMySQLdOptions }}
+        EXTRA_CMAKE_OPTIONS: ${{ parameters.extraCmakeOptions }}
+        EXTRA_RQG_OPTIONS: ${{ parameters.extraRQGOptions }}
+        EXTRA_MYSQLD_OPTIONS: ${{ parameters.extraMySQLdOptions }}
+        DEF_BASEDIR: ${{ parameters.defBaseDir }}
+        DEF_TOOLBOX_DIR: ${{ parameters.defToolboxDir }}
+        DEF_RQG_HOME: ${{ parameters.defRQGHome }}
+        DEF_LOGDIR: ${{ parameters.defLogDir }}
+        OOPT1: ${{ parameters.opt1 }}
+        OOPT2: ${{ parameters.opt2 }}
+        OOPT3: ${{ parameters.opt3 }}
