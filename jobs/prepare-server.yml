@@ -30,7 +30,7 @@ jobs:
   # Make sure that required parameters are defined
   - bash: |
       if [ -z "$SERVER_BRANCH" ]; then
-        echo ##vso[task.complete result=Failed;]Missing template parameter \"serverBranch\"
+        echo "##vso[task.complete result=Failed;]Missing template parameter \"serverBranch\""
       fi
     env:
       SERVER_BRANCH: '${{ parameters.serverBranch }}'
@@ -41,7 +41,7 @@ jobs:
   - bash: |
       rev=`wget -O - $SERVER_REPO/tree/$SERVER_BRANCH | grep -A 1 "Latest commit$" | tail -n 1 | sed -e 's/.*commit\/\(.*\)\".*/\1/' | cut -c 1-8`
       if [ -z "$rev" ]; then
-        echo ##vso[task.complete result=Failed;]Could not find head revision for branch $SERVER_BRANCH
+        echo "##vso[task.complete result=Failed;]Could not find head revision for branch $SERVER_BRANCH"
       fi
       echo Head revision for branch $SERVER_BRANCH: $rev
       echo "##vso[task.setvariable variable=headRevision]$rev"
@@ -62,12 +62,12 @@ jobs:
       cmake_options_hash=`echo "$CMAKE_OPTIONS" | md5sum | awk '{print $1}'`
       filename=build-$SERVER_BRANCH-$SERVER_REVISION-$cmake_options_hash
       echo "Bintar filename to search for: $filename"
-      echo ##vso[task.setvariable variable=bintarName]$filename
+      echo "##vso[task.setvariable variable=bintarName]$filename"
       cd $(Build.ArtifactStagingDirectory)
       if wget $FTP_DOWNLOAD/$filename.tar.gz ; then
-        echo ##vso[task.setvariable variable=oldBuild]true
+        echo "##vso[task.setvariable variable=oldBuild]true"
       else
-        echo ##vso[task.complete result=Skipped;]Could not find bintar $filename
+        echo "##vso[task.complete result=Skipped]Could not find bintar $filename"
       fi
     env:
       FTP_DOWNLOAD: '${{ parameters.ftpDownload }}'
