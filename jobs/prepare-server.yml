@@ -44,6 +44,7 @@ jobs:
         echo "##vso[task.complete result=Failed]Missing template parameter \"serverBranch\""
       fi
     env:
+      SERVER_BRANCH: $(vars.serverBranch)
     displayName: Check for required parameters
 
   # If server revision is not defined, find the head revision
