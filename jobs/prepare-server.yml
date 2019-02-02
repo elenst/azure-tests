@@ -114,11 +114,11 @@ jobs:
   # Archive newly built binaries
   - task: ArchiveFiles@2
     inputs:
-      rootFolderOrFile: $(BASEDIR)
+      rootFolderOrFile: ${{ parameters.serverBasedir }}
       includeRootFolder: false
       archiveType: 'tar'
       tarCompression: 'gz'
-      archiveFile:  $(Build.ArtifactStagingDirectory)/$(download_bintar.bintarName).tar.gz
+      archiveFile:  $(Build.ArtifactStagingDirectory)/$(bintarName).tar.gz
     displayName: 'Archive build'
     name: archive_build
     condition: ne(variables['download_bintar.oldBuild'], 'true')
