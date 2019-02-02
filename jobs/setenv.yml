@@ -39,10 +39,12 @@ jobs:
 
 - job: ${{ parameters.name }}
   pool:
-    vmImage: 'Ubuntu 16.04'
+    vmImage: ${{ parameters.vmImage }}
 
   steps:
   - template: ../steps/env.yml
     parameters:
-      name: ${{ parameters.taskname }}
+    ${{ each pair in parameters }}:
+      ${{ pair.key }}: ${{ pair.value }}
   - script: printenv
+    displayName: 'Print environment'
