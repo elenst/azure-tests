@@ -4,20 +4,24 @@
 
 parameters:
   vmImage: 'Ubuntu 16.04'
+  name: 'Upload_to_FTP'
   ftpUrl: 'ftp://ftp.askmonty.org'
   ftpDirectory: '/private/azure'
   ftpUser: 'anonymouos'
   ftpPassword: 'foo'
   artifactName: 'build'
+  dependencies: []
 
 jobs:
 
 #-----------------------------------------------------------------------
 # Publish a build artifact to FTP
 
-- job: Upload_Artifact_to_FTP
+- job: ${{ parameters.name }}
   pool:
     vmImage: ${{ parameters.vmImage }}
+
+  dependsOn: ${{ parameters.dependencies }}
 
   steps:
 
