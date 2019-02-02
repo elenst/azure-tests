@@ -46,5 +46,6 @@ jobs:
     parameters:
       ${{ each pair in parameters }}:
         ${{ pair.key }}: ${{ pair.value }}
+      name: ${{ parameters.taskname }}
   - script: printenv
     displayName: 'Print environment'
