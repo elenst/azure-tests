@@ -50,7 +50,7 @@ jobs:
       SERVER_REPO: ${{ parameters.serverRepo }}
     name: head_revision
     displayName: Get head revision
-    condition: eq( ${{ parameters.serverRevision }}, '')
+    condition: eq( '${{ parameters.serverRevision }}', '')
     
   # Check if the server with this revision and cmake options
   # has already been built and stored
