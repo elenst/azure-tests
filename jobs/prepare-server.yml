@@ -33,7 +33,7 @@ jobs:
         echo ##vso[task.complete result=Failed;]Missing template parameter \"serverBranch\"
       fi
     env:
-      SERVER_BRANCH: ${{ parameters.serverBranch }}
+      SERVER_BRANCH: '${{ parameters.serverBranch }}'
     displayName: Check for required parameters
 
   # If server revision is not defined, find the head revision
@@ -46,8 +46,8 @@ jobs:
       echo Head revision for branch $SERVER_BRANCH: $rev
       echo ##vso[task.setvariable variable=revno]$rev
     env:
-      SERVER_BRANCH: ${{ parameters.serverBranch }}
-      SERVER_REPO: ${{ parameters.serverRepo }}
+      SERVER_BRANCH: '${{ parameters.serverBranch }}'
+      SERVER_REPO: '${{ parameters.serverRepo }}'
     name: head_revision
     displayName: Get head revision
     condition: eq( '${{ parameters.serverRevision }}', '')
@@ -66,10 +66,10 @@ jobs:
         echo ##vso[task.complete result=Skipped;]Could not find bintar $filename
       fi
     env:
-      FTP_DOWNLOAD: ${{ parameters.ftpDownload }}
-      SERVER_BRANCH: ${{ parameters.serverBranch }}
-      SERVER_REVISION: coalesce(${{ parameters.serverRevision }}, variables['head_revision.revno'])
-      CMAKE_OPTIONS: ${{ parameters.cmakeOptions }}
+      FTP_DOWNLOAD: '${{ parameters.ftpDownload }}'
+      SERVER_BRANCH: '${{ parameters.serverBranch }}'
+      SERVER_REVISION: coalesce('${{ parameters.serverRevision }}', variables['head_revision.revno'])
+      CMAKE_OPTIONS: '${{ parameters.cmakeOptions }}'
     displayName: Download bintar from FTP
     name: download_bintar
 
@@ -96,14 +96,14 @@ jobs:
       cd $srcdir
       echo $SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $BASEDIR/server.version
     env:
-      BASEDIR: ${{ parameters.serverBasedir }}
+      BASEDIR: '${{ parameters.serverBasedir }}'
       HEAD_REVISION: variables['head_revision.revno']
-      SERVER_REVISION: ${{ parameters.serverRevision }}
-      SERVER_BRANCH: ${{ parameters.serverBranch }}
-      SERVER_REPO: ${{ parameters.serverRepo }}
-      CMAKE_OPTIONS: ${{ parameters.cmakeOptions }}
-      LIBRARIES: ${{ parameters.buildLibraries }}
-      EXTRA_LIBRARIES: ${{ parameters.extraLibraries }}
+      SERVER_REVISION: '${{ parameters.serverRevision }}'
+      SERVER_BRANCH: '${{ parameters.serverBranch }}'
+      SERVER_REPO: '${{ parameters.serverRepo }}'
+      CMAKE_OPTIONS: '${{ parameters.cmakeOptions }}'
+      LIBRARIES: '${{ parameters.buildLibraries }}'
+      EXTRA_LIBRARIES: '${{ parameters.extraLibraries }}'
     condition: ne(variables['download_bintar.oldBuild'], 'true')
     displayName: 'Clone and build server'
     name: build_server
