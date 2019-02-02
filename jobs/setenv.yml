@@ -53,12 +53,11 @@ jobs:
         extra_cmake_options=${EXTRACMAKEOPTIONS:-$PAR_EXTRA_CMAKE_OPTIONS}
         cmake_build_type=${CMAKEBUILDTYPE:-$PAR_CMAKE_BUILD_TYPE}
         if [ -n "$cmake_build_type" ] ; then
-          cmake_extra_options="$cmake_extra_options -DCMAKE_BUILD_TYPE=$cmake_build_type"
+          extra_cmake_options="$extra_cmake_options -DCMAKE_BUILD_TYPE=$cmake_build_type"
         fi
         cmake_with_asan=${CMAKEWITHASAN:-$PAR_CMAKE_WITH_ASAN}
-        echo "CmakeWithASAN: $cmake_with_asan $CMAKEWITHASAN $PAR_CMAKE_WITH_ASAN"
         if [ -n "$cmake_with_asan" ] ; then
-          cmake_extra_options="$cmake_extra_options -DWITH_ASAN=$cmake_with_asan"
+          extra_cmake_options="$extra_cmake_options -DWITH_ASAN=$cmake_with_asan"
         fi
         echo "##vso[task.setvariable variable=cmakeOptions;isOutput=true]${CMAKEOPTIONS:-$PAR_CMAKE_OPTIONS} $extra_cmake_options"
         echo "##vso[task.setvariable variable=rqgOptions;isOutput=true]${RQGOPTIONS:-$PAR_RQG_OPTIONS} ${EXTRARQGOPTIONS:-$PAR_EXTRA_RQG_OPTIONS}"
