@@ -1,0 +1,129 @@
+########################################################################
+# Jobs to upload/download MariaDB server binaries to/from FTP,
+# clone code, build server, etc.
+########################################################################
+
+parameters:
+  vmImage: 'Ubuntu 16.04'
+  serverBranch: ''
+  serverRevision: ''
+  serverRepo: 'https://github.com/MariaDB/server'
+  cmakeOptions: ''
+  ftpUpload: 'ftp://ftp.askmonty.org/private/azure'
+  ftpDownload: 'ftp://ftp.askmonty.org/public/azure'
+  serverBasedir: $(HOME)/server
+  buildLibraries: 'apt-utils build-essential cmake python-dev sudo git devscripts equivs libcurl4-openssl-dev ccache python3 python3-pip curl libssl-dev libzstd-dev libevent-dev dpatch gawk gdb libboost-dev libcrack2-dev libjudy-dev libnuma-dev libsnappy-dev libxml2-dev unixodbc-dev uuid-dev fakeroot iputils-ping libncurses5-dev libbison-dev'
+  extraLibraries: ''
+
+jobs:
+
+#-----------------------------------------------------------------------
+# Try to download the server from FTP;
+# if not found, then clone and build
+
+- job: Download_or_Build
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+
+  steps:
+
+  # Make sure that required parameters are defined
+  - bash: |
+      if [ -z "$SERVER_BRANCH" ]; then
+        echo ##vso[task.complete result=Failed;]Missing template parameter \"serverBranch\"
+      fi
+    env:
+      SERVER_BRANCH: ${{ parameters.serverBranch }}
+    displayName: Check for required parameters
+
+  # If server revision is not defined, find the head revision
+  # for the given branch on Github
+  - bash: |
+      rev=`wget -O - $SERVER_REPO/tree/$SERVER_BRANCH | grep -A 1 "Latest commit$" | tail -n 1 | sed -e 's/.*commit\/\(.*\)\".*/\1/' | cut -c 1-8`
+      if [ -z "$rev" ]; then
+        echo ##vso[task.complete result=Failed;]Could not find head revision for branch $SERVER_BRANCH
+      fi
+      echo Head revision for branch $SERVER_BRANCH: $rev
+      echo ##vso[task.setvariable variable=revno]$rev
+    env:
+      SERVER_BRANCH: ${{ parameters.serverBranch }}
+      SERVER_REPO: ${{ parameters.serverRepo }}
+    name: head_revision
+    displayName: Get head revision
+    condition: eq( ${{ parameters.serverRevision }}, '')
+    
+  # Check if the server with this revision and cmake options
+  # has already been built and stored
+  - bash: |
+      cmake_options_hash=`echo "$CMAKE_OPTIONS" | md5sum | awk '{print $1}'`
+      filename=build-$SERVER_BRANCH-$SERVER_REVISION-$cmake_options_hash
+      echo "Bintar filename to search for: $filename"
+      echo ##vso[task.setvariable variable=bintarName]$filename
+      cd $(Build.ArtifactStagingDirectory)
+      if wget $FTP_DOWNLOAD/$filename.tar.gz ; then
+        echo ##vso[task.setvariable variable=oldBuild]true
+      else
+        echo ##vso[task.complete result=Skipped;]Could not find bintar $filename
+      fi
+    env:
+      FTP_DOWNLOAD: ${{ parameters.ftpDownload }}
+      SERVER_BRANCH: ${{ parameters.serverBranch }}
+      SERVER_REVISION: coalesce(${{ parameters.serverRevision }}, variables['head_revision.revno'])
+      CMAKE_OPTIONS: ${{ parameters.cmakeOptions }}
+    displayName: Download bintar from FTP
+    name: download_bintar
+
+  # If bintar was not found, install libraries, clone and build server
+  - bash: |
+      srcdir=$HOME/src
+      builddir=$HOME/out-of-source
+      
+      # In case of head revision, we don't need to clone the whole history
+      if [ -z "$SERVER_REVISION" ] || [ "$HEAD_REVISION" == "$SERVER_REVISION" ] ; then
+        git clone $SERVER_REPO --depth=1 --branch=$SERVER_BRANCH $HOME/src
+      else
+        git clone $SERVER_REPO --branch=$SERVER_BRANCH $HOME/src
+        cd $(HEAD)/src
+        git checkout $SERVER_REVISION
+      fi
+      sudo apt-get update
+      sudo apt-get install -y -q $LIBRARIES $EXTRA_LIBRARIES
+      mkdir $builddir
+      cd $builddir
+      cmake $srcdir $CMAKE_OPTIONS -DCMAKE_INSTALL_PREFIX=$BASEDIR
+      make -j5
+      make install
+      cd $srcdir
+      echo $SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $BASEDIR/server.version
+    env:
+      BASEDIR: ${{ parameters.serverBasedir }}
+      HEAD_REVISION: variables['head_revision.revno']
+      SERVER_REVISION: ${{ parameters.serverRevision }}
+      SERVER_BRANCH: ${{ parameters.serverBranch }}
+      SERVER_REPO: ${{ parameters.serverRepo }}
+      CMAKE_OPTIONS: ${{ parameters.cmakeOptions }}
+      LIBRARIES: ${{ parameters.buildLibraries }}
+      EXTRA_LIBRARIES: ${{ parameters.extraLibraries }}
+    condition: ne(variables['download_bintar.oldBuild'], 'true')
+    displayName: 'Clone and build server'
+    name: build_server
+
+  # Archive newly built binaries
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: $(BASEDIR)
+      includeRootFolder: false
+      archiveType: 'tar'
+      tarCompression: 'gz'
+      archiveFile:  $(Build.ArtifactStagingDirectory)/$(download_bintar.bintarName).tar.gz
+    displayName: 'Archive build'
+    name: archive_build
+    condition: ne(variables['download_bintar.oldBuild'], 'true')
+
+  # Store bintar as a build artifact
+  # (in any case, be it downloaded or freshly built)
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: 'build'
+    displayName: 'Store build'
