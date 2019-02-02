@@ -55,6 +55,9 @@ jobs:
   # Check if the server with this revision and cmake options
   # has already been built and stored
   - bash: |
+      if [ -z "$SERVER_REVISION" ] ; then
+        SERVER_REVISION=$HEAD_REVISION
+      fi
       cmake_options_hash=`echo "$CMAKE_OPTIONS" | md5sum | awk '{print $1}'`
       filename=build-$SERVER_BRANCH-$SERVER_REVISION-$cmake_options_hash
       echo "Bintar filename to search for: $filename"
@@ -68,7 +71,8 @@ jobs:
     env:
       FTP_DOWNLOAD: '${{ parameters.ftpDownload }}'
       SERVER_BRANCH: '${{ parameters.serverBranch }}'
-      SERVER_REVISION: coalesce('${{ parameters.serverRevision }}', variables['head_revision.revno'])
+      SERVER_REVISION: '${{ parameters.serverRevision }}'
+      HEAD_REVISION: $(head_revision.revno)
       CMAKE_OPTIONS: '${{ parameters.cmakeOptions }}'
     displayName: Download bintar from FTP
     name: download_bintar
@@ -97,7 +101,7 @@ jobs:
       echo $SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $BASEDIR/server.version
     env:
       BASEDIR: '${{ parameters.serverBasedir }}'
-      HEAD_REVISION: variables['head_revision.revno']
+      HEAD_REVISION: $(head_revision.revno)
       SERVER_REVISION: '${{ parameters.serverRevision }}'
       SERVER_BRANCH: '${{ parameters.serverBranch }}'
       SERVER_REPO: '${{ parameters.serverRepo }}'
