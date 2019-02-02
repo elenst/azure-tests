@@ -5,8 +5,8 @@ trigger: none
 jobs:
 
 - template: jobs/setenv.yml
-  condition: false
   parameters:
+    condition: false
     name: setenv
     taskname: env
     rqgOptions: '--duration=300'

@@ -13,6 +13,7 @@
 parameters:
   vmImage: 'Ubuntu 16.04'
   name: 'setenv'
+  condition: succeeded()
   taskname: 'vars'
 
   serverBranch: '10.4'
