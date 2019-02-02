@@ -42,4 +42,4 @@ jobs:
     vmImage: 'Ubuntu 16.04'
 
   steps:
-  - template: steps/env.yml
+  - template: ../steps/env.yml
