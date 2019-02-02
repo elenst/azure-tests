@@ -9,7 +9,7 @@ variables:
   opt3: 'bar'
 
 jobs:
-  job: test
+- job: test
   steps: 
   - script: |
       echo "opt1: $OPT1 opt2: $OPT2 opt3: $OPT3"
