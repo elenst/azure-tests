@@ -36,3 +36,4 @@ jobs:
       password: '${{ parameters.ftpPassword'
       rootDirectory: '$(Build.ArtifactStagingDirectory)/build'
       remoteDirectory: '${{ parameters.ftpDirectory }}'
+    displayName: 'Upload ${{ parameters.artifactName }} to FTP'
