@@ -38,7 +38,6 @@ jobs:
       ${{ each pair in parameters }}:
         ${{ if ne(pair.key, 'name') }}:
           ${{ pair.key }}: ${{ pair.value }}
-      name: 'vars'
 
   # Make sure that required parameters are defined
   - bash: |
@@ -46,7 +45,7 @@ jobs:
         echo "##vso[task.complete result=Failed]Missing template parameter \"serverBranch\""
       fi
     env:
-      SERVER_BRANCH: $(vars.serverBranch)
+      SERVER_BRANCH: $(env.serverBranch)
     displayName: Check for required parameters
 
   # If server revision is not defined, find the head revision
@@ -59,7 +58,7 @@ jobs:
       echo Head revision for branch $SERVER_BRANCH: $rev
       echo "##vso[task.setvariable variable=headRevision]$rev"
     env:
-      SERVER_BRANCH: $(vars.serverBranch)
+      SERVER_BRANCH: $(env.serverBranch)
       SERVER_REPO: '${{ parameters.serverRepo }}'
     displayName: Get head revision
     condition: and(succeeded(), eq( '${{ parameters.serverRevision }}', ''))
@@ -84,9 +83,9 @@ jobs:
       fi
     env:
       FTP_DOWNLOAD: '${{ parameters.ftpDownload }}'
-      SERVER_BRANCH: $(vars.serverBranch)
+      SERVER_BRANCH: $(env.serverBranch)
       SERVER_REVISION: '${{ parameters.serverRevision }}'
-      CMAKE_OPTIONS: $(vars.cmakeOptions)
+      CMAKE_OPTIONS: $(env.cmakeOptions)
     displayName: Download bintar from FTP
     name: download_bintar
     condition: succeeded()
@@ -114,11 +113,11 @@ jobs:
       cd $srcdir
       echo $SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $BASEDIR/server.version
     env:
-      BASEDIR: $(vars.baseDir)
+      BASEDIR: $(env.baseDir)
       SERVER_REVISION: '${{ parameters.serverRevision }}'
-      SERVER_BRANCH: $(vars.serverBranch)
+      SERVER_BRANCH: $(env.serverBranch)
       SERVER_REPO: '${{ parameters.serverRepo }}'
-      CMAKE_OPTIONS: $(vars.cmakeOptions)
+      CMAKE_OPTIONS: $(env.cmakeOptions)
       LIBRARIES: '${{ parameters.buildLibraries }}'
       EXTRA_LIBRARIES: '${{ parameters.extraLibraries }}'
     condition: and(succeeded(), ne(variables['download_bintar.buildFromFTP'], 'true'))

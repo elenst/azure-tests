@@ -12,9 +12,7 @@
 
 parameters:
   vmImage: 'Ubuntu 16.04'
-  name: 'setenv'
   condition: succeeded()
-  taskname: 'vars'
 
   serverBranch: '10.4'
   rqgBranch: 'elenst-dev'
@@ -49,6 +47,5 @@ jobs:
       ${{ each pair in parameters }}:
         ${{ if ne(pair.key, 'name') }}:
           ${{ pair.key }}: ${{ pair.value }}
-      name: ${{ parameters.taskname }}
   - script: printenv
     displayName: 'Print environment'

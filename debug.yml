@@ -44,8 +44,6 @@ jobs:
   condition: false
   steps:
   - template: steps/env.yml
-    parameters:
-      name: env
   - script: |
       echo serverBranch: $(env.serverBranch)
       echo rqgBranch: $(env.rqgBranch)
