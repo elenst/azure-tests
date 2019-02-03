@@ -13,6 +13,6 @@ steps:
   - script: |
       set -x
       sudo apt-get update
-      sudo apt-get install -y -q ${{ parameters.packages }} ${{ extraPackages }}
+      sudo apt-get install -y -q ${{ parameters.packages }} ${{ parameters.extraPackages }}
     displayName: 'Install runtime packages'
     condition: ${{ parameters.condition }}
