@@ -1,0 +1,20 @@
+########################################################################
+# Clone RQG, toolbox etc.
+########################################################################
+
+parameters:
+  condition: succeeded()
+
+steps:
+  - script: |
+      set -x
+      git clone "https://github.com/elenst/mariadb-toolbox" --depth=1 --branch=$(env.toolboxBranch) $(env.toolboxDir)
+      git clone "https://github.com/MariaDB/randgen" --depth=1 --branch=$(env.rqgBranch) $(env.rqgHome)
+      mkdir -p $(env.logDir)
+      mv $(env.baseDir)/server.version $(env.logDir)/versions
+      cd $(env.rqgHome)
+      rqg_rev=`git log -1 --abbrev=8 --pretty="%h"`
+      cd $(env.toolboxDir)
+      echo "$(env.rqgBranch) $rqg_rev mariadb-toolbox:" $(env.toolboxBranch) `git log -1 --abbrev=8 --pretty="%h"` >> $(env.logDir)/versions
+    displayName: 'Clone tools and get versions'
+    condition: ${{ parameters.condition }}

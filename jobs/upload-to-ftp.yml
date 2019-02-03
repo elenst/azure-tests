@@ -21,10 +21,10 @@ jobs:
 - job: ${{ parameters.name }}
   pool:
     vmImage: ${{ parameters.vmImage }}
-  condition: ${{ parameters.condition }}
-
   dependsOn: ${{ parameters.dependencies }}
-
+  condition: ${{ parameters.condition }}
+  # Storing to FTP is "best effort", it shouldn't affect tests
+  continueOnError: true
   steps:
 
   # Get the artifact from build artifacts

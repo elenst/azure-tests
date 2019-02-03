@@ -9,6 +9,8 @@ parameters:
   serverBranch: ''
   serverRevision: ''
   serverRepo: 'https://github.com/MariaDB/server'
+  cmakeBuildType: ''
+  cmakeWithASAN: ''
   cmakeOptions: ''
   ftpDownload: 'ftp://perro.askmonty.org/public/azure'
   serverBasedir: $(HOME)/server

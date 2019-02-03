@@ -1,0 +1,23 @@
+########################################################################
+# Run single RQG test
+########################################################################
+
+parameters:
+  condition: succeeded()
+  grammar: ''
+
+steps:
+  - script: |
+      set -xo pipefail
+      cd $(env.rqgHome)
+      perl ./runall-new.pl \
+        --basedir=$(env.baseDir) \
+        --vardir=$(env.logDir)/vardir \
+        $(env.rqgOptions) \
+        --grammar=$(GRAMMAR) \
+        $(mysqldOptions) \
+        2>&1 | tee $(env.logDir)/trial.log
+    displayName: 'Run RQG test'
+    condition: ${{ parameters.condition }}
+    env:
+      GRAMMAR: ${{ parameters.grammar }}

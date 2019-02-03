@@ -1,0 +1,18 @@
+########################################################################
+# Installs packages needed to run server, MTR and RQG
+# (and possibly other tools)
+########################################################################
+
+parameters:
+  condition: succeeded()
+
+  packages: 'libdbi-perl libdbd-mysql-perl libsnappy1v5 gdb'
+  extraPackages: ''
+  
+steps:
+  - script: |
+      set -x
+      sudo apt-get update
+      sudo apt-get install -y -q ${{ parameters.packages }} ${{ extraPackages }}
+    displayName: 'Install runtime packages'
+    condition: ${{ parameters.condition }}
