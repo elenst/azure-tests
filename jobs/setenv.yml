@@ -12,7 +12,6 @@
 
 parameters:
   vmImage: 'Ubuntu 16.04'
-  name: setenv
   condition: succeeded()
 
   serverBranch: '10.4'

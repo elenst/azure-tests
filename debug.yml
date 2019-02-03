@@ -28,7 +28,7 @@ jobs:
     rqgOptions: '--duration=300'
 
 - job: check_after_job
-  dependsOn: setenv
+  dependsOn: setenv1
   steps:
   - script: |
       echo serverBranch: $(serverBranch)
