@@ -2,6 +2,15 @@
 
 trigger: none
 
+variables:
+  onlyScript: 2
+  onlyOptScript: 2
+  onlyScriptParam: 2
+  optScriptParam: 2
+  emptyOpt: 2
+  emptyScript: ''
+  emptyParam: 2
+
 jobs:
 
 - template: jobs/setenv.yml
