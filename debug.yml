@@ -5,6 +5,8 @@ trigger: none
 jobs:
 
 - template: jobs/setenv.yml
+  parameters:
+    name: setenv1
 
 - job: check_setenv_job
   dependsOn: setenv
