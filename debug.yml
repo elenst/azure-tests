@@ -6,12 +6,12 @@ jobs:
 
 - template: jobs/setenv.yml
 
-- job: check_after_job
+- job: check_setenv_job
   dependsOn: setenv
   steps:
   - script: printenv
   
-- job: check_after_step
+- job: check_env_step
   steps:
   - template: steps/env.yml
   - script: printenv
