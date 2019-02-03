@@ -50,18 +50,19 @@ jobs:
 
   # If server revision is not defined, find the head revision
   # for the given branch on Github
-  - bash: |
-      rev=`wget -O - $SERVER_REPO/tree/$SERVER_BRANCH | grep -A 1 "Latest commit$" | tail -n 1 | sed -e 's/.*commit\/\(.*\)\".*/\1/' | cut -c 1-8`
-      if [ -z "$rev" ]; then
-        echo "##vso[task.complete result=Failed]Could not find head revision for branch $SERVER_BRANCH"
-      fi
-      echo Head revision for branch $SERVER_BRANCH: $rev
-      echo "##vso[task.setvariable variable=headRevision]$rev"
-    env:
-      SERVER_BRANCH: $(env.serverBranch)
-      SERVER_REPO: '${{ parameters.serverRepo }}'
-    displayName: Get head revision
-    condition: and(succeeded(), ${{ eq( parameters.serverRevision, '') }} )
+  - ${{ if eq( parameters.serverRevision, '')) }}
+    - bash: |
+        rev=`wget -O - $SERVER_REPO/tree/$SERVER_BRANCH | grep -A 1 "Latest commit$" | tail -n 1 | sed -e 's/.*commit\/\(.*\)\".*/\1/' | cut -c 1-8`
+        if [ -z "$rev" ]; then
+          echo "##vso[task.complete result=Failed]Could not find head revision for branch $SERVER_BRANCH"
+        fi
+        echo Head revision for branch $SERVER_BRANCH: $rev
+        echo "##vso[task.setvariable variable=headRevision]$rev"
+      env:
+        SERVER_BRANCH: $(env.serverBranch)
+        SERVER_REPO: '${{ parameters.serverRepo }}'
+      displayName: Get head revision
+      condition: succeeded()
 
   # Check if the server with this revision and cmake options
   # has already been built and stored
