@@ -21,68 +21,68 @@ jobs:
 ########################################################################
 # Experiments with templates (disabled now by condition: false)
 
-- template: jobs/setenv.yml
-  parameters:
-    condition: false
-    taskname: env
-    rqgOptions: '--duration=300'
+#- template: jobs/setenv.yml
+#  parameters:
+#    condition: false
+#    taskname: env
+#    rqgOptions: '--duration=300'
 
-- job: check_after_job
-  dependsOn: setenv
-  steps:
-  - script: |
-      echo serverBranch: $(serverBranch)
-      echo rqgBranch: $(rqgBranch)
-      echo toolboxBranch: $(toolboxBranch)
-      echo cmakeOptions: $(cmakeOptions)
-      echo rqgOptions: $(rqgOptions)
-      echo mysqldOptions: $(mysqldOptions)
-      echo baseDir: $(baseDir)
-      echo toolboxDir: $(toolboxDir)
-      echo rqgHome: $(rqgHome)
-      echo logDir: $(logDir)
-  variables:
-    serverBranch: $[ dependencies.setenv.outputs['env.serverBranch' ] ]
-    rqgBranch: $[ dependencies.setenv.outputs['env.rqgBranch' ] ]
-    toolboxBranch: $[ dependencies.setenv.outputs['env.toolboxBranch' ] ]
-    cmakeOptions: $[ dependencies.setenv.outputs['env.cmakeOptions' ] ]
-    rqgOptions: $[ dependencies.setenv.outputs['env.rqgOptions' ] ]
-    mysqldOptions: $[ dependencies.setenv.outputs['env.mysqldOptions' ] ]
-    baseDir: $[ dependencies.setenv.outputs['env.baseDir' ] ]
-    toolboxDir: $[ dependencies.setenv.outputs['env.toolboxDir' ] ]
-    rqgHome: $[ dependencies.setenv.outputs['env.rqgHome' ] ]
-    logDir: $[ dependencies.setenv.outputs['env.logDir' ] ]
+#- job: check_after_job
+#  dependsOn: setenv
+#  steps:
+#  - script: |
+#      echo serverBranch: $(serverBranch)
+#      echo rqgBranch: $(rqgBranch)
+#      echo toolboxBranch: $(toolboxBranch)
+#      echo cmakeOptions: $(cmakeOptions)
+#      echo rqgOptions: $(rqgOptions)
+#      echo mysqldOptions: $(mysqldOptions)
+#      echo baseDir: $(baseDir)
+#      echo toolboxDir: $(toolboxDir)
+#      echo rqgHome: $(rqgHome)
+#      echo logDir: $(logDir)
+#  variables:
+#    serverBranch: $[ dependencies.setenv.outputs['env.serverBranch' ] ]
+#    rqgBranch: $[ dependencies.setenv.outputs['env.rqgBranch' ] ]
+#    toolboxBranch: $[ dependencies.setenv.outputs['env.toolboxBranch' ] ]
+#    cmakeOptions: $[ dependencies.setenv.outputs['env.cmakeOptions' ] ]
+#    rqgOptions: $[ dependencies.setenv.outputs['env.rqgOptions' ] ]
+#    mysqldOptions: $[ dependencies.setenv.outputs['env.mysqldOptions' ] ]
+#    baseDir: $[ dependencies.setenv.outputs['env.baseDir' ] ]
+#    toolboxDir: $[ dependencies.setenv.outputs['env.toolboxDir' ] ]
+#    rqgHome: $[ dependencies.setenv.outputs['env.rqgHome' ] ]
+#    logDir: $[ dependencies.setenv.outputs['env.logDir' ] ]
 
-- job: check_after_task
-  condition: false
-  steps:
-  - template: steps/env.yml
-  - script: |
-      echo serverBranch: $(env.serverBranch)
-      echo rqgBranch: $(env.rqgBranch)
-      echo toolboxBranch: $(env.toolboxBranch)
-      echo cmakeOptions: $(env.cmakeOptions)
-      echo rqgOptions: $(env.rqgOptions)
-      echo mysqldOptions: $(env.mysqldOptions)
-      echo baseDir: $(env.baseDir) $(env.BASEDIR) $ENV_BASEDIR
-      echo toolboxDir: $(env.toolboxDir)
-      echo rqgHome: $(env.rqgHome)
-      echo logDir: $(env.logDir)
+#- job: check_after_task
+#  condition: false
+#  steps:
+#  - template: steps/env.yml
+#  - script: |
+#      echo serverBranch: $(env.serverBranch)
+#      echo rqgBranch: $(env.rqgBranch)
+#      echo toolboxBranch: $(env.toolboxBranch)
+#      echo cmakeOptions: $(env.cmakeOptions)
+#      echo rqgOptions: $(env.rqgOptions)
+#      echo mysqldOptions: $(env.mysqldOptions)
+#      echo baseDir: $(env.baseDir) $(env.BASEDIR) $ENV_BASEDIR
+#      echo toolboxDir: $(env.toolboxDir)
+#      echo rqgHome: $(env.rqgHome)
+#      echo logDir: $(env.logDir)
 
 ########################################################################
 # Experiments with server building and uploading
 # (disabled by condition: false)
 
-- template: jobs/prepare-server.yml
-  parameters:
-    name: 'Download_or_Build_Server'
-    condition: false
+#- template: jobs/prepare-server.yml
+#  parameters:
+#    name: 'Download_or_Build_Server'
+#    condition: false
 #    serverBranch: $(serverBranch)
 #    cmakeOptions: '-DPLUGIN_CASSANDRA=NO -DPLUGIN_CONNECT=NO -DPLUGIN_FEDERATED=NO -DPLUGIN_FEDERATEDX=NO -DPLUGIN_MROONGA=NO -DPLUGIN_ROCKSDB=NO -DPLUGIN_SPHINX=NO -DPLUGIN_SPIDER=NO #-DPLUGIN_TOKUDB=NO -DWITH_MARIABACKUP=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_ASAN=NO'
 
-- template: jobs/upload-to-ftp.yml
-  parameters:
-    condition: false
-    dependencies:
-    - 'Download_or_Build_Server'
+#- template: jobs/upload-to-ftp.yml
+#  parameters:
+#    condition: false
+#    dependencies:
+#    - 'Download_or_Build_Server'
 #    condition: and(succeeded(), ne(dependencies.Download_or_Build_Server.outputs['download_bintar.buildFromFTP'], 'true'))
