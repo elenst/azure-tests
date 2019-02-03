@@ -60,9 +60,6 @@ jobs:
         echo "##vso[task.setvariable variable=headRevision]$rev"
       displayName: Get head revision
       condition: succeeded()
-    env:
-      SERVER_BRANCH: $(env.serverBranch)
-      SERVER_REPO: '${{ parameters.serverRepo }}'
 
   # Check if the server with this revision and cmake options
   # has already been built and stored
