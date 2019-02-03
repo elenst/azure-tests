@@ -22,7 +22,6 @@ jobs:
 - template: jobs/setenv.yml
   parameters:
     condition: false
-    name: setenv
     taskname: env
     rqgOptions: '--duration=300'
 
