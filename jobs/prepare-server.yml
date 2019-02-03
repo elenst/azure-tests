@@ -48,12 +48,11 @@ jobs:
       SERVER_BRANCH: $(env.serverBranch)
     displayName: Check for required parameters
 
-  - script: |
-      echo parameters.serverRevision: $SERVER_REVISION Branch: $SERVER_BRANCH Repo: $SERVER_REPO
-    env:
-      SERVER_REVISION: '${{ parameters.serverRevision }}'
-      SERVER_BRANCH: '${{ parameters.serverBranch }}'
-      SERVER_REPO: '${{ parameters.serverRepo }}'
+  - ${{ if and(ne( parameters.serverRevision, ''),ne( parameters.serverRevision, Null)) }}:
+    - script: |
+        echo parameters.serverRevision: $SERVER_REVISION
+      env:
+        SERVER_REVISION: '${{ parameters.serverRevision }}'
 
   # If server revision is not defined, find the head revision
   # for the given branch on Github
