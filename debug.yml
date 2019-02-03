@@ -4,6 +4,19 @@ trigger: none
 
 jobs:
 
+- template: jobs/setenv.yml
+  dependsOn: setenv
+
+- job: check_after_job
+  dependsOn: setenv
+  steps:
+  - script: printenv
+  
+- job: check_after_step
+  steps:
+  - template: steps/env.yml
+  - script: printenv
+
 ########################################################################
 # Experiments with templates (disabled now by condition: false)
 
