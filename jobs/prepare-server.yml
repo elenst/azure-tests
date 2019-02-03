@@ -61,7 +61,7 @@ jobs:
       SERVER_BRANCH: $(env.serverBranch)
       SERVER_REPO: '${{ parameters.serverRepo }}'
     displayName: Get head revision
-    condition: and(succeeded(), eq( '${{ parameters.serverRevision }}', ''))
+    condition: and(succeeded(), eq( ${{ parameters.serverRevision }}, ''))
 
   # Check if the server with this revision and cmake options
   # has already been built and stored
