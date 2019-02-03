@@ -48,7 +48,7 @@ jobs:
       SERVER_BRANCH: $(env.serverBranch)
     displayName: Check for required parameters
 
-  - ${{ if eq( parameters.serverRevision, '') }}:
+  - ${{ if ne( parameters.serverRevision, '') }}:
     - script: |
         echo parameters.serverRevision: $SERVER_REVISION
       env:
