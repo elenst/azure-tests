@@ -50,7 +50,7 @@ jobs:
 
   # If server revision is not defined, find the head revision
   # for the given branch on Github
-  - ${{ if eq( parameters.serverRevision, '')) }}
+  - ${{ if eq( parameters.serverRevision, '') }}
     - bash: |
         rev=`wget -O - $SERVER_REPO/tree/$SERVER_BRANCH | grep -A 1 "Latest commit$" | tail -n 1 | sed -e 's/.*commit\/\(.*\)\".*/\1/' | cut -c 1-8`
         if [ -z "$rev" ]; then
@@ -60,6 +60,9 @@ jobs:
         echo "##vso[task.setvariable variable=headRevision]$rev"
       displayName: Get head revision
       condition: succeeded()
+      env:
+        SERVER_BRANCH: $(env.serverBranch)
+        SERVER_REPO: '${{ parameters.serverRepo }}'
 
   # Check if the server with this revision and cmake options
   # has already been built and stored
