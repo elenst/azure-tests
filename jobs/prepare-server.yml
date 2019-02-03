@@ -50,7 +50,7 @@ jobs:
 
   # If server revision is not defined, find the head revision
   # for the given branch on Github
-  - ${{ if eq( parameters.serverRevision, '') }}
+  - ${{ if eq( parameters.serverRevision, '') }}:
     - bash: |
         rev=`wget -O - $SERVER_REPO/tree/$SERVER_BRANCH | grep -A 1 "Latest commit$" | tail -n 1 | sed -e 's/.*commit\/\(.*\)\".*/\1/' | cut -c 1-8`
         if [ -z "$rev" ]; then
