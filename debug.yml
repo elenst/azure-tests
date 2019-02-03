@@ -9,7 +9,7 @@ jobs:
     name: setenv1
 
 - job: check_setenv_job
-  dependsOn: setenv
+  dependsOn: setenv1
   steps:
   - script: printenv
   
@@ -28,7 +28,7 @@ jobs:
     rqgOptions: '--duration=300'
 
 - job: check_after_job
-  dependsOn: setenv1
+  dependsOn: setenv
   steps:
   - script: |
       echo serverBranch: $(serverBranch)
