@@ -52,9 +52,9 @@ jobs:
     - script: |
         echo parameters.serverRevision: $SERVER_REVISION Branch: $SERVER_BRANCH Repo: $SERVER_REPO
       env:
-        SERVER_REVISION: ${{ parameters.serverRevision }}
-        SERVER_BRANCH: ${{ parameters.serverBranch }}
-        SERVER_REPO: ${{ parameters.serverRepo }}
+        SERVER_REVISION: '${{ parameters.serverRevision }}'
+        SERVER_BRANCH: '${{ parameters.serverBranch }}'
+        SERVER_REPO: '${{ parameters.serverRepo }}'
 
   # If server revision is not defined, find the head revision
   # for the given branch on Github
