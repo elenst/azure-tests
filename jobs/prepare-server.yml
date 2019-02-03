@@ -7,7 +7,7 @@ parameters:
   name: 'Download_or_Build_Server'
   condition: succeeded()
   serverBranch: ''
-  serverRevision: 'foo'
+  serverRevision: ''
   serverRepo: 'https://github.com/MariaDB/server'
   cmakeBuildType: ''
   cmakeWithASAN: ''
@@ -48,27 +48,20 @@ jobs:
       SERVER_BRANCH: $(env.serverBranch)
     displayName: Check for required parameters
 
-  - ${{ if ne( parameters.serverRevision, 'foo') }}:
-    - script: |
-        echo parameters.serverRevision: \'$SERVER_REVISION\'
-      env:
-        SERVER_REVISION: '${{ parameters.serverRevision }}'
-
   # If server revision is not defined, find the head revision
   # for the given branch on Github
-  - ${{ if eq( parameters.serverRevision, '') }}:
-    - bash: |
-        rev=`wget -O - $SERVER_REPO/tree/$SERVER_BRANCH | grep -A 1 "Latest commit$" | tail -n 1 | sed -e 's/.*commit\/\(.*\)\".*/\1/' | cut -c 1-8`
-        if [ -z "$rev" ]; then
-          echo "##vso[task.complete result=Failed]Could not find head revision for branch $SERVER_BRANCH"
-        fi
-        echo Head revision for branch $SERVER_BRANCH: $rev
-        echo "##vso[task.setvariable variable=headRevision]$rev"
-      displayName: Get head revision
-      condition: succeeded()
-      env:
-        SERVER_BRANCH: $(env.serverBranch)
-        SERVER_REPO: '${{ parameters.serverRepo }}'
+  - bash: |
+      rev=`wget -O - $SERVER_REPO/tree/$SERVER_BRANCH | grep -A 1 "Latest commit$" | tail -n 1 | sed -e 's/.*commit\/\(.*\)\".*/\1/' | cut -c 1-8`
+      if [ -z "$rev" ]; then
+        echo "##vso[task.complete result=Failed]Could not find head revision for branch $SERVER_BRANCH"
+      fi
+      echo Head revision for branch $SERVER_BRANCH: $rev
+      echo "##vso[task.setvariable variable=headRevision]$rev"
+    displayName: Get head revision
+    condition: and(succeeded(), eq(variables['env.serverRevision'],''))
+    env:
+      SERVER_BRANCH: $(env.serverBranch)
+      SERVER_REPO: '${{ parameters.serverRepo }}'
 
   # Check if the server with this revision and cmake options
   # has already been built and stored
