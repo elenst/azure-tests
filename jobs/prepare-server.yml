@@ -7,7 +7,7 @@ parameters:
   name: 'Download_or_Build_Server'
   condition: succeeded()
   serverBranch: ''
-  serverRevision: ''
+  serverRevision: 'foo'
   serverRepo: 'https://github.com/MariaDB/server'
   cmakeBuildType: ''
   cmakeWithASAN: ''
@@ -48,7 +48,7 @@ jobs:
       SERVER_BRANCH: $(env.serverBranch)
     displayName: Check for required parameters
 
-  - ${{ if ne( parameters.serverRevision, '') }}:
+  - ${{ if ne( parameters.serverRevision, 'foo') }}:
     - script: |
         echo parameters.serverRevision: \'$SERVER_REVISION\'
       env:
