@@ -71,7 +71,7 @@ jobs:
   parameters:
     name: 'Download_or_Build_Server'
     serverBranch: $(serverBranch)
-    serverRevision: $(serverRevision)
+#    serverRevision: $(serverRevision)
     cmakeBuildType: $(cmakeBuildType)
     cmakeWithASAN: $(cmakeWithASAN)
     cmakeOptions: $(cmakeOptions)
