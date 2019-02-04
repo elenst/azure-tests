@@ -48,7 +48,7 @@ jobs:
         echo "##vso[task.complete result=Failed]Could not find head revision for branch $ENV_SERVER_BRANCH"
       fi
       echo Head revision for branch $ENV_SERVER_BRANCH: $rev
-      echo "##vso[task.setvariable variable=REVISION]$rev"
+      echo "##vso[task.setvariable variable=REVISION;isOutput=true]$rev"
     name: headrev
     displayName: Get head revision
     condition: and(succeeded(), eq(variables['env.SERVER_REVISION'],''))
