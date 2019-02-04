@@ -97,6 +97,7 @@ jobs:
       fi
       sudo apt-get update
       sudo apt-get install -y -q $PAR_LIBRARIES $PAR_EXTRA_LIBRARIES
+      set -x
       mkdir $builddir
       cd $builddir
       cmake $srcdir $ENV_CMAKE_OPTIONS -DCMAKE_INSTALL_PREFIX=$ENV_BASEDIR
