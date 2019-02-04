@@ -39,7 +39,7 @@ jobs:
       ${{ each pair in parameters }}:
         ${{ if notIn(pair.key, 'dependencies','name','condition') }}:
           ${{ pair.key }}: ${{ pair.value }}
-        AAA: 'foo'
+      AAA: 'foo'
 
   # Make sure that required parameters are defined
   - bash: |
