@@ -30,7 +30,7 @@ jobs:
   - template: ../steps/env.yml
     parameters:
       ${{ each pair in parameters }}:
-        ${{ if notIn(pair.key, ('dependencies','name','condition') }}:
+        ${{ if notIn(pair.key, 'dependencies','name','condition') }}:
           ${{ pair.key }}: ${{ pair.value }}
 
   # Make sure that required parameters are defined
