@@ -4,14 +4,21 @@ trigger: none
 
 variables:
   onlyScript: 2
-  onlyOptScript: 2
-  onlyScriptParam: 2
-  optScriptParam: 2
+  optScript: 2
   emptyOpt: 2
   emptyScript: ''
-  emptyParam: 2
 
 jobs:
+
+- job: check_direct
+  steps:
+  - script: printenv
+    env:
+      VAR_ONLYOPT: $(onlyOpt)
+      VAR_ONLYSCRIPT: $(onlyScript)
+      VAR_OPTSCRIPT: $(optScript)
+      VAR_EMPTYOPT: $(emptyOpt)
+      VAR_EMPTYSCRIPT: $(emptyScript)
 
 - template: jobs/setenv.yml
   parameters:
