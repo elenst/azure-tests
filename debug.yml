@@ -2,33 +2,8 @@
 
 trigger: none
 
-variables:
-  onlyScript: 2
-  optScript: 2
-  emptyOpt: 2
-  emptyScript: ''
-
 jobs:
 
-- job: check_direct
-  steps:
-  - script: printenv
-    env:
-      VAR_ONLYOPT: $(onlyOpt)
-      VAR_ONLYSCRIPT: $(onlyScript)
-      VAR_OPTSCRIPT: $(optScript)
-      VAR_EMPTYOPT: $(emptyOpt)
-      VAR_EMPTYSCRIPT: $(emptyScript)
-
-- template: jobs/setenv.yml
-  parameters:
-    name: setenv1
-
-- job: check_setenv_job
-  dependsOn: setenv1
-  steps:
-  - script: printenv
-  
 - job: check_env_step
   steps:
   - template: steps/env.yml
