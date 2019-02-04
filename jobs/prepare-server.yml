@@ -58,7 +58,7 @@ jobs:
   # Check if the server with this revision and cmake options
   # has already been built and stored
   - bash: |
-      server_revision=$(ENV_SERVER_REVISION:-$HEADREV_REVISION}
+      server_revision=${ENV_SERVER_REVISION:-$HEADREV_REVISION}
       cmake_options_hash=`echo "$ENV_CMAKE_OPTIONS" | md5sum | awk '{print $1}'`
       filename=build-$ENV_SERVER_BRANCH-$server_revision-$cmake_options_hash
       echo "Bintar filename to search for: $filename"
