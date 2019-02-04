@@ -28,9 +28,6 @@ jobs:
   steps:
 
   - template: ../steps/env.yml
-    parameters:
-      ${{ each pair in parameters }}:
-        ${{ pair.key }}: ${{ pair.value }}
 
   # Make sure that required parameters are defined
   - bash: |
