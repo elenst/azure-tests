@@ -1,23 +1,21 @@
 ########################################################################
-# Run single RQG test
+# Run single RQG test and collect test result information
 ########################################################################
 
 parameters:
   condition: succeeded()
-  grammar: ''
 
 steps:
   - script: |
+      mkdir -p $ENV_LOGDIR
       set -xo pipefail
-      cd $(env.rqgHome)
+      cd $ENV_RQG_HOME
       perl ./runall-new.pl \
-        --basedir=$(env.baseDir) \
-        --vardir=$(env.logDir)/vardir \
-        $(env.rqgOptions) \
-        --grammar=$(GRAMMAR) \
-        $(mysqldOptions) \
-        2>&1 | tee $(env.logDir)/trial.log
+        --basedir=$ENV_BASEDIR \
+        --vardir=$ENV_LOGDIR/vardir \
+        $ENV_RQG_OPTIONS \
+        2>&1 | tee $ENV_LOGDIR/trial.log
     displayName: 'Run RQG test'
     condition: ${{ parameters.condition }}
-    env:
-      GRAMMAR: ${{ parameters.grammar }}
+
+  - template: rqg-test-result.yml

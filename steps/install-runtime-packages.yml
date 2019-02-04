@@ -6,13 +6,16 @@
 parameters:
   condition: succeeded()
 
-  packages: 'libdbi-perl libdbd-mysql-perl libsnappy1v5 gdb'
-  extraPackages: ''
+  PACKAGES: 'libdbi-perl libdbd-mysql-perl libsnappy1v5 gdb'
+  EXTRA_PACKAGES: ''
   
 steps:
   - script: |
       set -x
       sudo apt-get update
-      sudo apt-get install -y -q ${{ parameters.packages }} ${{ parameters.extraPackages }}
+      sudo apt-get install -y -q $PAR_PACKAGES $PAR_EXTRA_PACKAGES
     displayName: 'Install runtime packages'
     condition: ${{ parameters.condition }}
+    env:
+      PAR_PACKAGES: ${{ parameters.PACKAGES }}
+      PAR_EXTRA_PACKAGES: ${{ parameters.EXTRA_PACKAGES }}

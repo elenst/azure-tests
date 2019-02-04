@@ -8,13 +8,11 @@ parameters:
 steps:
   - script: |
       set -x
-      git clone "https://github.com/elenst/mariadb-toolbox" --depth=1 --branch=$(env.toolboxBranch) $(env.toolboxDir)
-      git clone "https://github.com/MariaDB/randgen" --depth=1 --branch=$(env.rqgBranch) $(env.rqgHome)
-      mkdir -p $(env.logDir)
-      mv $(env.baseDir)/server.version $(env.logDir)/versions
-      cd $(env.rqgHome)
-      rqg_rev=`git log -1 --abbrev=8 --pretty="%h"`
-      cd $(env.toolboxDir)
-      echo "$(env.rqgBranch) $rqg_rev mariadb-toolbox:" $(env.toolboxBranch) `git log -1 --abbrev=8 --pretty="%h"` >> $(env.logDir)/versions
+      git clone "https://github.com/elenst/mariadb-toolbox" --depth=1 --branch=$ENV_TOOLBOX_BRANCH $ENV_TOOLBOX_DIR
+      git clone "https://github.com/MariaDB/randgen" --depth=1 --branch=$ENV_RQG_BRANCH $ENV_RQG_HOME
+      cd $ENV_RQG_HOME
+      echo $ENV_RQG_BRANCH `git log -1 --abbrev=8 --pretty="%h" > $ENV_RQG_HOME/rqg.info
+      cd $ENV_TOOLBOX_DIR
+      echo $ENV_TOOLBOX_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_TOOLBOX_DIR/toolbox.info
     displayName: 'Clone tools and get versions'
     condition: ${{ parameters.condition }}

@@ -1,0 +1,46 @@
+########################################################################
+# Collect results of all test runs and print the report
+########################################################################
+
+parameters:
+  vmImage: 'Ubuntu 16.04'
+  condition: always()
+  dependencies: []
+
+jobs:
+
+- job: Print_Summary
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+  condition: ${{ parameters.condition }}
+  dependsOn: ${{ parameters.dependencies }}
+
+  steps:
+
+  - template: ../steps/env.yml
+
+  # Collect test summaries stored as artifacts
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      downloadType: 'specific'
+      itemPattern: summary-*/**/test_report
+      downloadPath: $(Build.ArtifactStagingDirectory)
+    displayName: 'Download test reports from artifacts'
+
+  # Print the summary
+  - script: |
+      echo
+      echo "####################################################################################################"
+      echo "SUMMARY:"
+      echo "Server branch $ENV_SERVER_BRANCH $ENV_CMAKE_OPTIONS"
+      echo ""
+      echo "Found" `ls $(Build.ArtifactStagingDirectory)/*/test_result | wc -l` "test result(s)"
+      grep 'Test result: ' $(Build.ArtifactStagingDirectory)/*/test_result | sed -e 's/Test result: //g' | sort | uniq -c
+      for f in $(Build.ArtifactStagingDirectory)/*/test_result ; do
+        echo
+        echo "### $f"
+        cat $f
+      done
+    displayName: 'Test report'
+    condition: ${{ parameters.condition }}
+

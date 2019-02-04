@@ -8,31 +8,15 @@ trigger: none
 
 variables:
 
-  # Default git branches
-  serverBranch: 10.4
-  serverRevision: ''
-  rqgBranch: elenst-dev
-  toolboxBranch: master
+  CMAKE_BUILD_TYPE: Debug
+  CMAKE_OPTIONS: "-DPLUGIN_SPHINX=NO -DPLUGIN_OQGRAPH=NO -DPLUGIN_TOKUDB=NO -DPLUGIN_MROONGA=NO -DPLUGIN_FEDERATED=NO -DPLUGIN_FEDERATEDX=NO -DPLUGIN_CONNECT=NO -DPLUGIN_SPIDER=NO -DPLUGIN_ROCKSDB=NO -DWITH_MARIABACKUP=OFF"
 
-  # Default cmake options
-  cmakeBuildType: Debug
-  cmakeWithASAN: NO
-
-  # Common cmake options (can be overridden by namesake options, or extended by extraCmakeOptions)
-  cmakeOptions: "-DPLUGIN_SPHINX=NO -DPLUGIN_OQGRAPH=NO -DPLUGIN_TOKUDB=NO -DPLUGIN_MROONGA=NO -DPLUGIN_FEDERATED=NO -DPLUGIN_FEDERATEDX=NO -DPLUGIN_CONNECT=NO -DPLUGIN_SPIDER=NO -DPLUGIN_ROCKSDB=NO -DWITH_MARIABACKUP=OFF"
-
-  testDuration: 400
-  testThreads: 6
-  # 'true' means --views, 'false' means the absence of the option on the final command line,
-  # other values mean --views=<value>
-  # Same for --vcols
-  testViews: true
-  testVcols: false
-  # If set, it will override any engine settings in the matrix
-  testEngine: ''
+  RQG_DURATION: 400
+  RQG_THREADS: 6
+  RQG_VIEWS: '--views'
 
   # --redefine=conf/mariadb/modules/acl.yy disabled due to MDEV-18003
-  testRedefines: "\
+  RQG_REDEFINES: "\
     --redefine=conf/mariadb/bulk_insert.yy \
     --redefine=conf/mariadb/modules/sql_mode.yy \
     --redefine=conf/mariadb/alter_table.yy \
@@ -47,15 +31,12 @@ variables:
     --redefine=conf/mariadb/sequences.yy \
     --redefine=conf/mariadb/modules/locks-10.4-extra.yy \
   "
-  # Common RQG options (can be overridden by namesake options, or extended by extraRqgOptions)
-  rqgOptions: "\
+  RQG_OPTIONS: "\
     --seed=time \
     --reporters=Backtrace,ErrorLog,Deadlock \
-    --views \
     --filter=conf/mariadb/10.4-combo-filter.ff \
   "
-  # Common MySQLd options (can be overridden by namesake options, or extended by extraMysqldOptions)
-  defaultMysqldOptions: "\
+  MYSQLD_OPTIONS: "\
     --mysqld=--log_output=FILE \
     --mysqld=--loose-max-statement-time=20 \
     --mysqld=--lock-wait-timeout=10 \
@@ -70,11 +51,6 @@ jobs:
 - template: jobs/prepare-server.yml
   parameters:
     name: 'Download_or_Build_Server'
-    serverBranch: $(serverBranch)
-    serverRevision: $(serverRevision)
-    cmakeBuildType: $(cmakeBuildType)
-    cmakeWithASAN: $(cmakeWithASAN)
-    cmakeOptions: $(cmakeOptions)
 
 #########
 # Upload to FTP
@@ -82,7 +58,7 @@ jobs:
   parameters:
     dependencies:
     - 'Download_or_Build_Server'
-    condition: and(succeeded(), ne(dependencies.Download_or_Build_Server.outputs['download_bintar.buildFromFTP'], 'true'))
+    condition: and(succeeded(), ne(dependencies.Download_or_Build_Server.outputs['ftp_download.BINARIES_FROM_FTP'], 'true'))
 
 #########
 - job: Test
@@ -92,148 +68,179 @@ jobs:
 
   strategy:
     matrix:
+
       'test001':
-        GRAMMAR: 'conf/runtime/metadata_stability.yy'
-        extraRqgOptions: "--gendata=conf/runtime/metadata_stability.zz"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/runtime/metadata_stability.yy'
+        RQG_GENDATA: 'conf/runtime/metadata_stability.zz'
+
       'test002':
-        GRAMMAR: 'conf/runtime/performance_schema.yy'
-        extraMysqldOptions: "--mysqld=--performance-schema"
+        RQG_GRAMMAR: 'conf/runtime/performance_schema.yy'
+        MYSQLD_EXTRA_OPTIONS: '--mysqld=--performance-schema'
+
       'test003':
-        GRAMMAR: 'conf/runtime/information_schema.yy'
-        extraRqgOptions: ""
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/runtime/information_schema.yy'
+
       'test004':
-        GRAMMAR: 'conf/engines/many_indexes.yy'
-        extraRqgOptions: "--gendata=conf/engines/many_indexes.zz --engine=InnoDB"
+        RQG_GRAMMAR: 'conf/engines/many_indexes.yy'
+        RQG_GENDATA: 'conf/engines/many_indexes.zz'
+        RQG_ENGINE: InnoDB
+
       'test005':
-        GRAMMAR: 'conf/engines/many_indexes.yy'
-        extraRqgOptions: "--gendata=conf/engines/many_indexes.zz --engine=Aria"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/engines/many_indexes.yy'
+        RQG_GENDATA: 'conf/engines/many_indexes.zz'
+        RQG_ENGINE: Aria
+
       'test006':
-        GRAMMAR: 'conf/engines/engine_stress.yy'
-        extraRqgOptions: "--gendata=conf/engines/engine_stress.zz --engine=InnoDB"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
+        RQG_GENDATA: 'conf/engines/engine_stress.zz'
+        RQG_ENGINE: InnoDB
+
       'test007':
-        GRAMMAR: 'conf/engines/engine_stress.yy'
-        extraRqgOptions: "--gendata=conf/engines/engine_stress.zz --engine=Aria"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
+        RQG_GENDATA: 'conf/engines/engine_stress.zz'
+        RQG_ENGINE: Aria
+
       'test008':
-        GRAMMAR: 'conf/engines/engine_stress.yy'
-        extraRqgOptions: "--gendata=conf/engines/engine_stress.zz --engine=MyISAM"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
+        RQG_GENDATA: 'conf/engines/engine_stress.zz'
+        RQG_ENGINE: MyISAM
+
       'test009':
-        GRAMMAR: 'conf/partitioning/partitions.yy'
-        extraRqgOptions: "--engine=InnoDB"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/partitioning/partitions.yy'
+        RQG_ENGINE: InnoDB
+
       'test010':
-        GRAMMAR: 'conf/partitioning/partition_pruning.yy'
-        extraRqgOptions: "--gendata=conf/partitioning/partition_pruning.zz --engine=InnoDB"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/partitioning/partition_pruning.yy'
+        RQG_GENDATA: 'conf/partitioning/partition_pruning.zz'
+        RQG_ENGINE: InnoDB
+
       'test011':
-        GRAMMAR: 'conf/replication/replication.yy'
-        extraRqgOptions: "--gendata=conf/replication/replication-5.1.zz --engine=InnoDB"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/replication/replication.yy'
+        RQG_GENDATA: 'conf/replication/replication-5.1.zz'
+        RQG_ENGINE: InnoDB
+
       'test012':
-        GRAMMAR: 'conf/replication/replication-ddl_sql.yy'
-        extraRqgOptions: "--gendata=conf/replication/replication-ddl_data.zz --engine=InnoDB"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/replication/replication-ddl_sql.yy'
+        RQG_GENDATA: 'conf/replication/replication-ddl_data.zz'
+        RQG_ENGINE: InnoDB
+
       'test013':
-        GRAMMAR: 'conf/replication/replication-dml_sql.yy'
-        extraRqgOptions: "--gendata=conf/replication/replication-dml_data.zz --engine=InnoDB"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/replication/replication-dml_sql.yy'
+        RQG_GENDATA: 'conf/replication/replication-dml_data.zz'
+        RQG_ENGINE: InnoDB
+
       'test014':
-        GRAMMAR: 'conf/runtime/connect_kill_sql.yy'
-        extraRqgOptions: "--gendata=conf/runtime/connect_kill_data.zz --engine=InnoDB"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/runtime/connect_kill_sql.yy'
+        RQG_GENDATA: 'conf/runtime/connect_kill_data.zz'
+        RQG_ENGINE: InnoDB
+
       'test015':
-        GRAMMAR: 'conf/runtime/WL5004_sql.yy'
-        extraRqgOptions: "--gendata=conf/runtime/WL5004_data.zz --engine=InnoDB"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/runtime/WL5004_sql.yy'
+        RQG_GENDATA: 'conf/runtime/WL5004_data.zz'
+        RQG_ENGINE: InnoDB
+
       'test016':
-        GRAMMAR: 'conf/mariadb/optimizer.yy'
-        extraRqgOptions: "--engine=InnoDB"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/mariadb/optimizer.yy'
+        RQG_ENGINE: InnoDB
+
       'test017':
-        GRAMMAR: 'conf/mariadb/optimizer.yy'
-        extraRqgOptions: "--engine=Aria"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/mariadb/optimizer.yy'
+        RQG_ENGINE: Aria
+
       'test018':
-        GRAMMAR: 'conf/mariadb/optimizer.yy'
-        extraRqgOptions: "--engine=MyISAM"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/mariadb/optimizer.yy'
+        RQG_ENGINE: MyISAM
+
       'test019':
-        GRAMMAR: 'conf/optimizer/updateable_views.yy'
-        extraRqgOptions: "--engine=MyISAM --skip-gendata"
-        extraMysqldOptions: "--mysqld=--init-file=$(RQG_HOME)/conf/optimizer/updateable_views.init --mysqld=--default-storage-engine=MyISAM"
+        RQG_GRAMMAR: 'conf/optimizer/updateable_views.yy'
+        RQG_EXTRA_OPTIONS: '--skip-gendata'
+        MYSQLD_EXTRA_OPTIONS: "--mysqld=--init-file=$ENV_RQG_HOME/conf/optimizer/updateable_views.init --mysqld=--default-storage-engine=MyISAM"
+        RQG_ENGINE: MyISAM
+
       'test020':
-        GRAMMAR: 'conf/mariadb/oltp-transactional.yy'
-        extraRqgOptions: "--gendata=conf/mariadb/oltp.zz --engine=InnoDB"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/mariadb/oltp-transactional.yy'
+        RQG_GENDATA: 'conf/mariadb/oltp.zz'
+        RQG_ENGINE: InnoDB
+
       'test021':
-        GRAMMAR: 'conf/mariadb/oltp-transactional.yy'
-        extraRqgOptions: "--gendata=conf/mariadb/oltp.zz --engine=Aria"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/mariadb/oltp-transactional.yy'
+        RQG_GENDATA: 'conf/mariadb/oltp.zz'
+        RQG_ENGINE: Aria
+
       'test022':
-        GRAMMAR: 'conf/mariadb/oltp.yy'
-        extraRqgOptions: "--gendata=conf/mariadb/oltp.zz --engine=MyISAM"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/mariadb/oltp.yy'
+        RQG_GENDATA: 'conf/mariadb/oltp.zz'
+        RQG_ENGINE: MyISAM
+
       'test023':
-        GRAMMAR: 'conf/mariadb/functions.yy'
-        extraRqgOptions: ""
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/mariadb/functions.yy'
+
       'test024':
-        GRAMMAR: 'conf/runtime/alter_online.yy'
-        extraRqgOptions: "--gendata=conf/runtime/alter_online.zz"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/runtime/alter_online.yy'
+        RQG_GENDATA: 'conf/runtime/alter_online.zz'
+
       'test025':
-        GRAMMAR: 'conf/engines/innodb/full_text_search.yy'
-        extraRqgOptions: "--gendata=conf/engines/innodb/full_text_search.zz --engine=InnoDB"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/engines/innodb/full_text_search.yy'
+        RQG_GENDATA: 'conf/engines/innodb/full_text_search.zz'
+        RQG_ENGINE: InnoDB
+
       'test026':
-        GRAMMAR: 'conf/engines/innodb/full_text_search.yy'
-        extraRqgOptions: "--gendata=conf/engines/innodb/full_text_search.zz --engine=MyISAM"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/engines/innodb/full_text_search.yy'
+        RQG_GENDATA: 'conf/engines/innodb/full_text_search.zz'
+        RQG_ENGINE: MyISAM
+
       'test027':
-        GRAMMAR: 'conf/engines/innodb/full_text_search.yy'
-        extraRqgOptions: "--gendata=conf/engines/innodb/full_text_search.zz --engine=Aria"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/engines/innodb/full_text_search.yy'
+        RQG_GENDATA: 'conf/engines/innodb/full_text_search.zz'
+        RQG_ENGINE: Aria
+
       'test028':
-        GRAMMAR: 'conf/engines/heap/heap_dml_single.yy'
-        extraRqgOptions: "--skip-gendata"
-        extraMysqldOptions: "--mysqld=--init-file=$(RQG_HOME)/conf/engines/heap/heap_dml_single.init"
+        RQG_GRAMMAR: 'conf/engines/heap/heap_dml_single.yy'
+        RQG_EXTRA_OPTIONS: '--skip-gendata'
+        MYSQLD_EXTRA_OPTIONS: "--mysqld=--init-file=$ENV_RQG_HOME/conf/engines/heap/heap_dml_single.init"
+
       'test029':
-        GRAMMAR: 'conf/engines/heap/heap_ddl_multi.yy'
-        extraRqgOptions: "--skip-gendata"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/engines/heap/heap_ddl_multi.yy'
+        RQG_EXTRA_OPTIONS: '--skip-gendata'
+
       'test030':
-        GRAMMAR: 'conf/temporal/temporal_functions.yy'
-        extraRqgOptions: "--gendata=conf/temporal/temporal_functions.zz --engine=InnoDB"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/temporal/temporal_functions.yy'
+        RQG_GENDATA: 'conf/temporal/temporal_functions.zz'
+        RQG_ENGINE: InnoDB
+
       'test031':
-        GRAMMAR: 'conf/temporal/temporal_functions.yy'
-        extraRqgOptions: "--gendata=conf/temporal/temporal_functions.zz --engine=MyISAM"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/temporal/temporal_functions.yy'
+        RQG_GENDATA: 'conf/temporal/temporal_functions.zz'
+        RQG_ENGINE: MyISAM
+
       'test032':
-        GRAMMAR: 'conf/temporal/temporal_functions.yy'
-        extraRqgOptions: "--gendata=conf/temporal/temporal_functions-wl946.zz --duration=1200"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/temporal/temporal_functions.yy'
+        RQG_GENDATA: 'conf/temporal/temporal_functions-wl946.zz'
+        RQG_DURATION: 1200
+
       'test033':
-        GRAMMAR: 'conf/mariadb/generic-dml.yy'
-        extraRqgOptions: "--skip-gendata --gendata-advanced --engine=InnoDB"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/mariadb/generic-dml.yy'
+        RQG_GENDATA: '--gendata-advanced'
+        RQG_EXTRA_OPTIONS: '--skip-gendata'
+        RQG_ENGINE: InnoDB
+
       'test034':
-        GRAMMAR: 'conf/mariadb/generic-dml.yy'
-        extraRqgOptions: "--skip-gendata --gendata-advanced --engine=MyISAM"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/mariadb/generic-dml.yy'
+        RQG_GENDATA: '--gendata-advanced'
+        RQG_EXTRA_OPTIONS: '--skip-gendata'
+        RQG_ENGINE: MyISAM
+
       'test035':
-        GRAMMAR: 'conf/mariadb/generic-dml.yy'
-        extraRqgOptions: "--skip-gendata --gendata-advanced --engine=Aria"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/mariadb/generic-dml.yy'
+        RQG_GENDATA: '--gendata-advanced'
+        RQG_EXTRA_OPTIONS: '--skip-gendata'
+        RQG_ENGINE: Aria
+
       'test036':
-        GRAMMAR: 'conf/mariadb/generic-dml.yy'
-        extraRqgOptions: "--skip-gendata --gendata-advanced --engine=HEAP"
-        extraMysqldOptions: ""
+        RQG_GRAMMAR: 'conf/mariadb/generic-dml.yy'
+        RQG_GENDATA: '--gendata-advanced'
+        RQG_EXTRA_OPTIONS: '--skip-gendata'
+        RQG_ENGINE: HEAP
 
   steps:
 
@@ -248,7 +255,7 @@ jobs:
   - task: ExtractFiles@1
     inputs:
       archiveFilePatterns: '$(Build.ArtifactStagingDirectory)/build/build-*.tar.gz'
-      destinationFolder: $(env.baseDir)
+      destinationFolder: $(env.BASEDIR)
     displayName: 'Extract build'
 
   - template: steps/install-runtime-packages.yml
@@ -256,34 +263,6 @@ jobs:
   - template: steps/clone-test-tools.yml
 
   - template: steps/run-rqg-test.yml
-    parameters:
-      grammar: $(GRAMMAR)
-
-  - template: steps/collect-failure-info.yml
-
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: $(Build.ArtifactStagingDirectory)/result_summary.$(Agent.jobName)
-      artifactName: summary-$(Agent.jobName)
-    displayName: 'Store test result summary'
-    condition: always()
-
-  - task: ArchiveFiles@2
-    inputs:
-      rootFolderOrFile: $(Build.ArtifactStagingDirectory)/logs.$(Agent.jobName)
-      includeRootFolder: true
-      archiveType: 'tar'
-      tarCompression: 'gz'
-      archiveFile:  $(Build.ArtifactStagingDirectory)/data-$(Build.BuildNumber)-$(Agent.jobName).tar.gz
-    displayName: 'Archive test data'
-    condition: always()
-
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: $(Build.ArtifactStagingDirectory)/logs.$(Agent.jobName)
-      artifactName: data-$(Agent.jobName)
-    displayName: 'Store test data'
-    condition: always()
 
 #########
 # Print summary
