@@ -18,8 +18,8 @@ parameters:
   CMAKE_ASAN: ''
   CMAKE_OPTIONS: ''
   CMAKE_EXTRA_OPTIONS: ''
-  BASEDIR: ''
-
+  BASEDIR: $(HOME)/server
+  
 jobs:
 
 #-----------------------------------------------------------------------
@@ -39,6 +39,7 @@ jobs:
       ${{ each pair in parameters }}:
         ${{ if notIn(pair.key, 'dependencies','name','condition') }}:
           ${{ pair.key }}: ${{ pair.value }}
+        AAA: 'foo'
 
   # Make sure that required parameters are defined
   - bash: |
