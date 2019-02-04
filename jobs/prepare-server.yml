@@ -6,16 +6,11 @@ parameters:
   vmImage: 'Ubuntu 16.04'
   name: 'Download_or_Build_Server'
   condition: succeeded()
-  serverBranch: ''
-  serverRevision: ''
-  serverRepo: 'https://github.com/MariaDB/server'
-  cmakeBuildType: ''
-  cmakeWithASAN: ''
-  cmakeOptions: ''
-  ftpDownload: 'ftp://perro.askmonty.org/public/azure'
-  serverBasedir: $(HOME)/server
-  buildLibraries: 'apt-utils build-essential cmake python-dev sudo git devscripts equivs libcurl4-openssl-dev ccache python3 python3-pip curl libssl-dev libzstd-dev libevent-dev dpatch gawk gdb libboost-dev libcrack2-dev libjudy-dev libnuma-dev libsnappy-dev libxml2-dev unixodbc-dev uuid-dev fakeroot iputils-ping libncurses5-dev libbison-dev'
-  extraLibraries: ''
+
+  SERVER_REPO: 'https://github.com/MariaDB/server'
+  FTP_DOWNLOAD: 'ftp://perro.askmonty.org/public/azure'
+  BUILD_LIBRARIES: 'apt-utils build-essential cmake python-dev sudo git devscripts equivs libcurl4-openssl-dev ccache python3 python3-pip curl libssl-dev libzstd-dev libevent-dev dpatch gawk gdb libboost-dev libcrack2-dev libjudy-dev libnuma-dev libsnappy-dev libxml2-dev unixodbc-dev uuid-dev fakeroot iputils-ping libncurses5-dev libbison-dev'
+  EXTRA_LIBRARIES: ''
   dependencies: []
 
 jobs:
@@ -28,7 +23,6 @@ jobs:
   pool:
     vmImage: ${{ parameters.vmImage }}
   condition: ${{ parameters.condition }}
-
   dependsOn: ${{ parameters.dependencies }}
 
   steps:
@@ -36,58 +30,49 @@ jobs:
   - template: ../steps/env.yml
     parameters:
       ${{ each pair in parameters }}:
-        ${{ if ne(pair.key, 'name') }}:
-          ${{ pair.key }}: ${{ pair.value }}
+        ${{ pair.key }}: ${{ pair.value }}
 
   # Make sure that required parameters are defined
   - bash: |
-      if [ -z "$SERVER_BRANCH" ]; then
-        echo "##vso[task.complete result=Failed]Missing template parameter \"serverBranch\""
+      if [ -z "$ENV_SERVER_BRANCH" ]; then
+        echo "##vso[task.complete result=Failed]Missing template parameter \"SERVER_BRANCH\""
       fi
     env:
-      SERVER_BRANCH: $(env.serverBranch)
     displayName: Check for required parameters
 
   # If server revision is not defined, find the head revision
   # for the given branch on Github
   - bash: |
-      rev=`wget -O - $SERVER_REPO/tree/$SERVER_BRANCH | grep -A 1 "Latest commit$" | tail -n 1 | sed -e 's/.*commit\/\(.*\)\".*/\1/' | cut -c 1-8`
+      rev=`wget -O - $PAR_SERVER_REPO/tree/$ENV_SERVER_BRANCH | grep -A 1 "Latest commit$" | tail -n 1 | sed -e 's/.*commit\/\(.*\)\".*/\1/' | cut -c 1-8`
       if [ -z "$rev" ]; then
-        echo "##vso[task.complete result=Failed]Could not find head revision for branch $SERVER_BRANCH"
+        echo "##vso[task.complete result=Failed]Could not find head revision for branch $ENV_SERVER_BRANCH"
       fi
-      echo Head revision for branch $SERVER_BRANCH: $rev
-      echo "##vso[task.setvariable variable=headRevision]$rev"
+      echo Head revision for branch $ENV_SERVER_BRANCH: $rev
+      echo "##vso[task.setvariable variable=REVISION]$rev"
+    name: headrev
     displayName: Get head revision
-    condition: and(succeeded(), eq(variables['env.serverRevision'],''))
+    condition: and(succeeded(), eq(variables['env.SERVER_REVISION'],''))
     env:
-      SERVER_BRANCH: $(env.serverBranch)
-      SERVER_REPO: '${{ parameters.serverRepo }}'
+      PAR_SERVER_REPO: '${{ parameters.SERVER_REPO }}'
 
   # Check if the server with this revision and cmake options
   # has already been built and stored
   - bash: |
-      if [ -z "$SERVER_REVISION" ] ; then
-        echo Setting revision to $(headRevision)
-        SERVER_REVISION=$(headRevision)
-        echo "Revision set to $SERVER_REVISION"
-      fi
-      cmake_options_hash=`echo "$CMAKE_OPTIONS" | md5sum | awk '{print $1}'`
-      filename=build-$SERVER_BRANCH-$SERVER_REVISION-$cmake_options_hash
+      server_revision=$(ENV_SERVER_REVISION:-$HEADREV_REVISION}
+      cmake_options_hash=`echo "$ENV_CMAKE_OPTIONS" | md5sum | awk '{print $1}'`
+      filename=build-$ENV_SERVER_BRANCH-$server_revision-$cmake_options_hash
       echo "Bintar filename to search for: $filename"
-      echo "##vso[task.setvariable variable=bintarName]$filename"
+      echo "##vso[task.setvariable variable=BINTAR_NAME;isOutput=true]$filename"
       cd $(Build.ArtifactStagingDirectory)
-      if wget $FTP_DOWNLOAD/$filename.tar.gz ; then
-        echo "##vso[task.setvariable variable=buildFromFTP;isOutput=true]true"
+      if wget $PAR_FTP_DOWNLOAD/$filename.tar.gz ; then
+        echo "##vso[task.setvariable variable=BINARIES_FROM_FTP;isOutput=true]true"
       else
         echo "##vso[task.complete result=Skipped]Could not find bintar $filename"
       fi
     env:
-      FTP_DOWNLOAD: '${{ parameters.ftpDownload }}'
-      SERVER_BRANCH: $(env.serverBranch)
-      SERVER_REVISION: '${{ parameters.serverRevision }}'
-      CMAKE_OPTIONS: $(env.cmakeOptions)
+      PAR_FTP_DOWNLOAD: '${{ parameters.FTP_DOWNLOAD }}'
     displayName: Download bintar from FTP
-    name: download_bintar
+    name: ftp_download
     condition: succeeded()
 
   # If bintar was not found, install libraries, clone and build server
@@ -96,45 +81,42 @@ jobs:
       builddir=$HOME/out-of-source
       
       # In case of head revision, we don't need to clone the whole history
-      if [ -z "$SERVER_REVISION" ] || [ "$(headRevision)" == "$SERVER_REVISION" ] ; then
-        git clone $SERVER_REPO --depth=1 --branch=$SERVER_BRANCH $HOME/src
+      if [ -z "$ENV_SERVER_REVISION" ] || [ "$HEADREV_REVISION" == "$ENV_SERVER_REVISION" ] ; then
+        git clone $PAR_SERVER_REPO --depth=1 --branch=$ENV_SERVER_BRANCH $srcdir
       else
-        git clone $SERVER_REPO --branch=$SERVER_BRANCH $HOME/src
-        cd $(HOME)/src
-        git checkout $SERVER_REVISION
+        git clone $PAR_SERVER_REPO --branch=$ENV_SERVER_BRANCH $srcdir
+        cd $srcdir
+        git checkout $ENV_SERVER_REVISION
       fi
       sudo apt-get update
-      sudo apt-get install -y -q $LIBRARIES $EXTRA_LIBRARIES
+      sudo apt-get install -y -q $PAR_LIBRARIES $PAR_EXTRA_LIBRARIES
       mkdir $builddir
       cd $builddir
-      cmake $srcdir $CMAKE_OPTIONS -DCMAKE_INSTALL_PREFIX=$BASEDIR
+      cmake $srcdir $ENV_CMAKE_OPTIONS -DCMAKE_INSTALL_PREFIX=$ENV_BASEDIR
       make -j5
       make install
       cd $srcdir
-      echo $SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $BASEDIR/server.version
+      echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_BASEDIR/server.info
+      echo $ENV_CMAKE_OPTIONS >> $ENV_BASEDIR/server.info
     env:
-      BASEDIR: $(env.baseDir)
-      SERVER_REVISION: '${{ parameters.serverRevision }}'
-      SERVER_BRANCH: $(env.serverBranch)
-      SERVER_REPO: '${{ parameters.serverRepo }}'
-      CMAKE_OPTIONS: $(env.cmakeOptions)
-      LIBRARIES: '${{ parameters.buildLibraries }}'
-      EXTRA_LIBRARIES: '${{ parameters.extraLibraries }}'
-    condition: and(succeeded(), ne(variables['download_bintar.buildFromFTP'], 'true'))
+      PAR_SERVER_REPO: '${{ parameters.serverRepo }}'
+      PAR_LIBRARIES: '${{ parameters.buildLibraries }}'
+      PAR_EXTRA_LIBRARIES: '${{ parameters.extraLibraries }}'
+    condition: and(succeeded(), ne(variables['ftp_download.BINARIES_FROM_FTP'], 'true'))
     displayName: 'Clone and build server'
     name: build_server
 
   # Archive newly built binaries
   - task: ArchiveFiles@2
     inputs:
-      rootFolderOrFile: ${{ parameters.serverBasedir }}
+      rootFolderOrFile: $(env.BASEDIR)
       includeRootFolder: false
       archiveType: 'tar'
       tarCompression: 'gz'
-      archiveFile:  $(Build.ArtifactStagingDirectory)/$(bintarName).tar.gz
+      archiveFile:  $(Build.ArtifactStagingDirectory)/$(ftp_download.BINTAR_NAME).tar.gz
     displayName: 'Create bintar'
     name: create_bintar
-    condition: and(succeeded(), ne(variables['download_bintar.buildFromFTP'], 'true'))
+    condition: and(succeeded(), ne(variables['ftp_download.BINARIES_FROM_FTP'], 'true'))
 
   # Store bintar as a build artifact
   # (in any case, be it downloaded or freshly built)

@@ -6,11 +6,11 @@ parameters:
   vmImage: 'Ubuntu 16.04'
   name: 'Upload_to_FTP'
   condition: succeeded()
-  ftpUrl: 'ftp://perro.askmonty.org'
-  ftpDirectory: '/private/azure'
-  ftpUser: 'anonymous'
-  ftpPassword: 'foo'
   artifactName: 'build'
+  FTP_URL: 'ftp://perro.askmonty.org'
+  FTP_UPLOAD_DIRECTORY: '/private/azure'
+  FTP_USER: 'anonymous'
+  FTP_PASSWORD: 'foo'
   dependencies: []
 
 jobs:
@@ -25,8 +25,8 @@ jobs:
   condition: ${{ parameters.condition }}
   # Storing to FTP is "best effort", it shouldn't affect tests
   continueOnError: true
-  steps:
 
+  steps:
   # Get the artifact from build artifacts
   - task: DownloadBuildArtifacts@0
     inputs:
@@ -37,9 +37,9 @@ jobs:
   - task: FtpUpload@1
     inputs:
       credentialsOption: 'inputs'
-      serverUrl: '${{ parameters.ftpUrl }}'
-      username: '${{ parameters.ftpUser }}'
-      password: '${{ parameters.ftpPassword }}'
-      rootDirectory: '$(Build.ArtifactStagingDirectory)/build'
-      remoteDirectory: '${{ parameters.ftpDirectory }}'
+      serverUrl: '${{ parameters.FTP_URL }}'
+      username: '${{ parameters.FTP_USER }}'
+      password: '${{ parameters.FTP_PASSWORD }}'
+      rootDirectory: '$(Build.ArtifactStagingDirectory)/${{ parameters.artifactName }}'
+      remoteDirectory: '${{ parameters.FTP_UPLOAD_DIRECTORY }}'
     displayName: 'Upload ${{ parameters.artifactName }} to FTP'
