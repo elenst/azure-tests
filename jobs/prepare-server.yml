@@ -42,8 +42,8 @@ jobs:
 
   # If server revision is not defined, find the head revision
   # for the given branch on Github
-  - bash: |
-      rev=`wget -O - $PAR_SERVER_REPO/tree/$ENV_SERVER_BRANCH | grep -A 1 "Latest commit$" | tail -n 1 | sed -e 's/.*commit\/\(.*\)\".*/\1/' | cut -c 1-8`
+  - bash: | 
+      rev=`git ls-remote $PAR_SERVER_REPO $ENV_SERVER_BRANCH | cut -c 1-8`
       if [ -z "$rev" ]; then
         echo "##vso[task.complete result=Failed]Could not find head revision for branch $ENV_SERVER_BRANCH"
       fi
