@@ -35,9 +35,8 @@ jobs:
   # Make sure that required parameters are defined
   - bash: |
       if [ -z "$ENV_SERVER_BRANCH" ]; then
-        echo "##vso[task.complete result=Failed]Missing template parameter \"SERVER_BRANCH\""
+        echo "##vso[task.complete result=Failed]Missing value of \"SERVER_BRANCH\""
       fi
-    env:
     displayName: Check for required parameters
 
   # If server revision is not defined, find the head revision
