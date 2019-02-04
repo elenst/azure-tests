@@ -13,13 +13,6 @@ parameters:
   BUILD_LIBRARIES: 'apt-utils build-essential cmake python-dev sudo git devscripts equivs libcurl4-openssl-dev ccache python3 python3-pip curl libssl-dev libzstd-dev libevent-dev dpatch gawk gdb libboost-dev libcrack2-dev libjudy-dev libnuma-dev libsnappy-dev libxml2-dev unixodbc-dev uuid-dev fakeroot iputils-ping libncurses5-dev libbison-dev'
   EXTRA_LIBRARIES: ''
 
-#  SERVER_BRANCH: ''
-#  CMAKE_BUILD_TYPE: ''
-#  CMAKE_ASAN: ''
-#  CMAKE_OPTIONS: ''
-#  CMAKE_EXTRA_OPTIONS: ''
-#  BASEDIR: $(HOME)/server
-  
 jobs:
 
 #-----------------------------------------------------------------------
