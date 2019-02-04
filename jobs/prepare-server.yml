@@ -6,12 +6,12 @@ parameters:
   vmImage: 'Ubuntu 16.04'
   name: 'Download_or_Build_Server'
   condition: succeeded()
+  dependencies: []
 
   SERVER_REPO: 'https://github.com/MariaDB/server'
   FTP_DOWNLOAD: 'ftp://perro.askmonty.org/public/azure'
   BUILD_LIBRARIES: 'apt-utils build-essential cmake python-dev sudo git devscripts equivs libcurl4-openssl-dev ccache python3 python3-pip curl libssl-dev libzstd-dev libevent-dev dpatch gawk gdb libboost-dev libcrack2-dev libjudy-dev libnuma-dev libsnappy-dev libxml2-dev unixodbc-dev uuid-dev fakeroot iputils-ping libncurses5-dev libbison-dev'
   EXTRA_LIBRARIES: ''
-  dependencies: []
 
 jobs:
 
@@ -28,6 +28,10 @@ jobs:
   steps:
 
   - template: ../steps/env.yml
+    parameters:
+      ${{ each pair in parameters }}:
+        ${{ if notIn(pair.key, ('dependencies','name','condition') }}:
+          ${{ pair.key }}: ${{ pair.value }}
 
   # Make sure that required parameters are defined
   - bash: |
