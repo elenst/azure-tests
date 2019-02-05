@@ -4,6 +4,7 @@
 
 parameters:
   condition: succeeded()
+  name: 'trial'
 
 steps:
   - script: |
@@ -15,7 +16,8 @@ steps:
         --vardir=$ENV_LOGDIR/vardir \
         $ENV_RQG_OPTIONS \
         2>&1 | tee $ENV_LOGDIR/trial.log
-    displayName: 'Run RQG test'
+    name: ${{ parameters.name }}
+    displayName: 'Run RQG test' ${{ parameters.name }}
     condition: ${{ parameters.condition }}
 
   - template: rqg-test-result.yml
