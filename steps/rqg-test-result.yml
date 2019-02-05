@@ -32,6 +32,7 @@ steps:
       echo "Test $(Agent.jobName)" >> $result_summary_dir/test_report
       res=`grep 'exited with exit status' $result_summary_dir/trial.log | sed -e 's/.*exited with exit status STATUS_\([A-Z_]*\).*/\1/'`
       echo "Test result:" $res >> $result_summary_dir/test_report
+      echo "PipelineId-BuildId:" $(System.DefinitionId)-$(Build.BuildId) >> $results_summary_dir/test_report
       echo "-------------------------------------" >> $result_summary_dir/test_report
       echo >> $result_summary_dir/test_report
       echo `cat $result_summary_dir/server.info` >> $result_summary_dir/test_report
@@ -48,6 +49,12 @@ steps:
       done
       echo "####################################################################################################" >> $result_summary_dir/test_report
       cat $result_summary_dir/test_report
+      echo "Server:" `cat $result_summary_dir/server.info` >> $result_details_dir/repro.info
+      echo Cmake options: $ENV_CMAKE_OPTIONS >> $result_details_dir/repro.info
+      echo MySQLD options: $ENV_MYSQLD_OPTIONS >> $result_details_dir/repro.info
+      if echo $ENV_RQG_OPTIONS | grep ps-protocol > /dev/null ; then
+        echo "RQG options: --ps-protocol" >> $result_details_dir/repro.info
+      fi
     displayName: 'Test report'
     condition: ${{ parameters.condition }}
 
