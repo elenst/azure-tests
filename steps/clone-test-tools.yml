@@ -11,7 +11,7 @@ steps:
       git clone "https://github.com/elenst/mariadb-toolbox" --depth=1 --branch=$ENV_TOOLBOX_BRANCH $ENV_TOOLBOX_DIR
       git clone "https://github.com/MariaDB/randgen" --depth=1 --branch=$ENV_RQG_BRANCH $ENV_RQG_HOME
       cd $ENV_RQG_HOME
-      echo $ENV_RQG_BRANCH `git log -1 --abbrev=8 --pretty="%h" > $ENV_RQG_HOME/rqg.info
+      echo $ENV_RQG_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_RQG_HOME/rqg.info
       cd $ENV_TOOLBOX_DIR
       echo $ENV_TOOLBOX_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_TOOLBOX_DIR/toolbox.info
     displayName: 'Clone tools and get versions'
