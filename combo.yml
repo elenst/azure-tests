@@ -258,7 +258,9 @@ jobs:
       destinationFolder: $(env.BASEDIR)
     displayName: 'Extract build'
 
-  - template: steps/install-runtime-packages.yml
+  - template: steps/install-deb-packages.yml
+    parameters:
+      INSTALLATION_SET: 'runtime'
 
   - template: steps/clone-test-tools.yml
 

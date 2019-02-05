@@ -1,0 +1,39 @@
+########################################################################
+# Installs packages needed to run server, MTR and RQG
+# (and possibly other tools)
+########################################################################
+
+parameters:
+  condition: succeeded()
+
+  # Installation set is either 'all' or 'build' or 'runtime' or empty.
+  # If the installation set is empty, only extra_packages are installed
+  INSTALLATION_SET: ''
+  EXTRA_PACKAGES: ''
+
+  BUILD_PACKAGES: 'apt-utils build-essential cmake python-dev sudo git devscripts equivs libcurl4-openssl-dev ccache python3 python3-pip curl libssl-dev libzstd-dev libevent-dev dpatch gawk gdb libboost-dev libcrack2-dev libjudy-dev libnuma-dev libsnappy-dev libxml2-dev unixodbc-dev uuid-dev fakeroot iputils-ping libncurses5-dev libbison-dev'
+  RUNTIME_PACKAGES: 'libdbi-perl libdbd-mysql-perl libsnappy1v5 gdb'
+  
+steps:
+  - script: |
+      set -x
+      case "$PAR_INSTALLATION_SET" in
+      build)
+        packages="$PAR_BUILD_PACKAGES"
+        ;;
+      runtime)
+        packages="$PAR_RUNTIME_PACKAGES"
+        ;;
+      all)
+        packages="$PAR_BUILD_PACKAGES $PAR_RUNTIME_PACKAGES"
+        ;;
+      esac
+      sudo apt-get update
+      sudo apt-get install -y -q $packages $PAR_EXTRA_PACKAGES
+    displayName: Install ${{ parameters.INSTALLATION_SET }} packages
+    condition: ${{ parameters.condition }}
+    env:
+      PAR_INSTALLATION_SET: ${{ parameters.INSTALLATION_SET }}
+      PAR_BUILD_PACKAGES: ${{ parameters.BUILD_PACKAGES }}
+      PAR_RUNTIME_PACKAGES: ${{ parameters.RUNTIME_PACKAGES }}
+      PAR_EXTRA_PACKAGES: ${{ parameters.EXTRA_PACKAGES }}

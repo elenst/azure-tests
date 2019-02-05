@@ -10,8 +10,6 @@ parameters:
 
   SERVER_REPO: 'https://github.com/MariaDB/server'
   FTP_DOWNLOAD: 'ftp://perro.askmonty.org/public/azure'
-  BUILD_LIBRARIES: 'apt-utils build-essential cmake python-dev sudo git devscripts equivs libcurl4-openssl-dev ccache python3 python3-pip curl libssl-dev libzstd-dev libevent-dev dpatch gawk gdb libboost-dev libcrack2-dev libjudy-dev libnuma-dev libsnappy-dev libxml2-dev unixodbc-dev uuid-dev fakeroot iputils-ping libncurses5-dev libbison-dev'
-  EXTRA_LIBRARIES: ''
 
 jobs:
 
@@ -76,6 +74,12 @@ jobs:
     condition: succeeded()
 
   # If bintar was not found, install libraries, clone and build server
+
+  - template: steps/install-deb-packages.yml
+    parameters:
+      INSTALLATION_SET: 'build'
+    condition: and(succeeded(), ne(variables['ftp_download.BINARIES_FROM_FTP'], 'true'))
+
   - bash: |
       srcdir=$HOME/src
       builddir=$HOME/out-of-source
@@ -88,8 +92,6 @@ jobs:
         cd $srcdir
         git checkout $ENV_SERVER_REVISION
       fi
-      sudo apt-get update
-      sudo apt-get install -y -q $PAR_LIBRARIES $PAR_EXTRA_LIBRARIES
       set -x
       mkdir $builddir
       cd $builddir
@@ -101,8 +103,6 @@ jobs:
       echo $ENV_CMAKE_OPTIONS >> $ENV_BASEDIR/server.info
     env:
       PAR_SERVER_REPO: '${{ parameters.SERVER_REPO }}'
-      PAR_LIBRARIES: '${{ parameters.BUILD_LIBRARIES }}'
-      PAR_EXTRA_LIBRARIES: '${{ parameters.EXTRA_LIBRARIES }}'
     condition: and(succeeded(), ne(variables['ftp_download.BINARIES_FROM_FTP'], 'true'))
     displayName: 'Clone and build server'
     name: build_server
