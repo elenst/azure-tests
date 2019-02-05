@@ -29,18 +29,15 @@ jobs:
 
   # Print the summary
   - script: |
-      ls -l $(Build.ArtifactStagingDirectory)/
-      ls -l $(Build.ArtifactStagingDirectory)/*/*
-      ls -l $(Build.ArtifactStagingDirectory)/*/*/*
       echo
       echo "####################################################################################################"
       echo "SUMMARY:"
       echo "Server $ENV_SERVER_BRANCH"
       echo $ENV_CMAKE_OPTIONS
       echo ""
-      echo "Found" `ls $(Build.ArtifactStagingDirectory)/*/test_result | wc -l` "test result(s)"
-      grep 'Test result: ' $(Build.ArtifactStagingDirectory)/*/test_result | sed -e 's/Test result: //g' | sort | uniq -c
-      for f in $(Build.ArtifactStagingDirectory)/*/test_result ; do
+      echo "Found" `ls $(Build.ArtifactStagingDirectory)/*/test_report | wc -l` "test result(s)"
+      grep 'Test result: ' $(Build.ArtifactStagingDirectory)/*/test_report | sed -e 's/Test result: //g' | sort | uniq -c
+      for f in $(Build.ArtifactStagingDirectory)/*/test_report ; do
         echo
         echo "### $f"
         cat $f
