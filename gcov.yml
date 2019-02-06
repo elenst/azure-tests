@@ -93,10 +93,6 @@ jobs:
       echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_BASEDIR/server.info
       echo $ENV_CMAKE_OPTIONS >> $ENV_BASEDIR/server.info
     env:
-      PAR_SERVER_REPO: '${{ parameters.SERVER_REPO }}'
-      PAR_LIBRARIES: '${{ parameters.BUILD_LIBRARIES }}'
-      PAR_EXTRA_LIBRARIES: '${{ parameters.EXTRA_LIBRARIES }}'
-    condition: and(succeeded(), ne(variables['ftp_download.BINARIES_FROM_FTP'], 'true'))
     displayName: 'Clone and build server'
     name: build_server
 
