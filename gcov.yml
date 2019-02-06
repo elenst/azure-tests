@@ -134,4 +134,4 @@ jobs:
 - template: jobs/rqg-test-report.yml
   parameters:
     dependencies:
-    - Test
+    - GCOV
