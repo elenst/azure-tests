@@ -47,7 +47,7 @@ variables:
 jobs:
 
 #########
-- job: Test
+- job: GCOV test run
   pool:
     vmImage: 'Ubuntu 16.04'
 
@@ -67,7 +67,7 @@ jobs:
   - template: steps/install-deb-packages.yml
     parameters:
       INSTALLATION_SET: 'all'
-      EXTRA_PACKAGES: 'gcov lcov'
+      EXTRA_PACKAGES: 'lcov'
 
   # Clone and build server in-source
   - bash: |
