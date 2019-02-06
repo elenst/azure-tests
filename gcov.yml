@@ -102,18 +102,20 @@ jobs:
 
   - template: steps/clone-test-tools.yml
 
-  - template steps/env.yml
+  - template: steps/env.yml
     parameters:
       name: 'test001'
       RQG_GRAMMAR: 'conf/runtime/metadata_stability.yy'
       RQG_GENDATA: 'conf/runtime/metadata_stability.zz'
+
   - template: steps/run-rqg-test.yml
 
-  - template steps/env.yml
+  - template: steps/env.yml
     parameters:
       name: 'test002'
       RQG_GRAMMAR: 'conf/runtime/performance_schema.yy'
       MYSQLD_EXTRA_OPTIONS: '--mysqld=--performance-schema'
+
   - template: steps/run-rqg-test.yml
 
   - script: |
