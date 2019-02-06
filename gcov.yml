@@ -81,15 +81,10 @@ jobs:
       git clean -dfx
       git submodule foreach --recursive git clean -dfx
       git submodule update
-      sudo apt-get update
-      sudo apt-get install -y -q $PAR_LIBRARIES $PAR_EXTRA_LIBRARIES
       set -x
-      mkdir $builddir
-      cd $builddir
-      cmake $srcdir $ENV_CMAKE_OPTIONS -DCMAKE_INSTALL_PREFIX=$ENV_BASEDIR
+      cmake . $ENV_CMAKE_OPTIONS
       make -j5
       make install
-      cd $srcdir
       echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_BASEDIR/server.info
       echo $ENV_CMAKE_OPTIONS >> $ENV_BASEDIR/server.info
     displayName: 'Clone and build server'
