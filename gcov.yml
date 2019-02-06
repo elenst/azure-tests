@@ -11,7 +11,7 @@ variables:
   CMAKE_BUILD_TYPE: Debug
   CMAKE_OPTIONS: "-DPLUGIN_SPHINX=NO -DPLUGIN_OQGRAPH=NO -DPLUGIN_TOKUDB=NO -DPLUGIN_MROONGA=NO -DPLUGIN_FEDERATED=NO -DPLUGIN_FEDERATEDX=NO -DPLUGIN_CONNECT=NO -DPLUGIN_SPIDER=NO -DPLUGIN_ROCKSDB=NO -DWITH_MARIABACKUP=OFF"
 
-  RQG_DURATION: 400
+  RQG_DURATION: 100
   RQG_THREADS: 6
   RQG_VIEWS: '--views'
 
@@ -82,7 +82,7 @@ jobs:
       git submodule foreach --recursive git clean -dfx
       git submodule update
       set -x
-      cmake . $ENV_CMAKE_OPTIONS
+      cmake . $ENV_CMAKE_OPTIONS -DENABLE_GCOV=ON
       make -j5
       make install
       echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_BASEDIR/server.info
@@ -113,7 +113,7 @@ jobs:
       fi
       perl $ENV_TOOLBOX_DIR/scripts/coverage_summary.pl $gcov_result_dir/lcov.info > $gcov_result_dir/summary
       echo "##############################################"
-      echo "##### GCOV summary
+      echo "##### GCOV summary"
       echo
       cat $gcov_result_dir/summary
     name: gcov_report
