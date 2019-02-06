@@ -4,6 +4,7 @@
 
 parameters:
   condition: succeeded()
+  continueOnError: true
   trial_id: $(Agent.jobName)
   TRIAL_OPTIONS: ''
 
@@ -21,6 +22,7 @@ steps:
     name: test${{ parameters.trial_id }}
     displayName: Run RQG test ${{ parameters.trial_id }}
     condition: ${{ parameters.condition }}
+    continueOnError: ${{ parameters.continueOnError }}
     env:
       PAR_TRIAL_OPTIONS: ${{ parameters.TRIAL_OPTIONS }}
 
@@ -28,3 +30,4 @@ steps:
     parameters:
       trial_id: ${{ parameters.trial_id }}
       condition: ${{ parameters.condition }}
+      continueOnError: ${{ parameters.continueOnError }}
