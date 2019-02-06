@@ -11,7 +11,7 @@ variables:
   CMAKE_BUILD_TYPE: Debug
   CMAKE_OPTIONS: "-DPLUGIN_SPHINX=NO -DPLUGIN_OQGRAPH=NO -DPLUGIN_TOKUDB=NO -DPLUGIN_MROONGA=NO -DPLUGIN_FEDERATED=NO -DPLUGIN_FEDERATEDX=NO -DPLUGIN_CONNECT=NO -DPLUGIN_SPIDER=NO -DPLUGIN_ROCKSDB=NO -DWITH_MARIABACKUP=OFF"
 
-  RQG_DURATION: 100
+  RQG_DURATION: 200
   RQG_THREADS: 6
   RQG_VIEWS: '--views'
 
@@ -104,19 +104,23 @@ jobs:
 
   - script: |
       cd $ENV_BASEDIR
+      rev=${ENV_SERVER_REVISION:-$ENV_SERVER_BRANCH}
       rm -rf $(Build.ArtifactStagingDirectory)/*
-      gcov_result_dir=$(Build.ArtifactStagingDirectory)/gcov
-      mkdir $gcov_result_dir
-      lcov --quiet --directory $ENV_BASEDIR --capture --rc lcov_branch_coverage=1 --output-file $gcov_result_dir/lcov.info
+      gcov_result_dir=$(Build.ArtifactStagingDirectory)
+      mkdir -p $gcov_result_dir
+      fname=${rev}_vs_${BASELINE_REVISION}
+      diff_file=$gcov_result_dir/$fname.diff
+      lcov_file=$gcov_result_dir/$rev.lcov
+      lcov --quiet --directory $ENV_BASEDIR --capture --rc lcov_branch_coverage=1 --output-file $lcov_file
       if [ -n "$BASELINE_REVISION" ] ; then
-        git diff $BASELINE_REVISION > $gcov_result_dir/diff_to_$BASELINE_REVISION.file
-        perl $ENV_TOOLBOX_DIR/scripts/coverage_for_patch.pl --basedir=$ENV_BASEDIR --diff-file=$gcov_result_dir/diff_to_$BASELINE_REVISION.file --lcov-info=$gcov_result_dir/lcov.info --branch-info 1>$gcov_result_dir/coverage 2>$gcov_result_dir/missings
+        git diff $BASELINE_REVISION > $diff_file
+        perl $ENV_TOOLBOX_DIR/scripts/coverage_for_patch.pl --basedir=$ENV_BASEDIR --diff-file=$diff_file --lcov-info=$lcov_file --branch-info 1>$gcov_result_dir/$fname.hits 2>$gcov_result_dir/$fname.misses
       fi
-      perl $ENV_TOOLBOX_DIR/scripts/coverage_summary.pl $gcov_result_dir/lcov.info > $gcov_result_dir/summary
+      perl $ENV_TOOLBOX_DIR/scripts/coverage_summary.pl $lcov_file > $gcov_result_dir/$rev.coverage
       echo "##############################################"
       echo "##### GCOV summary"
-      echo
-      cat $gcov_result_dir/summary
+      echo `cat $ENV_BASEDIR/server.info`
+      cat $gcov_result_dir/$rev.coverage
     name: gcov_report
     displayName: GCOV report
     condition: always()
@@ -124,7 +128,7 @@ jobs:
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: $(Build.ArtifactStagingDirectory)
-      artifactName: 'gcov'
+      artifactName: gcov-$(Build.BuildNumber)
     displayName: 'Store gcov artifacts'
     condition: always()
 

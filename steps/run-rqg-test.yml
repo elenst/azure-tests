@@ -27,3 +27,4 @@ steps:
   - template: rqg-test-result.yml
     parameters:
       trial_id: ${{ parameters.trial_id }}
+    condition: ${{ parameters.condition }}
