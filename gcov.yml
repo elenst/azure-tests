@@ -8,7 +8,7 @@ trigger: none
 
 variables:
 
-  CMAKE_BUILD_TYPE: ''
+  CMAKE_BUILD_TYPE: 'Debug'
   CMAKE_OPTIONS: ''
 
   RQG_DURATION: 200
