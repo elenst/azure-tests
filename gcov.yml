@@ -47,7 +47,7 @@ variables:
 jobs:
 
 #########
-- job: GCOV test run
+- job: GCOV
   pool:
     vmImage: 'Ubuntu 16.04'
 
