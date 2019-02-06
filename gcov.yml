@@ -105,7 +105,6 @@ jobs:
   - template steps/env.yml
     parameters:
       name: 'test001'
-    env:
       RQG_GRAMMAR: 'conf/runtime/metadata_stability.yy'
       RQG_GENDATA: 'conf/runtime/metadata_stability.zz'
   - template: steps/run-rqg-test.yml
@@ -113,7 +112,6 @@ jobs:
   - template steps/env.yml
     parameters:
       name: 'test002'
-    env:
       RQG_GRAMMAR: 'conf/runtime/performance_schema.yy'
       MYSQLD_EXTRA_OPTIONS: '--mysqld=--performance-schema'
   - template: steps/run-rqg-test.yml
