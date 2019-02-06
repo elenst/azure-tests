@@ -4,11 +4,12 @@
 
 parameters:
   condition: always()
+  trial_id: $(Agent.jobName)
 
 steps:
   - script: |
-      result_summary_dir=$(Build.ArtifactStagingDirectory)/result_summary.$(Agent.jobName)
-      result_details_dir=$(Build.ArtifactStagingDirectory)/logs.$(Agent.jobName)
+      result_summary_dir=$(Build.ArtifactStagingDirectory)/result_summary.$PAR_SUFFIX
+      result_details_dir=$(Build.ArtifactStagingDirectory)/data.$PAR_SUFFIX
       mkdir -p $result_summary_dir
       mkdir -p $result_details_dir
       cp $ENV_LOGDIR/trial.log $ENV_RQG_HOME/rqg.info $ENV_BASEDIR/server.info $ENV_TOOLBOX_DIR/toolbox.info $result_summary_dir/
@@ -27,9 +28,9 @@ steps:
         gdb --batch --eval-command="thread apply all bt" $binary $c >> $result_details_dir/threads
         gdb --batch --eval-command="thread apply all bt full" $binary $c >> $result_details_dir/threads_full
       done
-      mv $ENV_LOGDIR $result_details_dir/data-$(Build.BuildNumber)-$(Agent.jobName)
+      mv $ENV_LOGDIR $result_details_dir/data-$(Build.BuildNumber)-$PAR_SUFFIX
       echo "####################################################################################################" >> $result_summary_dir/test_report
-      echo "Test $(Agent.jobName)" >> $result_summary_dir/test_report
+      echo "Test $PAR_SUFFIX" >> $result_summary_dir/test_report
       res=`grep 'exited with exit status' $result_summary_dir/trial.log | sed -e 's/.*exited with exit status STATUS_\([A-Z_]*\).*/\1/'`
       echo "Test result:" $res >> $result_summary_dir/test_report
       echo "PipelineId-BuildId:" $(System.DefinitionId)-$(Build.BuildId) >> $result_summary_dir/test_report
@@ -56,28 +57,30 @@ steps:
       fi
     displayName: 'Test report'
     condition: ${{ parameters.condition }}
+    env:
+      PAR_SUFFIX: ${{ parameters.trial_id }}
 
   - task: PublishBuildArtifacts@1
     inputs:
-      pathtoPublish: $(Build.ArtifactStagingDirectory)/result_summary.$(Agent.jobName)
-      artifactName: summary-$(Agent.jobName)
+      pathtoPublish: $(Build.ArtifactStagingDirectory)/result_summary.${{ parameters.trial_id }}
+      artifactName: summary-${{ parameters.trial_id }}
     displayName: 'Store test result summary'
     condition: always()
 
   - task: ArchiveFiles@2
     inputs:
-      rootFolderOrFile: $(Build.ArtifactStagingDirectory)/logs.$(Agent.jobName)
+      rootFolderOrFile: $(Build.ArtifactStagingDirectory)/data.${{ parameters.trial_id }}
       includeRootFolder: true
       archiveType: 'tar'
       tarCompression: 'gz'
-      archiveFile:  $(Build.ArtifactStagingDirectory)/data-$(Build.BuildNumber)-$(Agent.jobName).tar.gz
+      archiveFile:  $(Build.ArtifactStagingDirectory)/data-$(Build.BuildNumber)-${{ parameters.trial_id }}.tar.gz
     displayName: 'Archive test data'
     condition: always()
 
   - task: PublishBuildArtifacts@1
     inputs:
-      pathtoPublish: $(Build.ArtifactStagingDirectory)/logs.$(Agent.jobName)
-      artifactName: data-$(Agent.jobName)
+      pathtoPublish: $(Build.ArtifactStagingDirectory)/data.${{ parameters.trial_id }}
+      artifactName: data-${{ parameters.trial_id }}
     displayName: 'Store test data'
     condition: always()
 

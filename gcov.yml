@@ -94,12 +94,12 @@ jobs:
 
   - template: steps/run-rqg-test.yml
     parameters:
-      name: 'test001'
+      trial_id: '001'
       TRIAL_OPTIONS: '--grammar=conf/runtime/metadata_stability.yy --gendata=conf/runtime/metadata_stability.zz'
 
   - template: steps/run-rqg-test.yml
     parameters:
-      name: 'test002'
+      trial_id: '002'
       TRIAL_OPTIONS: '--grammar=conf/runtime/performance_schema.yy --mysqld=--performance-schema'
 
   - script: |
@@ -116,6 +116,9 @@ jobs:
       echo "##### GCOV summary
       echo
       cat $gcov_result_dir/summary
+    name: gcov_report
+    displayName: GCOV report
+    condition: always()
 
   - task: PublishBuildArtifacts@1
     inputs:
