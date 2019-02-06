@@ -17,7 +17,7 @@ steps:
         $ENV_RQG_OPTIONS \
         2>&1 | tee $ENV_LOGDIR/trial.log
     name: ${{ parameters.name }}
-    displayName: 'Run RQG test' ${{ parameters.name }}
+    displayName: Run RQG test ${{ parameters.name }}
     condition: ${{ parameters.condition }}
 
   - template: rqg-test-result.yml
