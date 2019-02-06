@@ -92,7 +92,6 @@ jobs:
       cd $srcdir
       echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_BASEDIR/server.info
       echo $ENV_CMAKE_OPTIONS >> $ENV_BASEDIR/server.info
-    env:
     displayName: 'Clone and build server'
     name: build_server
 
