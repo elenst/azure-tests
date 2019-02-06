@@ -21,7 +21,7 @@ steps:
     name: ${{ parameters.name }}
     displayName: Run RQG test ${{ parameters.name }}
     condition: ${{ parameters.condition }}
-    parameters:
+    env:
       PAR_TRIAL_OPTIONS: ${{ parameters.TRIAL_OPTIONS }}
 
   - template: rqg-test-result.yml
