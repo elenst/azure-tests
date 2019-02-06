@@ -1,8 +1,8 @@
 ########################################################################
-# RQG integration tests with DML and DDL, different engines.
-# The default set is big bang, but it can be narrowed down through
-# configuration parameters
+# GCOV report for RQG integration tests with DML and DDL
 ########################################################################
+
+# Expects BASELINE_REVISION
 
 trigger: none
 
