@@ -104,12 +104,13 @@ jobs:
 
   - script: |
       cd $ENV_BASEDIR
+      rm -rf $(Build.ArtifactStagingDirectory)/*
       gcov_result_dir=$(Build.ArtifactStagingDirectory)/gcov
       mkdir $gcov_result_dir
-      lcov --quiet --directory $ENV_BASEDIR --capture --output-file $gcov_result_dir/lcov.info
+      lcov --quiet --directory $ENV_BASEDIR --capture --rc lcov_branch_coverage=1 --output-file $gcov_result_dir/lcov.info
       if [ -n "$BASELINE_REVISION" ] ; then
         git diff $BASELINE_REVISION > $gcov_result_dir/diff_to_$BASELINE_REVISION.file
-        perl $ENV_TOOLBOX_DIR/scripts/coverage_for_patch.pl --basedir=$ENV_BASEDIR --diff-file=$gcov_result_dir/diff.file --lcov-info=$gcov_result_dir/lcov.info --branch-info 1>$gcov_result_dir/coverage 2>$gcov_result_dir/missings
+        perl $ENV_TOOLBOX_DIR/scripts/coverage_for_patch.pl --basedir=$ENV_BASEDIR --diff-file=$gcov_result_dir/diff_to_$BASELINE_REVISION.file --lcov-info=$gcov_result_dir/lcov.info --branch-info 1>$gcov_result_dir/coverage 2>$gcov_result_dir/missings
       fi
       perl $ENV_TOOLBOX_DIR/scripts/coverage_summary.pl $gcov_result_dir/lcov.info > $gcov_result_dir/summary
       echo "##############################################"
