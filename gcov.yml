@@ -1,0 +1,148 @@
+########################################################################
+# RQG integration tests with DML and DDL, different engines.
+# The default set is big bang, but it can be narrowed down through
+# configuration parameters
+########################################################################
+
+trigger: none
+
+variables:
+
+  CMAKE_BUILD_TYPE: Debug
+  CMAKE_OPTIONS: "-DPLUGIN_SPHINX=NO -DPLUGIN_OQGRAPH=NO -DPLUGIN_TOKUDB=NO -DPLUGIN_MROONGA=NO -DPLUGIN_FEDERATED=NO -DPLUGIN_FEDERATEDX=NO -DPLUGIN_CONNECT=NO -DPLUGIN_SPIDER=NO -DPLUGIN_ROCKSDB=NO -DWITH_MARIABACKUP=OFF"
+
+  RQG_DURATION: 400
+  RQG_THREADS: 6
+  RQG_VIEWS: '--views'
+
+  # --redefine=conf/mariadb/modules/acl.yy disabled due to MDEV-18003
+  RQG_REDEFINES: "\
+    --redefine=conf/mariadb/bulk_insert.yy \
+    --redefine=conf/mariadb/modules/sql_mode.yy \
+    --redefine=conf/mariadb/alter_table.yy \
+    --redefine=conf/mariadb/instant_add.yy \
+    --redefine=conf/mariadb/modules/alter_table_columns.yy \
+    --redefine=conf/mariadb/modules/foreign_keys.yy \
+    --redefine=conf/mariadb/sp.yy \
+    --redefine=conf/mariadb/modules/userstat.yy \
+    --redefine=conf/mariadb/modules/admin.yy \
+    --redefine=conf/mariadb/modules/locks.yy \
+    --redefine=conf/mariadb/versioning.yy \
+    --redefine=conf/mariadb/sequences.yy \
+    --redefine=conf/mariadb/modules/locks-10.4-extra.yy \
+  "
+  RQG_OPTIONS: "\
+    --seed=time \
+    --reporters=Backtrace,ErrorLog,Deadlock \
+    --filter=conf/mariadb/10.4-combo-filter.ff \
+  "
+  MYSQLD_OPTIONS: "\
+    --mysqld=--log_output=FILE \
+    --mysqld=--loose-max-statement-time=20 \
+    --mysqld=--lock-wait-timeout=10 \
+    --mysqld=--loose-innodb-lock-wait-timeout=5 \
+    --mysqld=--loose-debug_assert_on_not_freed_memory=0 \
+  "
+
+jobs:
+
+#########
+- job: Test
+  pool:
+    vmImage: 'Ubuntu 16.04'
+
+  strategy:
+    parallel: 1
+
+  steps:
+
+  - template: steps/env.yml
+
+  - bash: |
+      if [ -z "$ENV_SERVER_BRANCH" ] && [ -z "$ENV_SERVER_REVISION" ]; then
+        echo "##vso[task.complete result=Failed]Neither \"SERVER_BRANCH\" nor \"SERVER_REVISION\" have been specified"
+      fi
+    displayName: Check for required parameters
+
+  - template: steps/install-deb-packages.yml
+    parameters:
+      INSTALLATION_SET: 'all'
+      EXTRA_PACKAGES: 'gcov lcov'
+
+  # Clone and build server in-source
+  - bash: |
+      if [ -n "$ENV_SERVER_BRANCH" ] ; then
+        server_branch="--branch=$ENV_SERVER_BRANCH"
+      fi
+      git clone https://github.com/MariaDB/server $server_branch $ENV_BASEDIR
+      cd $ENV_BASEDIR
+      checkout=${ENV_SERVER_REVISION:-$ENV_SERVER_BRANCH}
+      git checkout $checkout
+      git clean -dfx
+      git submodule foreach --recursive git clean -dfx
+      git submodule update
+      sudo apt-get update
+      sudo apt-get install -y -q $PAR_LIBRARIES $PAR_EXTRA_LIBRARIES
+      set -x
+      mkdir $builddir
+      cd $builddir
+      cmake $srcdir $ENV_CMAKE_OPTIONS -DCMAKE_INSTALL_PREFIX=$ENV_BASEDIR
+      make -j5
+      make install
+      cd $srcdir
+      echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_BASEDIR/server.info
+      echo $ENV_CMAKE_OPTIONS >> $ENV_BASEDIR/server.info
+    env:
+      PAR_SERVER_REPO: '${{ parameters.SERVER_REPO }}'
+      PAR_LIBRARIES: '${{ parameters.BUILD_LIBRARIES }}'
+      PAR_EXTRA_LIBRARIES: '${{ parameters.EXTRA_LIBRARIES }}'
+    condition: and(succeeded(), ne(variables['ftp_download.BINARIES_FROM_FTP'], 'true'))
+    displayName: 'Clone and build server'
+    name: build_server
+
+  - template: steps/clone-test-tools.yml
+
+  - template steps/env.yml
+    parameters:
+      name: 'test001'
+    env:
+      RQG_GRAMMAR: 'conf/runtime/metadata_stability.yy'
+      RQG_GENDATA: 'conf/runtime/metadata_stability.zz'
+  - template: steps/run-rqg-test.yml
+
+  - template steps/env.yml
+    parameters:
+      name: 'test002'
+    env:
+      RQG_GRAMMAR: 'conf/runtime/performance_schema.yy'
+      MYSQLD_EXTRA_OPTIONS: '--mysqld=--performance-schema'
+  - template: steps/run-rqg-test.yml
+
+  - script: |
+      cd $ENV_BASEDIR
+      gcov_result_dir=$(Build.ArtifactStagingDirectory)/gcov
+      mkdir $gcov_result_dir
+      lcov --quiet --directory $ENV_BASEDIR --capture --output-file $gcov_result_dir/lcov.info
+      if [ -n "$BASELINE_REVISION" ] ; then
+        git diff $BASELINE_REVISION > $gcov_result_dir/diff_to_$BASELINE_REVISION.file
+        perl $ENV_TOOLBOX_DIR/scripts/coverage_for_patch.pl --basedir=$ENV_BASEDIR --diff-file=$gcov_result_dir/diff.file --lcov-info=$gcov_result_dir/lcov.info --branch-info 1>$gcov_result_dir/coverage 2>$gcov_result_dir/missings
+      fi
+      perl $ENV_TOOLBOX_DIR/scripts/coverage_summary.pl $gcov_result_dir/lcov.info > $gcov_result_dir/summary
+      echo "##############################################"
+      echo "##### GCOV summary
+      echo
+      cat $gcov_result_dir/summary
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: 'gcov'
+    displayName: 'Store gcov artifacts'
+    condition: always()
+
+#########
+# Print test summary
+- template: jobs/rqg-test-report.yml
+  parameters:
+    dependencies:
+    - Test
