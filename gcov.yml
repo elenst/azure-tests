@@ -59,35 +59,51 @@ jobs:
   - template: steps/env.yml
 
   - bash: |
-      if [ -z "$ENV_SERVER_BRANCH" ] && [ -z "$ENV_SERVER_REVISION" ]; then
+      server_ref=${ENV_SERVER_REVISION:-$ENV_SERVER_BRANCH}
+      if [ -z "$server_ref" ]; then
         echo "##vso[task.complete result=Failed]Neither \"SERVER_BRANCH\" nor \"SERVER_REVISION\" have been specified"
       fi
-    displayName: Check for required parameters
+      infodir=$HOME/gcov_info
+      mkdir $infodir
+      echo "##vso[task.setvariable variable=INFODIR;isOutput=true]$infodir"
+      echo "##vso[task.setvariable variable=SERVER_REF;isOutput=true]$server_ref"
+      echo "##vso[task.setvariable variable=DIFF_FILE;isOutput=true]$infodir/${BASELINE_REVISION}_to_${server_ref}.diff"
+    displayName: Check requirements and prepare
+    name: prep
 
   - template: steps/install-deb-packages.yml
     parameters:
       INSTALLATION_SET: 'all'
       EXTRA_PACKAGES: 'lcov'
 
-  # Clone and build server in-source
+  # Clone the server
   - bash: |
       if [ -n "$ENV_SERVER_BRANCH" ] ; then
         server_branch="--branch=$ENV_SERVER_BRANCH"
       fi
       git clone https://github.com/MariaDB/server $server_branch $ENV_BASEDIR
       cd $ENV_BASEDIR
-      checkout=${ENV_SERVER_REVISION:-$ENV_SERVER_BRANCH}
-      git checkout $checkout
+      git checkout $PREP_SERVER_REF
       git clean -dfx
       git submodule foreach --recursive git clean -dfx
       git submodule update
+      if [ -n "$BASELINE_REVISION" ] ; then
+        git fetch origin $BASELINE_REVISION
+        git diff $BASELINE_REVISION > $PREP_DIFF_FILE
+      fi
+
+    displayName: 'Clone server'
+    name: clone
+
+  # Build the server in-source
+  - bash: |
       set -x
+      cd $ENV_BASEDIR
       cmake . $ENV_CMAKE_OPTIONS -DENABLE_GCOV=ON
       make -j5
-      make install
-      echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_BASEDIR/server.info
+      echo $PREP_SERVER_REF `git log -1 --abbrev=8 --pretty="%h"` > $ENV_BASEDIR/server.info
       echo $ENV_CMAKE_OPTIONS >> $ENV_BASEDIR/server.info
-    displayName: 'Clone and build server'
+    displayName: 'Build server'
     name: build_server
 
   - template: steps/clone-test-tools.yml
@@ -96,210 +112,367 @@ jobs:
     parameters:
       trial_id: '001'
       TRIAL_OPTIONS: '--grammar=conf/runtime/metadata_stability.yy --gendata=conf/runtime/metadata_stability.zz'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '001'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '002'
       TRIAL_OPTIONS: '--grammar=conf/runtime/performance_schema.yy --mysqld=--performance-schema'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '002'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '003'
       TRIAL_OPTIONS: '--grammar=conf/runtime/information_schema.yy'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '003'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '004'
       TRIAL_OPTIONS: '--grammar=conf/engines/many_indexes.yy --gendata=conf/engines/many_indexes.zz --engine=InnoDB'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '004'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '005'
       TRIAL_OPTIONS: '--grammar=conf/engines/many_indexes.yy --gendata=conf/engines/many_indexes.zz --engine=Aria'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '005'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '006'
       TRIAL_OPTIONS: '--grammar=conf/engines/engine_stress.yy --gendata=conf/engines/engine_stress.zz --engine=InnoDB'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '006'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '007'
       TRIAL_OPTIONS: '--grammar=conf/engines/engine_stress.yy --gendata=conf/engines/engine_stress.zz --engine=MyISAM'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '007'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '008'
       TRIAL_OPTIONS: '--grammar=conf/engines/engine_stress.yy --gendata=conf/engines/engine_stress.zz --engine=Aria'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '008'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '009'
       TRIAL_OPTIONS: '--grammar=conf/partitioning/partitions.yy --engine=InnoDB'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '009'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '010'
       TRIAL_OPTIONS: '--grammar=conf/partitioning/partition_pruning.yy --gendata=conf/partitioning/partition_pruning.zz --engine=InnoDB'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '010'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '011'
       TRIAL_OPTIONS: '--grammar=conf/replication/replication.yy --gendata=conf/replication/replication-5.1.zz --engine=InnoDB'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '011'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '012'
       TRIAL_OPTIONS: '--grammar=conf/replication/replication-ddl_sql.yy --gendata=conf/replication/replication-ddl_data.zz --engine=InnoDB'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '012'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '013'
       TRIAL_OPTIONS: '--grammar=conf/replication/replication-dml_sql.yy --gendata=conf/replication/replication-dml_data.zz --engine=InnoDB'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '013'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '014'
       TRIAL_OPTIONS: '--grammar=conf/runtime/connect_kill_sql.yy --gendata=conf/runtime/connect_kill_data.zz --engine=InnoDB'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '014'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '015'
       TRIAL_OPTIONS: '--grammar=conf/runtime/WL5004_sql.yy --gendata=conf/runtime/WL5004_data.zz --engine=InnoDB'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '015'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '016'
       TRIAL_OPTIONS: '--grammar=conf/mariadb/optimizer.yy --engine=InnoDB'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '016'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '017'
       TRIAL_OPTIONS: '--grammar=conf/mariadb/optimizer.yy --engine=Aria'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '017'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '018'
       TRIAL_OPTIONS: '--grammar=conf/mariadb/optimizer.yy --engine=MyISAM'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '018'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '019'
       TRIAL_OPTIONS: "--grammar=conf/optimizer/updateable_views.yy --skip-gendata --engine=MyISAM --mysqld=--init-file=$ENV_RQG_HOME/conf/optimizer/updateable_views.init --mysqld=--default-storage-engine=MyISAM"
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '019'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '020'
       TRIAL_OPTIONS: '--grammar=conf/mariadb/oltp-transactional.yy --gendata=conf/mariadb/oltp.zz --engine=InnoDB'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '020'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '021'
       TRIAL_OPTIONS: '--grammar=conf/mariadb/oltp-transactional.yy --gendata=conf/mariadb/oltp.zz --engine=Aria'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '021'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '022'
       TRIAL_OPTIONS: '--grammar=conf/mariadb/oltp.yy --gendata=conf/mariadb/oltp.zz --engine=MyISAM'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '022'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '023'
       TRIAL_OPTIONS: '--grammar=conf/mariadb/functions.yy'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '023'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '024'
       TRIAL_OPTIONS: '--grammar=conf/runtime/alter_online.yy --gendata=conf/runtime/alter_online.zz'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '024'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '025'
       TRIAL_OPTIONS: '--grammar=conf/engines/innodb/full_text_search.yy --gendata=conf/engines/innodb/full_text_search.zz --engine=InnoDB'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '025'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '026'
       TRIAL_OPTIONS: '--grammar=conf/engines/innodb/full_text_search.yy --gendata=conf/engines/innodb/full_text_search.zz --engine=MyISAM'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '026'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '027'
       TRIAL_OPTIONS: '--grammar=conf/engines/innodb/full_text_search.yy --gendata=conf/engines/innodb/full_text_search.zz --engine=Aria'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '027'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '028'
       TRIAL_OPTIONS: "--grammar=conf/engines/heap/heap_dml_single.yy --skip-gendata --mysqld=--init-file=$ENV_RQG_HOME/conf/engines/heap/heap_dml_single.init"
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '028'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '029'
       TRIAL_OPTIONS: '--grammar=conf/engines/heap/heap_ddl_multi.yy --skip-gendata'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '029'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '030'
       TRIAL_OPTIONS: '--grammar=conf/temporal/temporal_functions.yy --gendata=conf/temporal/temporal_functions.zz --engine=InnoDB'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '030'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '031'
       TRIAL_OPTIONS: '--grammar=conf/temporal/temporal_functions.yy --gendata=conf/temporal/temporal_functions.zz --engine=MyISAM'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '031'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '032'
       TRIAL_OPTIONS: '--grammar=conf/temporal/temporal_functions.yy --gendata=conf/temporal/temporal_functions-wl946.zz --duration=1200'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '032'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '033'
       TRIAL_OPTIONS: '--grammar=conf/mariadb/generic-dml.yy --skip-gendata --gendata-advanced --engine=InnoDB'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '033'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '034'
       TRIAL_OPTIONS: '--grammar=conf/mariadb/generic-dml.yy --skip-gendata --gendata-advanced --engine=MyISAM'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '034'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '035'
       TRIAL_OPTIONS: '--grammar=conf/mariadb/generic-dml.yy --skip-gendata --gendata-advanced --engine=Aria'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '035'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       trial_id: '036'
       TRIAL_OPTIONS: '--grammar=conf/mariadb/generic-dml.yy --skip-gendata --gendata-advanced --engine=HEAP'
-
-  - script: |
-      cd $ENV_BASEDIR
-      rev=${ENV_SERVER_REVISION:-$ENV_SERVER_BRANCH}
-      rm -rf $(Build.ArtifactStagingDirectory)/*
-      gcov_result_dir=$(Build.ArtifactStagingDirectory)
-      mkdir -p $gcov_result_dir
-      fname=${rev}_vs_${BASELINE_REVISION}
-      diff_file=$gcov_result_dir/$fname.diff
-      lcov_file=$gcov_result_dir/$rev.lcov
-      lcov --quiet --directory $ENV_BASEDIR --capture --rc lcov_branch_coverage=1 --output-file $lcov_file
-      if [ -n "$BASELINE_REVISION" ] ; then
-        git diff $BASELINE_REVISION > $diff_file
-        perl $ENV_TOOLBOX_DIR/scripts/coverage_for_patch.pl --basedir=$ENV_BASEDIR --diff-file=$diff_file --lcov-info=$lcov_file --branch-info 1>$gcov_result_dir/$fname.coverage 2>$gcov_result_dir/$fname.misses
-      fi
-      perl $ENV_TOOLBOX_DIR/scripts/coverage_summary.pl $lcov_file > $gcov_result_dir/$rev.coverage_summary
-      echo "##############################################"
-      echo "##### GCOV summary"
-      echo `cat $ENV_BASEDIR/server.info`
-      cat $gcov_result_dir/$rev.coverage_summary
-    name: gcov_report
-    displayName: GCOV report
-    condition: always()
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '036'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
 
   - task: PublishBuildArtifacts@1
     inputs:
-      pathtoPublish: $(Build.ArtifactStagingDirectory)
+      pathtoPublish: $(prep.INFODIR)
       artifactName: gcov-$(Build.BuildNumber)
-    displayName: 'Store gcov artifacts'
+    displayName: 'Store GCOV artifacts'
     condition: always()
 
 #########
