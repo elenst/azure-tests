@@ -40,6 +40,6 @@ jobs:
       for f in $(Build.ArtifactStagingDirectory)/*/test_report ; do
         cat $f
       done
-    displayName: 'Test report'
+    displayName: TEST REPORT
     condition: ${{ parameters.condition }}
 
