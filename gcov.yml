@@ -298,25 +298,25 @@ jobs:
       SUMMARY_FOLDER: $(prep.INFODIR)
       DIFF_FILE: $(prep.DIFF_FILE)
 
-  - template: steps/run-rqg-test.yml
-    parameters:
-      trial_id: '020'
-      TRIAL_OPTIONS: '--grammar=conf/mariadb/oltp-transactional.yy --gendata=conf/mariadb/oltp.zz --engine=InnoDB'
-  - template: steps/collect-gcov-info.yml
-    parameters:
-      BASENAME: '020'
-      SUMMARY_FOLDER: $(prep.INFODIR)
-      DIFF_FILE: $(prep.DIFF_FILE)
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      trial_id: '020'
+#      TRIAL_OPTIONS: '--grammar=conf/mariadb/oltp-transactional.yy --gendata=conf/mariadb/oltp.zz --engine=InnoDB'
+#  - template: steps/collect-gcov-info.yml
+#    parameters:
+#      BASENAME: '020'
+#      SUMMARY_FOLDER: $(prep.INFODIR)
+#      DIFF_FILE: $(prep.DIFF_FILE)
 
-  - template: steps/run-rqg-test.yml
-    parameters:
-      trial_id: '021'
-      TRIAL_OPTIONS: '--grammar=conf/mariadb/oltp-transactional.yy --gendata=conf/mariadb/oltp.zz --engine=Aria'
-  - template: steps/collect-gcov-info.yml
-    parameters:
-      BASENAME: '021'
-      SUMMARY_FOLDER: $(prep.INFODIR)
-      DIFF_FILE: $(prep.DIFF_FILE)
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      trial_id: '021'
+#      TRIAL_OPTIONS: '--grammar=conf/mariadb/oltp-transactional.yy --gendata=conf/mariadb/oltp.zz --engine=Aria'
+#  - template: steps/collect-gcov-info.yml
+#    parameters:
+#      BASENAME: '021'
+#      SUMMARY_FOLDER: $(prep.INFODIR)
+#      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
@@ -358,25 +358,25 @@ jobs:
       SUMMARY_FOLDER: $(prep.INFODIR)
       DIFF_FILE: $(prep.DIFF_FILE)
 
-  - template: steps/run-rqg-test.yml
-    parameters:
-      trial_id: '026'
-      TRIAL_OPTIONS: '--grammar=conf/engines/innodb/full_text_search.yy --gendata=conf/engines/innodb/full_text_search.zz --engine=MyISAM'
-  - template: steps/collect-gcov-info.yml
-    parameters:
-      BASENAME: '026'
-      SUMMARY_FOLDER: $(prep.INFODIR)
-      DIFF_FILE: $(prep.DIFF_FILE)
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      trial_id: '026'
+#      TRIAL_OPTIONS: '--grammar=conf/engines/innodb/full_text_search.yy --gendata=conf/engines/innodb/full_text_search.zz --engine=MyISAM'
+#  - template: steps/collect-gcov-info.yml
+#    parameters:
+#      BASENAME: '026'
+#      SUMMARY_FOLDER: $(prep.INFODIR)
+#      DIFF_FILE: $(prep.DIFF_FILE)
 
-  - template: steps/run-rqg-test.yml
-    parameters:
-      trial_id: '027'
-      TRIAL_OPTIONS: '--grammar=conf/engines/innodb/full_text_search.yy --gendata=conf/engines/innodb/full_text_search.zz --engine=Aria'
-  - template: steps/collect-gcov-info.yml
-    parameters:
-      BASENAME: '027'
-      SUMMARY_FOLDER: $(prep.INFODIR)
-      DIFF_FILE: $(prep.DIFF_FILE)
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      trial_id: '027'
+#      TRIAL_OPTIONS: '--grammar=conf/engines/innodb/full_text_search.yy --gendata=conf/engines/innodb/full_text_search.zz --engine=Aria'
+#  - template: steps/collect-gcov-info.yml
+#    parameters:
+#      BASENAME: '027'
+#      SUMMARY_FOLDER: $(prep.INFODIR)
+#      DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
@@ -458,15 +458,15 @@ jobs:
       SUMMARY_FOLDER: $(prep.INFODIR)
       DIFF_FILE: $(prep.DIFF_FILE)
 
-  - template: steps/run-rqg-test.yml
-    parameters:
-      trial_id: '036'
-      TRIAL_OPTIONS: '--grammar=conf/mariadb/generic-dml.yy --skip-gendata --gendata-advanced --engine=HEAP'
-  - template: steps/collect-gcov-info.yml
-    parameters:
-      BASENAME: '036'
-      SUMMARY_FOLDER: $(prep.INFODIR)
-      DIFF_FILE: $(prep.DIFF_FILE)
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      trial_id: '036'
+#      TRIAL_OPTIONS: '--grammar=conf/mariadb/generic-dml.yy --skip-gendata --gendata-advanced --engine=HEAP'
+#  - template: steps/collect-gcov-info.yml
+#    parameters:
+#      BASENAME: '036'
+#      SUMMARY_FOLDER: $(prep.INFODIR)
+#      DIFF_FILE: $(prep.DIFF_FILE)
 
   - task: PublishBuildArtifacts@1
     inputs:
