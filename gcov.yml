@@ -468,6 +468,36 @@ jobs:
 #      SUMMARY_FOLDER: $(prep.INFODIR)
 #      DIFF_FILE: $(prep.DIFF_FILE)
 
+  - template: steps/run-rqg-test.yml
+    parameters:
+      trial_id: '037'
+      TRIAL_OPTIONS: '--grammar=conf/temporal/current_timestamp_6.yy --gendata=conf/temporal/current_timestamp_6.zz --strict-fields --short-column-names --mysqld=--default-time-zone=UTC'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '037'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      trial_id: '038'
+      TRIAL_OPTIONS: '--grammar=conf/temporal/current_timestamp.yy --gendata=conf/temporal/current_timestamp.zz --strict-fields --short-column-names --mysqld=--default-time-zone=UTC'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '038'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      trial_id: '039'
+      TRIAL_OPTIONS: '--grammar=conf/temporal/temporal_ranges.yy --gendata=conf/temporal/temporal_ranges.zz --mysqld=--sql-mode=NO_ENGINE_SUBSTITUTION'
+  - template: steps/collect-gcov-info.yml
+    parameters:
+      BASENAME: '039'
+      SUMMARY_FOLDER: $(prep.INFODIR)
+      DIFF_FILE: $(prep.DIFF_FILE)
+
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: $(prep.INFODIR)
