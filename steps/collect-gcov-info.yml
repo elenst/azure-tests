@@ -17,7 +17,7 @@ steps:
       mkdir -p $PAR_DETAILS_FOLDER
       mkdir -p $PAR_SUMMARY_FOLDER
       lcov_file=$PAR_DETAILS_FOLDER/$PAR_BASENAME.lcov
-      lcov --quiet --directory $dir --capture --rc lcov_branch_coverage=1 --output-file $lcov_file
+      lcov --quiet --directory $ENV_BASEDIR --capture --rc lcov_branch_coverage=1 --output-file $lcov_file
       if [ -e $PAR_DIFF_FILE ] ; then
         perl $ENV_TOOLBOX_DIR/scripts/coverage_for_patch.pl --basedir=$ENV_BASEDIR --diff-file=$PAR_DIFF_FILE --lcov-info=$lcov_file --branch-info 1>$PAR_SUMMARY_FOLDER/$PAR_BASENAME.coverage 2>$PAR_SUMMARY_FOLDER/$PAR_BASENAME.misses
         # Override previous files, so that we always have the last ones here
@@ -33,7 +33,7 @@ steps:
       # Override previous files, so that we always have the last ones here
       cp $PAR_SUMMARY_FOLDER/$PAR_BASENAME.coverage_summary $PAR_SUMMARY_FOLDER/total.coverage_summary
       parts=${GCOV_COMPONENTS:-$PAR_COMPONENTS}
-      for $p in $parts ; do
+      for p in $parts ; do
         dir=$ENV_BASEDIR/$p
         lcov --quiet --directory $dir --capture --rc lcov_branch_coverage=1 --output-file $lcov_file.`basename $dir`
         perl $ENV_TOOLBOX_DIR/scripts/coverage_summary.pl $lcov_file.`basename $dir` > $PAR_SUMMARY_FOLDER/$PAR_BASENAME.coverage_summary.`basename $dir`
