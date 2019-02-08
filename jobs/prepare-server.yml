@@ -75,7 +75,7 @@ jobs:
 
   # If bintar was not found, install libraries, clone and build server
 
-  - template: steps/install-deb-packages.yml
+  - template: ../steps/install-deb-packages.yml
     parameters:
       INSTALLATION_SET: 'build'
       condition: and(succeeded(), ne(variables['ftp_download.BINARIES_FROM_FTP'], 'true'))
