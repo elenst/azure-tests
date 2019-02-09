@@ -19,8 +19,8 @@ steps:
         $ENV_RQG_OPTIONS \
         $PAR_TRIAL_OPTIONS \
         2>&1 | tee $ENV_LOGDIR/trial.log
-    name: ${{ parameters.trial_id }}
-    displayName: Run RQG test ${{ parameters.trial_id }}
+    name: RQG_test
+    displayName: Run RQG test ${{ coalesce(parameters.trial_id,variables['TRIAL_ID']) }}
     condition: ${{ parameters.condition }}
     continueOnError: ${{ parameters.continueOnError }}
     env:
