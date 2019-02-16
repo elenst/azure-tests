@@ -65,7 +65,7 @@ steps:
 
   - task: PublishBuildArtifacts@1
     inputs:
-      pathtoPublish: $(Build.ArtifactStagingDirectory)/result_summary.${{ variables.TEST_ID }}
+      pathtoPublish: $(Build.ArtifactStagingDirectory)/result_summary.$(TEST_ID)
       artifactName: summary-${{ variables.TEST_ID }}
     displayName: 'Store test result summary'
     condition: ${{ parameters.condition }}
@@ -73,18 +73,18 @@ steps:
 
   - task: ArchiveFiles@2
     inputs:
-      rootFolderOrFile: $(Build.ArtifactStagingDirectory)/data.${{ variables.TEST_ID }}
+      rootFolderOrFile: $(Build.ArtifactStagingDirectory)/data.$(TEST_ID)
       includeRootFolder: true
       archiveType: 'tar'
       tarCompression: 'gz'
-      archiveFile:  $(Build.ArtifactStagingDirectory)/data-$(Build.BuildNumber)-${{ variables.TEST_ID }}.tar.gz
+      archiveFile:  $(Build.ArtifactStagingDirectory)/data-$(Build.BuildNumber)-$(TEST_ID).tar.gz
     displayName: 'Archive test data'
     condition: ${{ parameters.condition }}
     continueOnError: ${{ parameters.continueOnError }}
 
   - task: PublishBuildArtifacts@1
     inputs:
-      pathtoPublish: $(Build.ArtifactStagingDirectory)/data.${{ variables.TEST_ID }}
+      pathtoPublish: $(Build.ArtifactStagingDirectory)/data.$(TEST_ID)
       artifactName: data-${{ variables.TEST_ID }}
     displayName: 'Store test data'
     condition: ${{ parameters.condition }}
