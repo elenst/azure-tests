@@ -10,7 +10,7 @@ parameters:
 
 steps:
   - script: |
-      test_id=${PAR_TRIAL_ID:-SYSTEM_JOBDISPLAYNAME}
+      test_id=${PAR_TRIAL_ID:-$SYSTEM_JOBDISPLAYNAME}
       echo "##vso[task.setvariable variable=TEST_ID]$test_id"
     env:
       PAR_TRIAL_ID: ${{ parameters.TRIAL_ID }}
