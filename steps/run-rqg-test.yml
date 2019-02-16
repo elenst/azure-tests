@@ -5,11 +5,17 @@
 parameters:
   condition: succeeded()
   continueOnError: true
-  trial_id: $(Agent.jobName)
+  TRIAL_ID: ''
   TRIAL_OPTIONS: ''
 
 steps:
   - script: |
+      test_id=${PAR_TRIAL_ID:-SYSTEM_JOBDISPLAYNAME}
+      echo "##vso[task.setvariable variable=TEST_ID]$test_id"
+    parameters:
+      PAR_TRIAL_ID: ${{ parameters.TRIAL_ID }}
+  - script: |
+      echo Test ID: $TEST_ID
       mkdir -p $ENV_LOGDIR
       set -xo pipefail
       cd $ENV_RQG_HOME
@@ -28,6 +34,6 @@ steps:
 
   - template: rqg-test-result.yml
     parameters:
-      trial_id: ${{ parameters.trial_id }}
+      trial_id: $[ variables.TEST_ID ]
       condition: ${{ parameters.condition }}
       continueOnError: ${{ parameters.continueOnError }}

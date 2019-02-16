@@ -5,7 +5,7 @@
 parameters:
   condition: always()
   continueOnError: true
-  trial_id: $(Agent.jobName)
+  trial_id: ''
 
 steps:
   - script: |
