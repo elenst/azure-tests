@@ -9,6 +9,7 @@ parameters:
 
 steps:
   - script: |
+      echo TRIAL_ID: $PAR_SUFFIX
       result_summary_dir=$(Build.ArtifactStagingDirectory)/result_summary.$PAR_SUFFIX
       result_details_dir=$(Build.ArtifactStagingDirectory)/data.$PAR_SUFFIX
       mkdir -p $result_summary_dir

@@ -34,6 +34,6 @@ steps:
 
   - template: rqg-test-result.yml
     parameters:
-      trial_id: $[ variables.TEST_ID ]
+      trial_id: $[ variables['TEST_ID'] ]
       condition: ${{ parameters.condition }}
       continueOnError: ${{ parameters.continueOnError }}
