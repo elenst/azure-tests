@@ -65,27 +65,27 @@ steps:
 
   - task: PublishBuildArtifacts@1
     inputs:
-      pathtoPublish: $(Build.ArtifactStagingDirectory)/result_summary.${{ parameters.trial_id }}
-      artifactName: summary-${{ parameters.trial_id }}
+      pathtoPublish: $(Build.ArtifactStagingDirectory)/result_summary.${{ variables.TEST_ID }}
+      artifactName: summary-${{ variables.TEST_ID }}
     displayName: 'Store test result summary'
     condition: ${{ parameters.condition }}
     continueOnError: ${{ parameters.continueOnError }}
 
   - task: ArchiveFiles@2
     inputs:
-      rootFolderOrFile: $(Build.ArtifactStagingDirectory)/data.${{ parameters.trial_id }}
+      rootFolderOrFile: $(Build.ArtifactStagingDirectory)/data.${{ variables.TEST_ID }}
       includeRootFolder: true
       archiveType: 'tar'
       tarCompression: 'gz'
-      archiveFile:  $(Build.ArtifactStagingDirectory)/data-$(Build.BuildNumber)-${{ parameters.trial_id }}.tar.gz
+      archiveFile:  $(Build.ArtifactStagingDirectory)/data-$(Build.BuildNumber)-${{ variables.TEST_ID }}.tar.gz
     displayName: 'Archive test data'
     condition: ${{ parameters.condition }}
     continueOnError: ${{ parameters.continueOnError }}
 
   - task: PublishBuildArtifacts@1
     inputs:
-      pathtoPublish: $(Build.ArtifactStagingDirectory)/data.${{ parameters.trial_id }}
-      artifactName: data-${{ parameters.trial_id }}
+      pathtoPublish: $(Build.ArtifactStagingDirectory)/data.${{ variables.TEST_ID }}
+      artifactName: data-${{ variables.TEST_ID }}
     displayName: 'Store test data'
     condition: ${{ parameters.condition }}
     continueOnError: ${{ parameters.continueOnError }}
