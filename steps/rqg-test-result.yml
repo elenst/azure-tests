@@ -29,10 +29,10 @@ steps:
         TEST_ID=${SYSTEM_JOBDISPLAYNAME}.${TRIAL_NO}
       fi
       echo "##vso[task.setvariable variable=TEST_ID]$TEST_ID"
+      rm -rf $(Build.ArtifactStagingDirectory)/*
       summary_dir=$(Build.ArtifactStagingDirectory)/summary-$(Build.BuildNumber).$TEST_ID
       details_dir=$(Build.ArtifactStagingDirectory)/data-$(Build.BuildNumber).$TEST_ID
       repro_dir=$(Build.ArtifactStagingDirectory)/repro-$(Build.BuildNumber).$TEST_ID
-      rm -rf $summary_dir $details_dir $repro_dir
       mkdir -p $summary_dir $details_dir $repro_dir
       cp $ENV_LOGDIR/trial.log $ENV_RQG_HOME/rqg.info $ENV_BASEDIR/server.info $ENV_TOOLBOX_DIR/toolbox.info $summary_dir/
       cp `find $ENV_LOGDIR -name mysql*err* | xargs` $summary_dir/
