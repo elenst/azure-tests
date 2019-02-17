@@ -111,17 +111,19 @@ jobs:
 
   - template: steps/run-rqg-test.yml
     parameters:
+      TRIAL_NO: 001
       TRIAL_OPTIONS: '--grammar=conf/runtime/metadata_stability.yy --gendata=conf/runtime/metadata_stability.zz'
       WITH_GCOV: true
-      SUMMARY_FOLDER: $(prep.INFODIR)
-      DIFF_FILE: $(prep.DIFF_FILE)
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
+      TRIAL_NO: 002
       TRIAL_OPTIONS: '--grammar=conf/runtime/performance_schema.yy --mysqld=--performance-schema'
       WITH_GCOV: true
-      SUMMARY_FOLDER: $(prep.INFODIR)
-      DIFF_FILE: $(prep.DIFF_FILE)
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
 
   - task: PublishBuildArtifacts@1
     inputs:
