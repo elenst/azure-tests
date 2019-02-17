@@ -12,7 +12,6 @@ parameters:
   GCOV_DIFF_FILE: ''
 
 steps:
-- ${{ if eq(parameters.WITH_GCOV, 'true') }}:
   - script: |
       mkdir -p $ENV_LOGDIR
       set -xo pipefail
@@ -37,6 +36,7 @@ steps:
 
   - template: collect-gcov-info.yml
     parameters:
+      WITH_GCOV: ${{ parameters.WITH_GCOV }}
       SUMMARY_FOLDER: ${{ parameters.GCOV_SUMMARY_FOLDER }}
       DIFF_FILE: ${{ parameters.GCOV_DIFF_FILE }}
       TRIAL_NO: ${{ parameters.TRIAL_NO }}

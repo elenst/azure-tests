@@ -11,8 +11,10 @@ parameters:
   COMPONENTS: 'sql storage/innobase storage/maria'
   TEST_ID: ''
   TRIAL_NO: ''
+  WITH_GCOV: true
 
 steps:
+- ${{ if eq(parameters.WITH_GCOV, 'true') }}:
   - script: |
       cd $ENV_BASEDIR
       mkdir -p $PAR_DETAILS_FOLDER $PAR_SUMMARY_FOLDER
