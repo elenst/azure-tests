@@ -72,7 +72,7 @@ steps:
       done
       echo "####################################################################################################" >> $summary_dir/test_report
       cat $summary_dir/test_report
-      cat $summary_dir/server.info >> $details_dir/repro.info
+      cat $summary_dir/server.info >> $repro_dir/repro.info
       echo $ENV_MYSQLD_OPTIONS >> $details_dir/repro.info
       if echo $ENV_RQG_OPTIONS | grep ps-protocol > /dev/null ; then
         echo "--ps-protocol" >> $details_dir/repro.info
