@@ -6,7 +6,6 @@ parameters:
   condition: always()
   continueOnError: true
   SUMMARY_FOLDER: ''
-  DETAILS_FOLDER: ''
   DIFF_FILE: ''
   COMPONENTS: 'sql storage/innobase storage/maria'
   TEST_ID: ''
@@ -17,9 +16,9 @@ steps:
 - ${{ if eq(parameters.WITH_GCOV, 'true') }}:
   - script: |
       cd $ENV_BASEDIR
-      mkdir -p $PAR_DETAILS_FOLDER $PAR_SUMMARY_FOLDER
+      mkdir -p $PAR_SUMMARY_FOLDER
       testname=${PART_TEST_ID:-$TEST_ID}
-      lcov_file=$PAR_DETAILS_FOLDER/$testname.lcov
+      lcov_file=$PAR_SUMMARY_FOLDER/$testname.lcov
       totals_suffix=$(Build.BuildNumber)
       if [ "$SYSTEM_JOBDISPLAYNAME" != "Job" ] ; then
         totals_suffix=$totals_suffix.$SYSTEM_JOBDISPLAYNAME
@@ -52,7 +51,6 @@ steps:
     condition: ${{ parameters.condition }}
     env:
       PAR_SUMMARY_FOLDER: ${{ parameters.SUMMARY_FOLDER }}
-      PAR_DETAILS_FOLDER: ${{ parameters.DETAILS_FOLDER }}
       PAR_DIFF_FILE: ${{ parameters.DIFF_FILE }}
       PAR_COMPONENTS: ${{ parameters.COMPONENTS }}
       PAR_TEST_ID: ${{ parameters.TEST_ID }}
