@@ -23,7 +23,7 @@ jobs:
   - task: DownloadBuildArtifacts@0
     inputs:
       downloadType: 'specific'
-      itemPattern: summary-*/test_report
+      itemPattern: test-*/summary-*/test_report
       downloadPath: $(Build.ArtifactStagingDirectory)
     displayName: 'Download test reports from artifacts'
 
