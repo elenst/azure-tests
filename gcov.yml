@@ -111,7 +111,7 @@ jobs:
 
   - template: steps/run-rqg-test.yml
     parameters:
-      TRIAL_NO: 001
+      TRIAL_NO: '001'
       TRIAL_OPTIONS: '--grammar=conf/runtime/metadata_stability.yy --gendata=conf/runtime/metadata_stability.zz'
       WITH_GCOV: true
       GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
@@ -119,8 +119,305 @@ jobs:
 
   - template: steps/run-rqg-test.yml
     parameters:
-      TRIAL_NO: 002
+      TRIAL_NO: '002'
       TRIAL_OPTIONS: '--grammar=conf/runtime/performance_schema.yy --mysqld=--performance-schema'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '003'
+      TRIAL_OPTIONS: '--grammar=conf/runtime/information_schema.yy'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '004'
+      TRIAL_OPTIONS: '--grammar=conf/engines/many_indexes.yy --gendata=conf/engines/many_indexes.zz'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      TRIAL_NO: '005'
+#      TRIAL_OPTIONS: '--grammar=conf/engines/many_indexes.yy --gendata=conf/engines/many_indexes.zz --engine=Aria'
+#      WITH_GCOV: true
+#      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+#      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '006'
+      TRIAL_OPTIONS: '--grammar=conf/engines/engine_stress.yy --gendata=conf/engines/engine_stress.zz --engine=InnoDB'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      TRIAL_NO: '007'
+#      TRIAL_OPTIONS: '--grammar=conf/engines/engine_stress.yy --gendata=conf/engines/engine_stress.zz --engine=MyISAM'
+#      WITH_GCOV: true
+#      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+#      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      TRIAL_NO: '008'
+#      TRIAL_OPTIONS: '--grammar=conf/engines/engine_stress.yy --gendata=conf/engines/engine_stress.zz --engine=Aria'
+#      WITH_GCOV: true
+#      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+#      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '009'
+      TRIAL_OPTIONS: '--grammar=conf/partitioning/partitions.yy'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '010'
+      TRIAL_OPTIONS: '--grammar=conf/partitioning/partition_pruning.yy --gendata=conf/partitioning/partition_pruning.zz'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '011'
+      TRIAL_OPTIONS: '--grammar=conf/replication/replication.yy --gendata=conf/replication/replication-5.1.zz'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '012'
+      TRIAL_OPTIONS: '--grammar=conf/replication/replication-ddl_sql.yy --gendata=conf/replication/replication-ddl_data.zz'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '013'
+      TRIAL_OPTIONS: '--grammar=conf/replication/replication-dml_sql.yy --gendata=conf/replication/replication-dml_data.zz'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '014'
+      TRIAL_OPTIONS: '--grammar=conf/runtime/connect_kill_sql.yy --gendata=conf/runtime/connect_kill_data.zz'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '015'
+      TRIAL_OPTIONS: '--grammar=conf/runtime/WL5004_sql.yy --gendata=conf/runtime/WL5004_data.zz'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '016'
+      TRIAL_OPTIONS: '--grammar=conf/mariadb/optimizer.yy'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      TRIAL_NO: '017'
+#      TRIAL_OPTIONS: '--grammar=conf/mariadb/optimizer.yy --engine=Aria'
+#      WITH_GCOV: true
+#      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+#      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      TRIAL_NO: '018'
+#      TRIAL_OPTIONS: '--grammar=conf/mariadb/optimizer.yy --engine=MyISAM'
+#      WITH_GCOV: true
+#      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+#      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '019'
+      TRIAL_OPTIONS: "--grammar=conf/optimizer/updateable_views.yy --skip-gendata --engine=MyISAM --mysqld=--init-file=$ENV_RQG_HOME/conf/optimizer/updateable_views.init --mysqld=--default-storage-engine=MyISAM"
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '020'
+      TRIAL_OPTIONS: '--grammar=conf/mariadb/oltp-transactional.yy --gendata=conf/mariadb/oltp.zz'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      TRIAL_NO: '021'
+#      TRIAL_OPTIONS: '--grammar=conf/mariadb/oltp-transactional.yy --gendata=conf/mariadb/oltp.zz --engine=Aria'
+#      WITH_GCOV: true
+#      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+#      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      TRIAL_NO: '022'
+#      TRIAL_OPTIONS: '--grammar=conf/mariadb/oltp.yy --gendata=conf/mariadb/oltp.zz --engine=MyISAM'
+#      WITH_GCOV: true
+#      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+#      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '023'
+      TRIAL_OPTIONS: '--grammar=conf/mariadb/functions.yy'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '024'
+      TRIAL_OPTIONS: '--grammar=conf/runtime/alter_online.yy --gendata=conf/runtime/alter_online.zz'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '025'
+      TRIAL_OPTIONS: '--grammar=conf/engines/innodb/full_text_search.yy --gendata=conf/engines/innodb/full_text_search.zz'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      TRIAL_NO: '026'
+#      TRIAL_OPTIONS: '--grammar=conf/engines/innodb/full_text_search.yy --gendata=conf/engines/innodb/full_text_search.zz --engine=MyISAM'
+#      WITH_GCOV: true
+#      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+#      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      TRIAL_NO: '027'
+#      TRIAL_OPTIONS: '--grammar=conf/engines/innodb/full_text_search.yy --gendata=conf/engines/innodb/full_text_search.zz --engine=Aria'
+#      WITH_GCOV: true
+#      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+#      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '028'
+      TRIAL_OPTIONS: "--grammar=conf/engines/heap/heap_dml_single.yy --skip-gendata --mysqld=--init-file=$ENV_RQG_HOME/conf/engines/heap/heap_dml_single.init"
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '029'
+      TRIAL_OPTIONS: '--grammar=conf/engines/heap/heap_ddl_multi.yy --skip-gendata'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '030'
+      TRIAL_OPTIONS: '--grammar=conf/temporal/temporal_functions.yy --gendata=conf/temporal/temporal_functions.zz'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      TRIAL_NO: '031'
+#      TRIAL_OPTIONS: '--grammar=conf/temporal/temporal_functions.yy --gendata=conf/temporal/temporal_functions.zz --engine=MyISAM'
+#      WITH_GCOV: true
+#      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+#      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      TRIAL_NO: '032'
+#      TRIAL_OPTIONS: '--grammar=conf/temporal/temporal_functions.yy --gendata=conf/temporal/temporal_functions-wl946.zz --duration=1200'
+#      WITH_GCOV: true
+#      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+#      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '033'
+      TRIAL_OPTIONS: '--grammar=conf/mariadb/generic-dml.yy --skip-gendata --gendata-advanced --engine=InnoDB,MyISAM,Aria,HEAP'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      TRIAL_NO: '034'
+#      TRIAL_OPTIONS: '--grammar=conf/mariadb/generic-dml.yy --skip-gendata --gendata-advanced --engine=MyISAM'
+#      WITH_GCOV: true
+#      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+#      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      TRIAL_NO: '035'
+#      TRIAL_OPTIONS: '--grammar=conf/mariadb/generic-dml.yy --skip-gendata --gendata-advanced --engine=Aria'
+#      WITH_GCOV: true
+#      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+#      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+#  - template: steps/run-rqg-test.yml
+#    parameters:
+#      TRIAL_NO: '036'
+#      TRIAL_OPTIONS: '--grammar=conf/mariadb/generic-dml.yy --skip-gendata --gendata-advanced --engine=HEAP'
+#      WITH_GCOV: true
+#      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+#      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '037'
+      TRIAL_OPTIONS: '--grammar=conf/temporal/current_timestamp_6.yy --gendata=conf/temporal/current_timestamp_6.zz --strict-fields --short-column-names --mysqld=--default-time-zone=UTC'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '038'
+      TRIAL_OPTIONS: '--grammar=conf/temporal/current_timestamp.yy --gendata=conf/temporal/current_timestamp.zz --strict-fields --short-column-names --mysqld=--default-time-zone=UTC'
+      WITH_GCOV: true
+      GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
+      GCOV_DIFF_FILE: $(prep.DIFF_FILE)
+
+  - template: steps/run-rqg-test.yml
+    parameters:
+      TRIAL_NO: '039'
+      TRIAL_OPTIONS: '--grammar=conf/temporal/temporal_ranges.yy --gendata=conf/temporal/temporal_ranges.zz --mysqld=--sql-mode=NO_ENGINE_SUBSTITUTION'
       WITH_GCOV: true
       GCOV_SUMMARY_FOLDER: $(prep.INFODIR)
       GCOV_DIFF_FILE: $(prep.DIFF_FILE)
