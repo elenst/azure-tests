@@ -29,7 +29,6 @@ jobs:
 
   # Print the summary
   - script: |
-      ls $(Build.ArtifactStagingDirectory)/*
       echo
       echo "####################################################################################################"
       echo "SUMMARY:"
