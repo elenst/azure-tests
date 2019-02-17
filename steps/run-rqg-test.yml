@@ -30,7 +30,7 @@ steps:
 
   - template: rqg-test-result.yml
     parameters:
-      condition: ${{ parameters.condition }}
+      condition: always()
       continueOnError: ${{ parameters.continueOnError }}
       TRIAL_NO: ${{ parameters.TRIAL_NO }}
 
