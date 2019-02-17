@@ -26,7 +26,7 @@ steps:
       fi
       lcov --quiet --directory $ENV_BASEDIR --capture --rc lcov_branch_coverage=1 --output-file $lcov_file
       if [ -e $PAR_DIFF_FILE ] ; then
-        perl $ENV_TOOLBOX_DIR/scripts/coverage_for_patch.pl --basedir=$ENV_BASEDIR --diff-file=$PAR_DIFF_FILE --lcov-info=$lcov_file --branch-info 1>$PAR_SUMMARY_FOLDER/$basename.coverage 2>$PAR_SUMMARY_FOLDER/$basename.misses
+        perl $ENV_TOOLBOX_DIR/scripts/coverage_for_patch.pl --basedir=$ENV_BASEDIR --diff-file=$PAR_DIFF_FILE --lcov-info=$lcov_file --branch-info 1>$PAR_SUMMARY_FOLDER/$testname.coverage 2>$PAR_SUMMARY_FOLDER/$testname.misses
         # Override previous files, so that we always have the last ones here
         cp $PAR_SUMMARY_FOLDER/$testname.coverage $PAR_SUMMARY_FOLDER/total.coverage.$totals_suffix
         cp $PAR_SUMMARY_FOLDER/$testname.misses $PAR_SUMMARY_FOLDER/total.misses.$totals_suffix
