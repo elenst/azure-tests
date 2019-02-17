@@ -52,7 +52,7 @@ jobs:
               result=1
             fi
           else
-            no_matches=$no_matches $testnum
+            no_matches="$no_matches $testnum"
             result=2
           fi
         fi
