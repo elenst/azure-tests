@@ -5,17 +5,11 @@
 parameters:
   condition: succeeded()
   continueOnError: true
-  TRIAL_ID: ''
   TRIAL_OPTIONS: ''
+  TRIAL_ID: ''
 
 steps:
   - script: |
-      test_id=${PAR_TRIAL_ID:-$SYSTEM_JOBDISPLAYNAME}
-      echo "##vso[task.setvariable variable=TEST_ID]$test_id"
-    env:
-      PAR_TRIAL_ID: ${{ parameters.TRIAL_ID }}
-  - script: |
-      echo Test ID: $TEST_ID
       mkdir -p $ENV_LOGDIR
       set -xo pipefail
       cd $ENV_RQG_HOME
@@ -26,7 +20,7 @@ steps:
         $PAR_TRIAL_OPTIONS \
         2>&1 | tee $ENV_LOGDIR/trial.log
     name: RQG_test
-    displayName: Run RQG test ${{ variables.TEST_ID }}
+    displayName: RQG test
     condition: ${{ parameters.condition }}
     continueOnError: ${{ parameters.continueOnError }}
     env:
@@ -34,6 +28,6 @@ steps:
 
   - template: rqg-test-result.yml
     parameters:
-      trial_id: ${{ variables.TEST_ID }}
       condition: ${{ parameters.condition }}
       continueOnError: ${{ parameters.continueOnError }}
+      TRIAL_ID: ${{ parameters.TRIAL_ID }}
