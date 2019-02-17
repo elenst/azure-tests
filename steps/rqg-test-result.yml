@@ -5,33 +5,33 @@
 parameters:
   condition: always()
   continueOnError: true
-  TRIAL_ID: ''
+  TRIAL_NO: ''
 
 steps:
   - script: |
       # If Trial ID is defined via parameters, we will use it.
       # Otherwise, we will initialize a variable and will use it within the job
-      if [ -n "$PAR_TRIAL_ID" ] ; then
-        TRIAL_ID=$PAR_TRIAL_ID
+      if [ -n "$PAR_TRIAL_NO" ] ; then
+        TRIAL_NO=$PAR_TRIAL_NO
       else
-        if [ -z "$TRIAL_ID" ] ; then
-          TRIAL_ID=1
+        if [ -z "$TRIAL_NO" ] ; then
+          TRIAL_NO=1
         else
-          TRIAL_ID=$(($TRIAL_ID+1))
+          TRIAL_NO=$(($TRIAL_NO+1))
         fi
-        echo "##vso[task.setvariable variable=TRIAL_ID]$TRIAL_ID"
+        echo "##vso[task.setvariable variable=TRIAL_NO]$TRIAL_NO"
       fi
       # If we are using a matrix, we also need a job name for the unique
       # suffix. Otherwise, only trial ID
       if [ "$SYSTEM_JOBDISPLAYNAME" == "Job" ] ; then
-        SUFFIX=$TRIAL_ID
+        TEST_ID=$TRIAL_NO
       else
-        SUFFIX=${SYSTEM_JOBDISPLAYNAME}.${TRIAL_ID}
+        TEST_ID=${SYSTEM_JOBDISPLAYNAME}.${TRIAL_NO}
       fi
-      echo "##vso[task.setvariable variable=SUFFIX]$SUFFIX"
-      summary_dir=$(Build.ArtifactStagingDirectory)/summary-$(Build.BuildNumber).$SUFFIX
-      details_dir=$(Build.ArtifactStagingDirectory)/data-$(Build.BuildNumber).$SUFFIX
-      repro_dir=$(Build.ArtifactStagingDirectory)/repro-$(Build.BuildNumber).$SUFFIX
+      echo "##vso[task.setvariable variable=TEST_ID]$TEST_ID"
+      summary_dir=$(Build.ArtifactStagingDirectory)/summary-$(Build.BuildNumber).$TEST_ID
+      details_dir=$(Build.ArtifactStagingDirectory)/data-$(Build.BuildNumber).$TEST_ID
+      repro_dir=$(Build.ArtifactStagingDirectory)/repro-$(Build.BuildNumber).$TEST_ID
       rm -rf $summary_dir $details_dir $repro_dir
       mkdir -p $summary_dir $details_dir $repro_dir
       cp $ENV_LOGDIR/trial.log $ENV_RQG_HOME/rqg.info $ENV_BASEDIR/server.info $ENV_TOOLBOX_DIR/toolbox.info $summary_dir/
@@ -52,7 +52,7 @@ steps:
       done
       tar zcf $details_dir/logs.tar.gz $ENV_LOGDIR
       echo "####################################################################################################" >> $summary_dir/test_report
-      echo "Test $SUFFIX" >> $summary_dir/test_report
+      echo "Test $TEST_ID" >> $summary_dir/test_report
       res=`grep 'exited with exit status' $summary_dir/trial.log | sed -e 's/.*exited with exit status STATUS_\([A-Z_]*\).*/\1/'`
       echo "Test result:" $res >> $summary_dir/test_report
       echo "PipelineId-BuildId:" $(System.DefinitionId)-$(Build.BuildId) >> $summary_dir/test_report
@@ -81,12 +81,12 @@ steps:
     condition: ${{ parameters.condition }}
     continueOnError: ${{ parameters.continueOnError }}
     env:
-      PAR_TRIAL_ID: ${{ parameters.TRIAL_ID }}
+      PAR_TRIAL_NO: ${{ parameters.TRIAL_NO }}
 
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: $(Build.ArtifactStagingDirectory)
-      artifactName: test-$(Build.BuildNumber).$(SUFFIX)
+      artifactName: test-$(Build.BuildNumber).$(TEST_ID)
     displayName: 'Store test results'
     condition: ${{ parameters.condition }}
     continueOnError: ${{ parameters.continueOnError }}
