@@ -104,7 +104,7 @@ jobs:
 
 #########
 # Print summary
-- template: jobs/rqg-test-report.yml
+- template: jobs/test-report.yml
   parameters:
     dependencies:
     - Test

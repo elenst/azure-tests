@@ -112,16 +112,14 @@ jobs:
   - template: steps/run-rqg-test.yml
     parameters:
       TRIAL_OPTIONS: '--grammar=conf/runtime/metadata_stability.yy --gendata=conf/runtime/metadata_stability.zz'
-  - template: steps/collect-gcov-info.yml
-    parameters:
+      WITH_GCOV: true
       SUMMARY_FOLDER: $(prep.INFODIR)
       DIFF_FILE: $(prep.DIFF_FILE)
 
   - template: steps/run-rqg-test.yml
     parameters:
       TRIAL_OPTIONS: '--grammar=conf/runtime/performance_schema.yy --mysqld=--performance-schema'
-  - template: steps/collect-gcov-info.yml
-    parameters:
+      WITH_GCOV: true
       SUMMARY_FOLDER: $(prep.INFODIR)
       DIFF_FILE: $(prep.DIFF_FILE)
 
@@ -129,12 +127,12 @@ jobs:
     inputs:
       pathtoPublish: $(prep.INFODIR)
       artifactName: gcov-$(Build.BuildNumber)
-    displayName: 'Store GCOV artifacts'
+    displayName: Store GCOV artifacts
     condition: always()
 
 #########
 # Print test summary
-- template: jobs/rqg-test-report.yml
+- template: jobs/test-report.yml
   parameters:
     dependencies:
     - GCOV

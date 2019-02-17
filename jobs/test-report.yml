@@ -36,9 +36,9 @@ jobs:
       echo "Server $ENV_SERVER_BRANCH"
       echo $ENV_CMAKE_OPTIONS
       echo ""
-      echo "Found" `ls $(Build.ArtifactStagingDirectory)/*/test_report | wc -l` "test result(s)"
-      grep 'Test result: ' $(Build.ArtifactStagingDirectory)/*/test_report | sed -e 's/.*Test result: //g' | sort | uniq -c
-      for f in $(Build.ArtifactStagingDirectory)/*/test_report ; do
+      echo "Found" `ls $(Build.ArtifactStagingDirectory)/*/*/test_report | wc -l` "test result(s)"
+      grep 'Test result: ' $(Build.ArtifactStagingDirectory)/*/*/test_report | sed -e 's/.*Test result: //g' | sort | uniq -c
+      for f in $(Build.ArtifactStagingDirectory)/*/*/test_report ; do
         cat $f
       done
     displayName: TEST REPORT

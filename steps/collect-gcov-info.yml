@@ -10,6 +10,7 @@ parameters:
   DIFF_FILE: ''
   COMPONENTS: 'sql storage/innobase storage/maria'
   TEST_ID: ''
+  TRIAL_NO: ''
 
 steps:
   - script: |
@@ -45,7 +46,7 @@ steps:
         echo "----- GCOV summary for $p -----"
         cat $PAR_SUMMARY_FOLDER/$testname.coverage_summary.`basename $dir`
       done
-    displayName: GCOV REPORT
+    displayName: GCOV REPORT ${{ parameters.TRIAL_NO }}
     condition: ${{ parameters.condition }}
     env:
       PAR_SUMMARY_FOLDER: ${{ parameters.SUMMARY_FOLDER }}

@@ -6,7 +6,10 @@ parameters:
   condition: succeeded()
   continueOnError: true
   TRIAL_OPTIONS: ''
-  TRIAL_ID: ''
+  TRIAL_NO: ''
+  WITH_GCOV: false
+  GCOV_SUMMARY_FOLDER: ''
+  GCOV_DIFF_FILE: ''
 
 steps:
   - script: |
@@ -19,7 +22,7 @@ steps:
         $ENV_RQG_OPTIONS \
         $PAR_TRIAL_OPTIONS \
         2>&1 | tee $ENV_LOGDIR/trial.log
-    displayName: RQG test
+    displayName: RQG test ${{ parameters.TRIAL_NO }}
     condition: ${{ parameters.condition }}
     continueOnError: ${{ parameters.continueOnError }}
     env:
@@ -29,4 +32,11 @@ steps:
     parameters:
       condition: ${{ parameters.condition }}
       continueOnError: ${{ parameters.continueOnError }}
-      TRIAL_ID: ${{ parameters.TRIAL_ID }}
+      TRIAL_NO: ${{ parameters.TRIAL_NO }}
+
+- ${{ if eq(parameters.WITH_GCOV, 'true') }}:
+  - template: collect-gcov-info.yml
+    parameters:
+      SUMMARY_FOLDER: ${{ parameters.GCOV_SUMMARY_FOLDER }}
+      DIFF_FILE: ${{ parameters.GCOV_DIFF_FILE }}
+      TRIAL_NO: ${{ parameters.TRIAL_NO }}

@@ -77,7 +77,7 @@ steps:
       if echo $ENV_RQG_OPTIONS | grep ps-protocol > /dev/null ; then
         echo "--ps-protocol" >> $details_dir/repro.info
       fi
-    displayName: 'Test report'
+    displayName: Test result ${{ parameters.TRIAL_NO }}
     condition: ${{ parameters.condition }}
     continueOnError: ${{ parameters.continueOnError }}
     env:
@@ -87,6 +87,6 @@ steps:
     inputs:
       pathtoPublish: $(Build.ArtifactStagingDirectory)
       artifactName: test-$(Build.BuildNumber).$(TEST_ID)
-    displayName: 'Store test results'
+    displayName: Store test result ${{ parameters.TRIAL_NO }}
     condition: ${{ parameters.condition }}
     continueOnError: ${{ parameters.continueOnError }}
