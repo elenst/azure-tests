@@ -19,7 +19,6 @@ steps:
         $ENV_RQG_OPTIONS \
         $PAR_TRIAL_OPTIONS \
         2>&1 | tee $ENV_LOGDIR/trial.log
-    name: RQG_test
     displayName: RQG test
     condition: ${{ parameters.condition }}
     continueOnError: ${{ parameters.continueOnError }}
