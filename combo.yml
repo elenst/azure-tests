@@ -265,6 +265,8 @@ jobs:
   - template: steps/clone-test-tools.yml
 
   - template: steps/run-rqg-test.yml
+    parameters:
+      continueOnError: false
 
 #########
 # Print summary
