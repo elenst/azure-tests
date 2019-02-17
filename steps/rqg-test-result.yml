@@ -63,7 +63,9 @@ steps:
       echo >> $summary_dir/test_report
       grep -A 1 'Final command line' $summary_dir/trial.log >> $summary_dir/test_report
       echo >> $summary_dir/test_report
-      perl $ENV_TOOLBOX_DIR/travis/check_for_known_bugs.pl $summary_dir/mysql*.err* $summary_dir/stacktraces $summary_dir/trial.log >> $summary_dir/test_report
+      if ! perl $ENV_TOOLBOX_DIR/travis/check_for_known_bugs.pl $summary_dir/mysql*.err* $summary_dir/stacktraces >> $summary_dir/test_report ; then
+        perl $ENV_TOOLBOX_DIR/travis/check_for_known_bugs.pl $summary_dir/trial.log >> $summary_dir/test_report
+      fi
       echo >> $summary_dir/test_report
       for f in $summary_dir/mysql*.err* ; do
         echo "========== $f ==========" >> $summary_dir/test_report
