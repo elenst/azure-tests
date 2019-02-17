@@ -28,6 +28,7 @@ steps:
       else
         SUFFIX=${SYSTEM_JOBDISPLAYNAME}.${TRIAL_ID}
       fi
+      echo "##vso[task.setvariable variable=SUFFIX]$SUFFIX"
       summary_dir=$(Build.ArtifactStagingDirectory)/summary-$(Build.BuildNumber).$SUFFIX
       details_dir=$(Build.ArtifactStagingDirectory)/data-$(Build.BuildNumber).$SUFFIX
       repro_dir=$(Build.ArtifactStagingDirectory)/repro-$(Build.BuildNumber).$SUFFIX
