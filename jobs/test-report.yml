@@ -44,9 +44,9 @@ jobs:
         # If test result is not OK, then
         # - if strong signature matches have been found, then the result will be a warning (succeeded with issues)
         # - if no strong matches have been found, then the result will be an error
-        if ! grep 'Test result: OK' $f ; then
+        if ! grep 'Test result: OK' $f > /dev/null ; then
           testnum=`head -n 2 $f | tail -n 1 | awk '{print $2}'`
-          if grep 'STRONG matches' $f ; then
+          if grep 'STRONG matches' $f > /dev/null ; then
             strong_matches=$strong_matches $testnum
             if [ "$result" == "0" ] ; then
               result=1
