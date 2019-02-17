@@ -9,7 +9,7 @@ parameters:
 
 jobs:
 
-- job: Print_Summary
+- job: Test_Report
   pool:
     vmImage: ${{ parameters.vmImage }}
   condition: ${{ parameters.condition }}
@@ -29,17 +29,39 @@ jobs:
 
   # Print the summary
   - script: |
+      result=0
+      strong_matches=""
+      no_matches=""
       echo
       echo "####################################################################################################"
       echo "SUMMARY:"
       echo "Server $ENV_SERVER_BRANCH"
-      echo $ENV_CMAKE_OPTIONS
       echo ""
       echo "Found" `ls $(Build.ArtifactStagingDirectory)/*/*/test_report | wc -l` "test result(s)"
       grep 'Test result: ' $(Build.ArtifactStagingDirectory)/*/*/test_report | sed -e 's/.*Test result: //g' | sort | uniq -c
       for f in $(Build.ArtifactStagingDirectory)/*/*/test_report ; do
         cat $f
+        # If test result is not OK, then
+        # - if strong signature matches have been found, then the result will be a warning (succeeded with issues)
+        # - if no strong matches have been found, then the result will be an error
+        if ! grep 'Test result: OK' $f ; then
+          testnum=`head -n 2 $f | tail -n 1 | awk '{print $2}'`
+          if grep 'STRONG matches' $f ; then
+            strong_matches=$strong_matches $testnum
+            if [ "$result" == "0" ] ; then
+              result=1
+            fi
+          else
+            no_matches=$no_matches $testnum
+            result=2
+          fi
+        fi
       done
+      if [ "$result" == "2" ] ; then
+        echo "##vso[task.complete result=Failed]Failures without strong matches: $no_matches"
+      elif [ "$result" == "1" ] ; then
+        echo "##vso[task.complete result=SucceededWithIssues]Failures with matches: $strong_matches"
+      fi
     displayName: TEST REPORT
     condition: ${{ parameters.condition }}
 
