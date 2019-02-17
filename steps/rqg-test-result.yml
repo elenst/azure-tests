@@ -69,7 +69,7 @@ steps:
       echo >> $summary_dir/test_report
       for f in $summary_dir/mysql*.err* ; do
         echo "========== $f ==========" >> $summary_dir/test_report
-        cat $f | grep -v -f $ENV_TOOLBOX_DIR/travis/server_warnings.supp | grep -v "\[Note\]" | grep -v "^$" | cut -c 1-4096 >> $summary_dir/test_report
+        cat $f | grep -v -f $ENV_TOOLBOX_DIR/travis/server_warnings.supp | grep -v "\[Note\]" | grep -v "\] Query: " | grep -v "^$" | cut -c 1-4096 >> $summary_dir/test_report
         echo >> $summary_dir/test_report
       done
       echo "####################################################################################################" >> $summary_dir/test_report
