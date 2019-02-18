@@ -47,7 +47,7 @@ jobs:
         if ! grep 'Test result: OK' $f > /dev/null ; then
           testnum=`head -n 2 $f | tail -n 1 | awk '{print $2}'`
           if grep 'STRONG matches' $f > /dev/null ; then
-            strong_matches=$strong_matches $testnum
+            strong_matches="$strong_matches $testnum"
             if [ "$result" == "0" ] ; then
               result=1
             fi
