@@ -31,7 +31,12 @@ jobs:
   - script: |
       result=0
       strong_matches=""
+      files_with_strong_matches=""
+      weak_matches=""
+      files_with_weak_matches=""
       no_matches=""
+      files_with_no_matches=""
+      files_ok=""
       echo
       echo "####################################################################################################"
       echo "SUMMARY:"
@@ -39,24 +44,68 @@ jobs:
       echo ""
       echo "Found" `ls $(Build.ArtifactStagingDirectory)/*/*/test_report | wc -l` "test result(s)"
       grep 'Test result: ' $(Build.ArtifactStagingDirectory)/*/*/test_report | sed -e 's/.*Test result: //g' | sort | uniq -c
+      echo ""
+      number_of_printed_asserts=`grep -c "Warning: assertion failed" $(Build.ArtifactStagingDirectory)/*/*/test_report`
+      number_of_files_with_printed_asserts=`grep -l "Warning: assertion failed" $(Build.ArtifactStagingDirectory)/*/*/test_report | wc -l`
+      echo "$number_of_printed_asserts found in $number_of_files_with_printed_asserts file(s)"
+      echo ""
       for f in $(Build.ArtifactStagingDirectory)/*/*/test_report ; do
-        cat $f
         # If test result is not OK, then
         # - if strong signature matches have been found, then the result will be a warning (succeeded with issues)
         # - if no strong matches have been found, then the result will be an error
-        if ! grep 'Test result: OK' $f > /dev/null ; then
+        if ! grep 'Test result: OK' $f > /dev/null || grep 'Warning: assertion failed' $f > /dev/null ; then
           testnum=`head -n 2 $f | tail -n 1 | awk '{print $2}'`
           if grep 'STRONG matches' $f > /dev/null ; then
             strong_matches="$strong_matches $testnum"
+            files_with_strong_matches="$files_with_strong_matches $f"
             if [ "$result" == "0" ] ; then
               result=1
             fi
+          elif grep 'WEAK matches' $f > /dev/null ; then
+            weak_matches="$weak_matches $testnum"
+            files_with_weak_matches="$files_with_weak_matches $f"
+            result=2
           else
             no_matches="$no_matches $testnum"
+            files_with_no_matches="$files_with_no_matches $f"
             result=2
           fi
+        else
+          files_ok="$files_ok $f"
         fi
       done
+      if [ -n "$files_with_no_matches" ] ; then
+        echo ""
+        echo "NO MATCHES:"
+        echo ""
+        for f in $files_with_no_matches ; do
+          cat $f
+        done
+      fi
+      if [ -n "$files_with_weak_matches" ] ; then
+        echo ""
+        echo "WEAK MATCHES:"
+        echo ""
+        for f in $files_with_weak_matches ; do
+          cat $f
+        done
+      fi
+      if [ -n "$files_with_strong_matches" ] ; then
+        echo ""
+        echo "STRONG MATCHES:"
+        echo ""
+        for f in $files_with_strong_matches ; do
+          cat $f
+        done
+      fi
+      if [ -n "$files_ok" ] ; then
+        echo ""
+        echo "OK:"
+        echo ""
+        for f in $files_ok ; do
+          cat $f
+        done
+      fi
       if [ "$result" == "2" ] ; then
         echo "##vso[task.complete result=Failed]Failures without strong matches: $no_matches"
       elif [ "$result" == "1" ] ; then
