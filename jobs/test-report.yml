@@ -47,7 +47,7 @@ jobs:
       echo ""
       number_of_printed_asserts=`grep -h -c "Warning: assertion failed" $(Build.ArtifactStagingDirectory)/*/*/test_report | awk '{s+=$1} END {print s}'`
       number_of_files_with_printed_asserts=`grep -l "Warning: assertion failed" $(Build.ArtifactStagingDirectory)/*/*/test_report | wc -l`
-      echo "$number_of_printed_asserts found in $number_of_files_with_printed_asserts file(s)"
+      echo "$number_of_printed_asserts printed asserts found in $number_of_files_with_printed_asserts file(s)"
       echo ""
       for f in $(Build.ArtifactStagingDirectory)/*/*/test_report ; do
         # If test result is not OK, then
