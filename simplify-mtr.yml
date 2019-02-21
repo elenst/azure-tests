@@ -1,13 +1,12 @@
 trigger: none
 
   # The general log is located in a different pipeline/build.
+  #
   # TRIGGER_ID consists has a form of PipelineID-BuildId-ReproArtifactSuffix,
   # e.g. 10-837-20190220.1.003.1
   # Repro info is located in artifact test-<ReproArtifactSuffix>/repro-<ReproArtifactSuffix>
   # We don't require artifact name for the build, because it's always 'build'
 
-variables:
-  
   # Other parameters, which we (might) need in any case
   # SEARCH_PATTERN (needed for all practical purposes, although technically not mandatory)
   # MTR_OPTIONS (optional)
