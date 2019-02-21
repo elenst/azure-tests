@@ -1,0 +1,140 @@
+trigger: none
+
+  # The general log is located in a different pipeline/build.
+  # TRIGGER_ID consists has a form of PipelineID-BuildId-ReproArtifactSuffix,
+  # e.g. 10-837-20190220.1.003.1
+  # Repro info is located in artifact test-<ReproArtifactSuffix>/repro-<ReproArtifactSuffix>
+  # We don't require artifact name for the build, because it's always 'build'
+
+variables:
+  
+  # Other parameters, which we (might) need in any case
+  # SEARCH_PATTERN (needed for all practical purposes, although technically not mandatory)
+  # MTR_OPTIONS (optional)
+  # CONVERSION_OPTIONS (optional, --convert-to-ps and such)
+  # SIMPLIFICATION_OPTIONS (optional, --mode, --max-chunk, --trials=X)
+  # _TEST_COMMENT (optional, just a convenience for easier detecting what it was about)
+  
+jobs:
+
+#########
+- job: Simplify
+  timeoutInMinutes: 0
+  pool:
+    vmImage: 'Ubuntu 16.04'
+  strategy:
+    parallel: 1
+
+  steps:
+
+  - script: |
+      if [ -n "$_TEST_COMMENT" ] ; then
+        echo "#####################"
+        echo $_TEST_COMMENT
+        echo "#####################"
+      fi
+      if [ -z "$TRIGGER_ID" ] ; then
+        echo "##vso[task.complete result=Failed]\"TRIGGER_ID\" has not been specified"
+      fi
+      
+      IFS='-' read -r -a ids <<< $TRIGGER_ID
+      TRIGGERING_PIPELINE_ID=${ids[0]}
+      TRIGGERING_BUILD_ID=${ids[1]}
+      TRIGGERING_ARTIFACT_ID=${ids[2]}
+      echo "##vso[task.setvariable variable=TRIGGERING_PIPELINE_ID]$TRIGGERING_PIPELINE_ID"
+      echo "##vso[task.setvariable variable=TRIGGERING_BUILD_ID]$TRIGGERING_BUILD_ID"
+      echo "##vso[task.setvariable variable=TRIGGERING_ARTIFACT_ID]$TRIGGERING_ARTIFACT_ID"
+      echo "##vso[task.setvariable variable=BASEDIR]$HOME/server"
+      echo "##vso[task.setvariable variable=RQG_HOME]$HOME/rqg"
+      echo "##vso[task.setvariable variable=TOOLBOX_DIR]$HOME/toolbox"
+        
+      echo "Test comment:          " $_TEST_COMMENT
+      echo "Search pattern:        " $SEARCH_PATTERN
+      echo "Trigger ID:            " $TRIGGER_ID
+      echo "Triggering pipeline ID:" $TRIGGERING_PIPELINE_ID
+      echo "Triggering build ID:   " $TRIGGERING_BUILD_ID
+      echo "Triggering artifact ID:" $TRIGGERING_ARTIFACT_ID
+      echo "Cmake options:         " $CMAKE_OPTIONS
+      echo "Conversion options:    " $CONVERSION_OPTIONS
+      echo "Simplification options:" $SIMPLIFICATION_OPTIONS
+      echo "Log URL:               " $LOG_URL
+      echo "MTR options:           " $MTR_OPTIONS
+      echo "MySQLd options:        " $MYSQLD_OPTIONS
+      echo "Server branch:         " $SERVER_BRANCH
+      echo "Server revision:       " $SERVER_REVISION
+    displayName: 'Check configuration'
+
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      buildType: 'specific'
+      project: 'MariaDB tests'
+      pipeline: '$TRIGGERING_PIPELINE_ID'
+      buildVersionToDownload: 'specific'
+      buildId: '$TRIGGERING_BUILD_ID'
+      downloadType: 'single'
+      artifactName: test-$TRIGGERING_ARTIFACT_ID
+      itemPattern: repro-$TRIGGERING_ARTIFACT_ID/*
+      downloadPath: '$(System.ArtifactsDirectory)' 
+    name: get_repro_info
+    displayName: 'Download repro info from pipeline'
+
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      buildType: 'specific'
+      project: 'MariaDB tests'
+      pipeline: '$TRIGGERING_PIPELINE_ID'
+      buildVersionToDownload: 'specific'
+      buildId: '$TRIGGERING_BUILD_ID'
+      downloadType: 'single'
+      artifactName: 'build'
+      downloadPath: '$(System.ArtifactsDirectory)' 
+    name: get_binaries
+    displayName: 'Download binaries from pipeline'
+
+  - script: |
+      ls -l $(System.ArtifactsDirectory)/
+      mkdir $BASEDIR
+      cd $BASEDIR
+      tar zxf $(System.ArtifactsDirectory)/build/build-*.tar.gz
+    name: unpack_binaries
+    displayName: 'Unpack server binaries'
+
+  # Get tools, extract repro info, convert general log into MTR and run simplification
+  - script: |
+      sudo apt-get update
+      sudo apt-get install -y -q libdbi-perl libdbd-mysql-perl libsnappy1v5 gdb
+      git clone "https://github.com/MariaDB/randgen" --branch=elenst-dev $RQG_HOME
+      git clone "https://github.com/elenst/mariadb-toolbox" $TOOLBOX_DIR
+      mysqld_repro_options=`grep 'MySQLd options' $(System.ArtifactsDirectory)/repro-$TRIGGERING_ARTIFACT_ID/repro.info | sed -e "s/MySQLd options://"`
+      mtr_repro_options=``grep 'MTR options' $(System.ArtifactsDirectory)/repro-$TRIGGERING_ARTIFACT_ID/repro.info | sed -e "s/MTR options://"`
+      cd $BASEDIR
+      patch -p 1 < $TOOLBOX_DIR/mtr/mtr_default_server.patch
+      cd mysql-test
+      mkdir suite/bug
+      perl $TOOLBOX_DIR/scripts/mysql_log_to_mysqltest.pl $CONVERSION_OPTIONS $(System.ArtifactsDirectory)/repro-$TRIGGERING_ARTIFACT_ID/mysql.log > $BASEDIR/mysql-test/suite/bug/repro.test
+      echo "perl $TOOLBOX_DIR/scripts/simplify-mtr-test.pl --suitedir=$BASEDIR/mysql-test/suite/bug --testcase=repro $SIMPLIFICATION_OPTIONS --options=\"$mysqld_repro_options $mtr_repro_options $MTR_OPTIONS $MYSQLD_OPTIONS\"" > simplification_cmd
+      if [ -n "$SEARCH_PATTERN" ] ; then
+        echo `cat simplification_cmd` "--output=\"$SEARCH_PATTERN\"" > simplification_cmd
+      fi
+      cat simplification_cmd
+      . ./simplification_cmd
+      cp simplification_cmd mtr_cmd $(Build.ArtifactStagingDirectory)/
+      cp var/log/mysqld.1.err $(Build.ArtifactStagingDirectory)/  
+      cp suite/bug/repro.test $(Build.ArtifactStagingDirectory)/
+      cp repro.output/repro.out.last $(Build.ArtifactStagingDirectory)/
+      tar zcf repro.output.tar.gz repro.output
+      mv repro.output.tar.gz $(Build.ArtifactStagingDirectory)/
+      echo ""
+      echo "We tried to reproduce the failure happened in TRIGGERING_ARTIFACT_ID of pipeline $TRIGGERING_PIPELINE_ID, build $TRIGGERING_BUILD_ID)"
+      echo "   while searching for pattern $SEARCH_PATTERN"
+      last_test=`ls -tr $BASEDIR/mysql-test/suite/bug/repro.test.reproducible.* | tail -n 1`
+      cp $last_test $(Build.ArtifactStagingDirectory)/last_test.test
+    name: simplify
+    displayName: 'Prepare and run simplification'
+
+  - task: PublishPipelineArtifact@0
+    inputs:
+      targetPath: $(Build.ArtifactStagingDirectory)/
+      artifactName: data
+    displayName: 'Store test file and output'
+    condition: always()
