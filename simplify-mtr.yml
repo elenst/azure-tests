@@ -71,8 +71,7 @@ jobs:
       buildVersionToDownload: 'specific'
       buildId: '$(TRIGGERING_BUILD_ID)'
       downloadType: 'single'
-      artifactName: test-$(TRIGGERING_ARTIFACT_ID)
-      itemPattern: repro-$(TRIGGERING_ARTIFACT_ID)/*
+      artifactName: 'test-$(TRIGGERING_ARTIFACT_ID)'
       downloadPath: '$(System.ArtifactsDirectory)' 
     name: get_repro_info
     displayName: 'Download repro info from pipeline'
@@ -105,7 +104,7 @@ jobs:
       git clone "https://github.com/MariaDB/randgen" --branch=elenst-dev $RQG_HOME
       git clone "https://github.com/elenst/mariadb-toolbox" $TOOLBOX_DIR
       mysqld_repro_options=`grep 'MySQLd options' $(System.ArtifactsDirectory)/repro-$TRIGGERING_ARTIFACT_ID/repro.info | sed -e "s/MySQLd options://"`
-      mtr_repro_options=``grep 'MTR options' $(System.ArtifactsDirectory)/repro-$TRIGGERING_ARTIFACT_ID/repro.info | sed -e "s/MTR options://"`
+      mtr_repro_options=`grep 'MTR options' $(System.ArtifactsDirectory)/repro-$TRIGGERING_ARTIFACT_ID/repro.info | sed -e "s/MTR options://"`
       cd $BASEDIR
       patch -p 1 < $TOOLBOX_DIR/mtr/mtr_default_server.patch
       cd mysql-test
