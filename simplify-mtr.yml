@@ -67,12 +67,12 @@ jobs:
     inputs:
       buildType: 'specific'
       project: 'MariaDB tests'
-      pipeline: '$TRIGGERING_PIPELINE_ID'
+      pipeline: '$(TRIGGERING_PIPELINE_ID)'
       buildVersionToDownload: 'specific'
-      buildId: '$TRIGGERING_BUILD_ID'
+      buildId: '$(TRIGGERING_BUILD_ID)'
       downloadType: 'single'
-      artifactName: test-$TRIGGERING_ARTIFACT_ID
-      itemPattern: repro-$TRIGGERING_ARTIFACT_ID/*
+      artifactName: test-$(TRIGGERING_ARTIFACT_ID)
+      itemPattern: repro-$(TRIGGERING_ARTIFACT_ID)/*
       downloadPath: '$(System.ArtifactsDirectory)' 
     name: get_repro_info
     displayName: 'Download repro info from pipeline'
@@ -81,9 +81,9 @@ jobs:
     inputs:
       buildType: 'specific'
       project: 'MariaDB tests'
-      pipeline: '$TRIGGERING_PIPELINE_ID'
+      pipeline: '$(TRIGGERING_PIPELINE_ID)'
       buildVersionToDownload: 'specific'
-      buildId: '$TRIGGERING_BUILD_ID'
+      buildId: '$(TRIGGERING_BUILD_ID)'
       downloadType: 'single'
       artifactName: 'build'
       downloadPath: '$(System.ArtifactsDirectory)' 
