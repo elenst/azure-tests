@@ -51,17 +51,25 @@ steps:
         gdb --batch --eval-command="thread apply all bt full" $binary $c >> $details_dir/threads_full
       done
       tar zcf $details_dir/logs.tar.gz $ENV_LOGDIR
-      echo "####################################################################################################" >> $summary_dir/test_report
+      echo "" >> $summary_dir/test_report
       echo "Test $TEST_ID" >> $summary_dir/test_report
       res=`grep 'exited with exit status' $summary_dir/trial.log | sed -e 's/.*exited with exit status STATUS_\([A-Z_]*\).*/\1/'`
       echo "Test result:" $res >> $summary_dir/test_report
-      echo "PipelineId-BuildId:" $(System.DefinitionId)-$(Build.BuildId) >> $summary_dir/test_report
+      echo "Trigger ID:" $(System.DefinitionId)-$(Build.BuildId)-$(Build.BuildNumber).$TEST_ID >> $summary_dir/test_report
       echo "-------------------------------------" >> $summary_dir/test_report
       echo >> $summary_dir/test_report
-      echo `cat $summary_dir/server.info` >> $summary_dir/test_report
+      cp $summary_dir/server.info $repro_dir/repro.info
+      rqg_cmd=`grep -A 1 'Final command line' $summary_dir/trial.log | tail -n 1'`
+      mysqld_options=""
+      for o $rqg_cmd ; do
+        if expr match "$o" "--mysqld" ; then
+          mysqld_options="$mysqld_options $o"
+        fi
+      done
+      echo "RQG command line: $rqg_cmd" >> $repro_dir/repro.info
+      echo "MySQLd options: $mysqld_options" >> $repro_dir/repro.info
       echo `cat $summary_dir/rqg.info` `cat $summary_dir/toolbox.info` >> $summary_dir/test_report
-      echo >> $summary_dir/test_report
-      grep -A 1 'Final command line' $summary_dir/trial.log >> $summary_dir/test_report
+      cat $repro_dir/repro.info >> $summary_dir/test_report
       echo >> $summary_dir/test_report
       if ! perl $ENV_TOOLBOX_DIR/travis/check_for_known_bugs.pl $summary_dir/mysql*.err* $summary_dir/stacktraces >> $summary_dir/test_report ; then
         perl $ENV_TOOLBOX_DIR/travis/check_for_known_bugs.pl $summary_dir/trial.log >> $summary_dir/test_report
@@ -72,13 +80,8 @@ steps:
         cat $f | grep -v -f $ENV_TOOLBOX_DIR/travis/server_warnings.supp | grep -v "\[Note\]" | grep -v "\] Query: " | grep -v "^$" | cut -c 1-4096 >> $summary_dir/test_report
         echo >> $summary_dir/test_report
       done
-      echo "####################################################################################################" >> $summary_dir/test_report
+      echo "#####################################" >> $summary_dir/test_report
       cat $summary_dir/test_report
-      cat $summary_dir/server.info >> $repro_dir/repro.info
-      echo $ENV_MYSQLD_OPTIONS >> $details_dir/repro.info
-      if echo $ENV_RQG_OPTIONS | grep ps-protocol > /dev/null ; then
-        echo "--ps-protocol" >> $details_dir/repro.info
-      fi
     displayName: Test result ${{ parameters.TRIAL_NO }}
     condition: ${{ parameters.condition }}
     continueOnError: ${{ parameters.continueOnError }}

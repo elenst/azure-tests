@@ -32,6 +32,7 @@ jobs:
       result=0
       strong_matches=""
       files_with_strong_matches=""
+      files_with_drafts=""
       weak_matches=""
       files_with_weak_matches=""
       no_matches=""
@@ -57,9 +58,14 @@ jobs:
           testnum=`head -n 2 $f | tail -n 1 | awk '{print $2}'`
           if grep 'STRONG matches' $f > /dev/null ; then
             strong_matches="$strong_matches $testnum"
-            files_with_strong_matches="$files_with_strong_matches $f"
-            if [ "$result" == "0" ] ; then
-              result=1
+            if grep 'MDEV.*Draft' $f > /dev/null ; then
+              files_with_drafts="$files_with_drafts $f"
+              result=2
+            else
+              files_with_strong_matches="$files_with_strong_matches $f"
+              if [ "$result" == "0" ] ; then
+                result=1
+              fi
             fi
           elif grep 'WEAK matches' $f > /dev/null ; then
             weak_matches="$weak_matches $testnum"
@@ -75,33 +81,41 @@ jobs:
         fi
       done
       if [ -n "$files_with_no_matches" ] ; then
-        echo ""
+        echo "####################################################################################################"
         echo "NO MATCHES:"
-        echo ""
+        echo "####################################################################################################"
         for f in $files_with_no_matches ; do
           cat $f
         done
       fi
+      if [ -n "$files_with_drafts" ] ; then
+        echo "####################################################################################################"
+        echo "OCCURRENCES OF DRAFTS:"
+        echo "####################################################################################################"
+        for f in $files_with_drafts ; do
+          cat $f
+        done
+      fi
       if [ -n "$files_with_weak_matches" ] ; then
-        echo ""
+        echo "####################################################################################################"
         echo "WEAK MATCHES:"
-        echo ""
+        echo "####################################################################################################"
         for f in $files_with_weak_matches ; do
           cat $f
         done
       fi
       if [ -n "$files_with_strong_matches" ] ; then
-        echo ""
+        echo "####################################################################################################"
         echo "STRONG MATCHES:"
-        echo ""
+        echo "####################################################################################################"
         for f in $files_with_strong_matches ; do
           cat $f
         done
       fi
       if [ -n "$files_ok" ] ; then
-        echo ""
+        echo "####################################################################################################"
         echo "OK:"
-        echo ""
+        echo "####################################################################################################"
         for f in $files_ok ; do
           cat $f
         done
