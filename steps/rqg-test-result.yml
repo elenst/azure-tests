@@ -59,9 +59,9 @@ steps:
       echo "-------------------------------------" >> $summary_dir/test_report
       echo >> $summary_dir/test_report
       cp $summary_dir/server.info $repro_dir/repro.info
-      rqg_cmd=`grep -A 1 'Final command line' $summary_dir/trial.log | tail -n 1'`
+      rqg_cmd=`grep -A 1 'Final command line' $summary_dir/trial.log | tail -n 1`
       mysqld_options=""
-      for o $rqg_cmd ; do
+      for o in $rqg_cmd ; do
         if expr match "$o" "--mysqld" ; then
           mysqld_options="$mysqld_options $o"
         fi
