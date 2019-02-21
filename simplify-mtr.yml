@@ -103,20 +103,21 @@ jobs:
       sudo apt-get install -y -q libdbi-perl libdbd-mysql-perl libsnappy1v5 gdb
       git clone "https://github.com/MariaDB/randgen" --branch=elenst-dev $RQG_HOME
       git clone "https://github.com/elenst/mariadb-toolbox" $TOOLBOX_DIR
-      mysqld_repro_options=`grep 'MySQLd options' $(System.ArtifactsDirectory)/repro-$TRIGGERING_ARTIFACT_ID/repro.info | sed -e "s/MySQLd options://"`
-      mtr_repro_options=`grep 'MTR options' $(System.ArtifactsDirectory)/repro-$TRIGGERING_ARTIFACT_ID/repro.info | sed -e "s/MTR options://"`
+      REPRO_DIR=$(System.ArtifactsDirectory)/test-$TRIGGERING_ARTIFACT_ID
+      mysqld_repro_options=`grep 'MySQLd options' $REPRO_DIR/repro.info | sed -e "s/MySQLd options://"`
+      mtr_repro_options=`grep 'MTR options' $REPRO_DIR/repro.info | sed -e "s/MTR options://"`
       cd $BASEDIR
       patch -p 1 < $TOOLBOX_DIR/mtr/mtr_default_server.patch
       cd mysql-test
       mkdir suite/bug
-      perl $TOOLBOX_DIR/scripts/mysql_log_to_mysqltest.pl $CONVERSION_OPTIONS $(System.ArtifactsDirectory)/repro-$TRIGGERING_ARTIFACT_ID/mysql.log > $BASEDIR/mysql-test/suite/bug/repro.test
+      perl $TOOLBOX_DIR/scripts/mysql_log_to_mysqltest.pl $CONVERSION_OPTIONS $REPRO_DIR/mysql.log > $BASEDIR/mysql-test/suite/bug/repro.test
       echo "perl $TOOLBOX_DIR/scripts/simplify-mtr-test.pl --suitedir=$BASEDIR/mysql-test/suite/bug --testcase=repro $SIMPLIFICATION_OPTIONS --options=\"$mysqld_repro_options $mtr_repro_options $MTR_OPTIONS $MYSQLD_OPTIONS\"" > simplification_cmd
       if [ -n "$SEARCH_PATTERN" ] ; then
         echo `cat simplification_cmd` "--output=\"$SEARCH_PATTERN\"" > simplification_cmd
       fi
       cat simplification_cmd
       . ./simplification_cmd
-      cp simplification_cmd mtr_cmd $(Build.ArtifactStagingDirectory)/
+      cp simplification_cmd $(Build.ArtifactStagingDirectory)/
       cp var/log/mysqld.1.err $(Build.ArtifactStagingDirectory)/  
       cp suite/bug/repro.test $(Build.ArtifactStagingDirectory)/
       cp repro.output/repro.out.last $(Build.ArtifactStagingDirectory)/
