@@ -47,7 +47,7 @@ jobs:
 
 #  - task: DownloadBuildArtifacts@0
 #      downloadType: 'single'
-  - task: DownloadPipelineArtifact@1
+  - task: DownloadPipelineArtifact@0
     inputs:
       buildType: 'specific'
       project: 'MariaDB tests'
