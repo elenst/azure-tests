@@ -45,15 +45,14 @@ jobs:
       echo "Triggering build ID:   " $TRIGGERING_BUILD_ID
     displayName: 'Check configuration'
 
-#  - task: DownloadBuildArtifacts@0
-#      downloadType: 'single'
-  - task: DownloadPipelineArtifact@0
+  - task: DownloadBuildArtifacts@0
     inputs:
       buildType: 'specific'
       project: 'MariaDB tests'
       pipeline: '$(TRIGGERING_PIPELINE_ID)'
       buildVersionToDownload: 'specific'
       buildId: '$(TRIGGERING_BUILD_ID)'
+      downloadType: 'single'
       artifactName: 'data'
       downloadPath: '$(System.ArtifactsDirectory)' 
     name: get_repro_info
