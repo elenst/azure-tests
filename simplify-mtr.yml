@@ -137,9 +137,9 @@ jobs:
     name: simplify
     displayName: 'Prepare and run simplification'
 
-  - task: PublishPipelineArtifact@0
+  - task: PublishBuildArtifacts@1
     inputs:
-      targetPath: $(Build.ArtifactStagingDirectory)/
+      pathtoPublish: $(Build.ArtifactStagingDirectory)/
       artifactName: data
     displayName: 'Store test file and output'
     condition: always()
