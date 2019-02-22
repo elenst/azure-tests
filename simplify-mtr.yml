@@ -124,8 +124,14 @@ jobs:
       tar zcf repro.output.tar.gz repro.output
       mv repro.output.tar.gz $(Build.ArtifactStagingDirectory)/
       echo ""
-      echo "We tried to reproduce the failure happened in TRIGGERING_ARTIFACT_ID of pipeline $TRIGGERING_PIPELINE_ID, build $TRIGGERING_BUILD_ID)"
-      echo "   while searching for pattern $SEARCH_PATTERN"
+      if [ -n "$_TEST_COMMENT" ] ; then
+        echo $_TEST_COMMENT
+        echo ""
+      fi
+      echo "We tried to reproduce the failure happened in $TRIGGERING_ARTIFACT_ID of pipeline $TRIGGERING_PIPELINE_ID, build $TRIGGERING_BUILD_ID)"
+      echo "on the server " `head -n 2 $REPRO_DIR/repro.info`
+      echo "while searching for pattern $SEARCH_PATTERN"
+      echo ""
       last_test=`ls -tr $BASEDIR/mysql-test/suite/bug/repro.test.reproducible.* | tail -n 1`
       cp $last_test $(Build.ArtifactStagingDirectory)/last_test.test
     name: simplify
