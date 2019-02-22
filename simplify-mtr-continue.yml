@@ -46,6 +46,7 @@ jobs:
     displayName: 'Check configuration'
 
 #  - task: DownloadBuildArtifacts@0
+#      downloadType: 'single'
   - task: DownloadPipelineArtifact@1
     inputs:
       buildType: 'specific'
@@ -53,7 +54,6 @@ jobs:
       pipeline: '$(TRIGGERING_PIPELINE_ID)'
       buildVersionToDownload: 'specific'
       buildId: '$(TRIGGERING_BUILD_ID)'
-#      downloadType: 'single'
       artifactName: 'data'
       downloadPath: '$(System.ArtifactsDirectory)' 
     name: get_repro_info
