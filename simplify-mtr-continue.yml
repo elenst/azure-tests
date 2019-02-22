@@ -46,7 +46,7 @@ jobs:
     displayName: 'Check configuration'
 
 #  - task: DownloadBuildArtifacts@0
-  - task: DownloadPipelineArtifact
+  - task: DownloadPipelineArtifact@1
     inputs:
       buildType: 'specific'
       project: 'MariaDB tests'
