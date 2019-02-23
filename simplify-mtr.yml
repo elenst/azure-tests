@@ -67,7 +67,7 @@ jobs:
       buildId: '$(TRIGGERING_BUILD_ID)'
       downloadType: 'single'
       artifactName: 'test-$(TRIGGERING_ARTIFACT_ID)'
-      itemPattern: 'repro*/**'
+      itemPattern: 'test-$(TRIGGERING_ARTIFACT_ID)/repro-test-$(TRIGGERING_ARTIFACT_ID)/**'
       downloadPath: '$(HOME)/test_info'
     name: get_repro_info
     displayName: 'Download repro info from pipeline'
