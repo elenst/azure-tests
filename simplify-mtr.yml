@@ -54,7 +54,6 @@ jobs:
       echo "Conversion options:    " $CONVERSION_OPTIONS
       echo "Simplification options:" $SIMPLIFICATION_OPTIONS
       echo "MTR options:           " $MTR_OPTIONS
-      mkdir $HOME/test_info
     displayName: 'Check configuration'
 
 # Test info goes to a different dir, as we will only need a portion of it to republish
@@ -68,7 +67,7 @@ jobs:
       downloadType: 'single'
       artifactName: 'test-$(TRIGGERING_ARTIFACT_ID)'
       itemPattern: 'test-$(TRIGGERING_ARTIFACT_ID)/repro-$(TRIGGERING_ARTIFACT_ID)/**'
-      downloadPath: '$(HOME)/test_info'
+      downloadPath: '$(System.ArtifactsDirectory)'
     name: get_repro_info
     displayName: 'Download repro info from pipeline'
 
@@ -101,8 +100,7 @@ jobs:
       git clone "https://github.com/MariaDB/randgen" --branch=elenst-dev $RQG_HOME
       git clone "https://github.com/elenst/mariadb-toolbox" $TOOLBOX_DIR
       REPRO_DIR=$(System.ArtifactsDirectory)/repro
-      mkdir $REPRO_DIR
-      mv $(System.ArtifactsDirectory)/test-$TRIGGERING_ARTIFACT_ID/repro-$TRIGGERING_ARTIFACT_ID/* $REPRO_DIR/
+      mv $(System.ArtifactsDirectory)/test-$(TRIGGERING_ARTIFACT_ID)/repro-$(TRIGGERING_ARTIFACT_ID) $REPRO_DIR
       mysqld_repro_options=`grep 'MySQLd options' $REPRO_DIR/repro.info | sed -e "s/MySQLd options://"`
       mtr_repro_options=`grep 'MTR options' $REPRO_DIR/repro.info | sed -e "s/MTR options://"`
       cd $BASEDIR
