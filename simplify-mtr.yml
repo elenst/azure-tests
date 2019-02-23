@@ -35,7 +35,6 @@ jobs:
       if [ -z "$TRIGGER_ID" ] ; then
         echo "##vso[task.complete result=Failed]\"TRIGGER_ID\" has not been specified"
       fi
-      
       IFS='-' read -r -a ids <<< $TRIGGER_ID
       TRIGGERING_PIPELINE_ID=${ids[0]}
       TRIGGERING_BUILD_ID=${ids[1]}
@@ -46,23 +45,19 @@ jobs:
       echo "##vso[task.setvariable variable=BASEDIR]$HOME/server"
       echo "##vso[task.setvariable variable=RQG_HOME]$HOME/rqg"
       echo "##vso[task.setvariable variable=TOOLBOX_DIR]$HOME/toolbox"
-        
       echo "Test comment:          " $_TEST_COMMENT
       echo "Search pattern:        " $SEARCH_PATTERN
       echo "Trigger ID:            " $TRIGGER_ID
       echo "Triggering pipeline ID:" $TRIGGERING_PIPELINE_ID
       echo "Triggering build ID:   " $TRIGGERING_BUILD_ID
       echo "Triggering artifact ID:" $TRIGGERING_ARTIFACT_ID
-      echo "Cmake options:         " $CMAKE_OPTIONS
       echo "Conversion options:    " $CONVERSION_OPTIONS
       echo "Simplification options:" $SIMPLIFICATION_OPTIONS
-      echo "Log URL:               " $LOG_URL
       echo "MTR options:           " $MTR_OPTIONS
-      echo "MySQLd options:        " $MYSQLD_OPTIONS
-      echo "Server branch:         " $SERVER_BRANCH
-      echo "Server revision:       " $SERVER_REVISION
+      mkdir $HOME/test_info
     displayName: 'Check configuration'
 
+# Test info goes to a different dir, as we will only need a portion of it to republish
   - task: DownloadBuildArtifacts@0
     inputs:
       buildType: 'specific'
@@ -72,10 +67,12 @@ jobs:
       buildId: '$(TRIGGERING_BUILD_ID)'
       downloadType: 'single'
       artifactName: 'test-$(TRIGGERING_ARTIFACT_ID)'
-      downloadPath: '$(System.ArtifactsDirectory)' 
+      itemPattern: 'repro*/**'
+      downloadPath: '$(HOME)/test_info'
     name: get_repro_info
     displayName: 'Download repro info from pipeline'
 
+# The build goes directly to ArtifactsDirectory, as we'll need to publish it again
   - task: DownloadBuildArtifacts@0
     inputs:
       buildType: 'specific'
@@ -90,7 +87,7 @@ jobs:
     displayName: 'Download binaries from pipeline'
 
   - script: |
-      ls -l $(System.ArtifactsDirectory)/
+      ls -l $HOME/test_info/
       mkdir $BASEDIR
       cd $BASEDIR
       tar zxf $(System.ArtifactsDirectory)/build/build-*.tar.gz
@@ -103,7 +100,9 @@ jobs:
       sudo apt-get install -y -q libdbi-perl libdbd-mysql-perl libsnappy1v5 gdb
       git clone "https://github.com/MariaDB/randgen" --branch=elenst-dev $RQG_HOME
       git clone "https://github.com/elenst/mariadb-toolbox" $TOOLBOX_DIR
-      REPRO_DIR=$(System.ArtifactsDirectory)/test-$TRIGGERING_ARTIFACT_ID/repro-$TRIGGERING_ARTIFACT_ID
+      REPRO_DIR=$(System.ArtifactsDirectory)/repro
+      mkdir $REPRO_DIR
+      mv $(System.ArtifactsDirectory)/test-$TRIGGERING_ARTIFACT_ID/repro-$TRIGGERING_ARTIFACT_ID/* $REPRO_DIR/
       mysqld_repro_options=`grep 'MySQLd options' $REPRO_DIR/repro.info | sed -e "s/MySQLd options://"`
       mtr_repro_options=`grep 'MTR options' $REPRO_DIR/repro.info | sed -e "s/MTR options://"`
       cd $BASEDIR
@@ -111,19 +110,17 @@ jobs:
       cd mysql-test
       mkdir suite/bug
       perl $TOOLBOX_DIR/scripts/mysql_log_to_mysqltest.pl $CONVERSION_OPTIONS $REPRO_DIR/mysql.log > $BASEDIR/mysql-test/suite/bug/repro.test
-      echo "perl $TOOLBOX_DIR/scripts/simplify-mtr-test.pl --suitedir=$BASEDIR/mysql-test/suite/bug --testcase=repro $SIMPLIFICATION_OPTIONS --options=\"$mysqld_repro_options $mtr_repro_options $MTR_OPTIONS $MYSQLD_OPTIONS\"" > simplification_cmd
+      echo "perl $TOOLBOX_DIR/scripts/simplify-mtr-test.pl --suitedir=$BASEDIR/mysql-test/suite/bug --testcase=repro $SIMPLIFICATION_OPTIONS --options=\"$mysqld_repro_options $mtr_repro_options $MTR_OPTIONS $MYSQLD_OPTIONS\"" > $REPRO_DIR/simplification_cmd
       if [ -n "$SEARCH_PATTERN" ] ; then
-        echo `cat simplification_cmd` "--output=\"$SEARCH_PATTERN\"" > simplification_cmd
+        echo `cat $REPRO_DIR/simplification_cmd` "--output=\"$SEARCH_PATTERN\"" > $REPRO_DIR/simplification_cmd
       fi
-      cat simplification_cmd
-      . ./simplification_cmd
-      cp simplification_cmd $(Build.ArtifactStagingDirectory)/
-      cp var/log/mysqld.1.err $(Build.ArtifactStagingDirectory)/  
-      cp suite/bug/repro.test $(Build.ArtifactStagingDirectory)/
-      cp repro.output/repro.out.last $(Build.ArtifactStagingDirectory)/
-      tar zcf repro.output.tar.gz repro.output
+      . $REPRO_DIR/simplification_cmd
+      cp suite/bug/repro.test $(Build.ArtifactStagingDirectory)/first_test.test
+      tar zcf repro.output.tar.gz repro.output var/log/mysqld.1.err
       mv repro.output.tar.gz $(Build.ArtifactStagingDirectory)/
-      echo ""
+      last_test=`ls -tr $BASEDIR/mysql-test/suite/bug/repro.test.reproducible.* | tail -n 1`
+      cp $last_test $REPRO_DIR/last_test.test
+      echo "#######################################################################"
       if [ -n "$_TEST_COMMENT" ] ; then
         echo $_TEST_COMMENT
         echo ""
@@ -131,9 +128,8 @@ jobs:
       echo "We tried to reproduce the failure happened in $TRIGGERING_ARTIFACT_ID of pipeline $TRIGGERING_PIPELINE_ID, build $TRIGGERING_BUILD_ID)"
       echo "on the server " `head -n 2 $REPRO_DIR/repro.info`
       echo "while searching for pattern $SEARCH_PATTERN"
+      echo "#######################################################################"
       echo ""
-      last_test=`ls -tr $BASEDIR/mysql-test/suite/bug/repro.test.reproducible.* | tail -n 1`
-      cp $last_test $(Build.ArtifactStagingDirectory)/last_test.test
     name: simplify
     displayName: 'Prepare and run simplification'
 
