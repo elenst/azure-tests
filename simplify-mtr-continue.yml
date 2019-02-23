@@ -90,8 +90,9 @@ jobs:
         echo $_TEST_COMMENT
         echo ""
       fi
-      echo "e tried to continue reproducing the failure from pipeline $TRIGGERING_PIPELINE_ID, build $TRIGGERING_BUILD_ID)"
-      echo "on the server " `cat $BASEDIR/server.info`
+      echo "we tried to continue reproducing the failure from pipeline $TRIGGERING_PIPELINE_ID, build $TRIGGERING_BUILD_ID"
+      echo "on the server"
+      cat $BASEDIR/server.info
       echo "while running the command"
       cat $REPRO_DIR/simplification_cmd
       echo "#######################################################################"
