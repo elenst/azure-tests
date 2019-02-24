@@ -93,6 +93,10 @@ jobs:
         git checkout $ENV_SERVER_REVISION
       fi
       set -x
+      # Prepare mysqltest for further reproducing
+      cd $srcdir
+      sed -i -e 's/define DEFAULT_MAX_CONN        64/define DEFAULT_MAX_CONN        256/' client/mysqltest.cc
+      grep DEFAULT_MAX_CONN client/mysqltest.cc
       mkdir $builddir
       cd $builddir
       cmake $srcdir $ENV_CMAKE_OPTIONS -DCMAKE_INSTALL_PREFIX=$ENV_BASEDIR
