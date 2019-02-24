@@ -56,56 +56,18 @@ jobs:
       downloadPath: '$(System.ArtifactsDirectory)' 
     name: get_repro_info
     displayName: 'Download build and repro info from the previous stage'
-    # Remove after processing old intermediate results
-    condition: false
-
-  # Remove after processing old intermediate results
-  - task: DownloadBuildArtifacts@0
-    inputs:
-      buildType: 'specific'
-      project: 'MariaDB tests'
-      pipeline: '$(TRIGGERING_PIPELINE_ID)'
-      buildVersionToDownload: 'specific'
-      buildId: '$(TRIGGERING_BUILD_ID)'
-      downloadType: 'single'
-      artifactName: 'data'
-      itemPattern: 'data/data/build/**'
-      downloadPath: '$(System.ArtifactsDirectory)' 
-    displayName: 'Download build from the previous stage'
-
-  # Remove after processing old intermediate results
-  - task: DownloadBuildArtifacts@0
-    inputs:
-      buildType: 'specific'
-      project: 'MariaDB tests'
-      pipeline: '$(TRIGGERING_PIPELINE_ID)'
-      buildVersionToDownload: 'specific'
-      buildId: '$(TRIGGERING_BUILD_ID)'
-      downloadType: 'single'
-      artifactName: 'data'
-      itemPattern: 'data/@(last_test.test|simplification_cmd)'
-      downloadPath: '$(System.ArtifactsDirectory)' 
-    displayName: 'Download repro info from the previous stage'
 
   - script: |
       mkdir $BASEDIR
       cd $BASEDIR
-      #tar zxf $(System.ArtifactsDirectory)/data/build/build-*.tar.gz
-      # Change back to ^ after processing old intermediate results
-      tar zxf $(System.ArtifactsDirectory)/data/data/build/build-*.tar.gz
+      tar zxf $(System.ArtifactsDirectory)/data/build/build-*.tar.gz
     name: unpack_binaries
     displayName: 'Unpack server binaries'
 
   # Get tools, extract repro info, convert general log into MTR and run simplification
   - script: |
       mv $(System.ArtifactsDirectory)/data/build $(System.ArtifactsDirectory)/
-      # Change back to ^ after processing old intermediate results
-      mv $(System.ArtifactsDirectory)/data/data/build $(System.ArtifactsDirectory)/
-      # Remove after processing old intermediate results
-      mkdir $(System.ArtifactsDirectory)/repro
-      # mv $(System.ArtifactsDirectory)/data/repro $(System.ArtifactsDirectory)/
-      # Change back to ^ after processing old intermediate results
-      mv $(System.ArtifactsDirectory)/data/last_test.test $(System.ArtifactsDirectory)/data/simplification_cmd $(System.ArtifactsDirectory)/repro/
+      mv $(System.ArtifactsDirectory)/data/repro $(System.ArtifactsDirectory)/
       rm -rf $(System.ArtifactsDirectory)/data
       sudo apt-get update
       sudo apt-get install -y -q libdbi-perl libdbd-mysql-perl libsnappy1v5 gdb
