@@ -101,7 +101,7 @@ jobs:
       git clone "https://github.com/elenst/mariadb-toolbox" $TOOLBOX_DIR
       REPRO_DIR=$(System.ArtifactsDirectory)/repro
       mv $(System.ArtifactsDirectory)/test-$(TRIGGERING_ARTIFACT_ID)/repro-$(TRIGGERING_ARTIFACT_ID) $REPRO_DIR
-      mysqld_repro_options=`grep 'MySQLd options' $REPRO_DIR/repro.info | sed -e "s/MySQLd options://"`
+      mysqld_repro_options=`grep 'MySQLd options' $REPRO_DIR/repro.info | sed -e "s/MySQLd options://" | sed -e "s/\$ENV_RQG_HOME/$RQG_HOME/g"`
       mtr_repro_options=`grep 'MTR options' $REPRO_DIR/repro.info | sed -e "s/MTR options://"`
       cd $BASEDIR
       patch -p 1 < $TOOLBOX_DIR/mtr/mtr_default_server.patch
