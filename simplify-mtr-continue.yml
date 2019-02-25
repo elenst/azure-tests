@@ -80,6 +80,7 @@ jobs:
       mkdir suite/bug
       mv $REPRO_DIR/last_test.test $BASEDIR/mysql-test/suite/bug/repro.test
       . $REPRO_DIR/simplification_cmd
+      res=$?
       cp suite/bug/repro.test $(Build.ArtifactStagingDirectory)/first_test.test
       tar zcf repro.output.tar.gz repro.output var/log/mysqld.1.err
       mv repro.output.tar.gz $(Build.ArtifactStagingDirectory)/
@@ -95,8 +96,15 @@ jobs:
       cat $BASEDIR/server.info
       echo "while running the command"
       cat $REPRO_DIR/simplification_cmd
+      echo ""
+      echo "RESULT: $res"
       echo "#######################################################################"
       echo ""
+      if [ "$res" == "1" ] ; then
+        echo "##vso[task.complete result=Failed]Could not reproduce the failure"
+      elif [ "$res" == "2" ] ; then
+        echo "##vso[task.complete result=SucceededWithIssues]The process ended due to approaching timeout"
+      fi
     name: simplify
     displayName: 'Prepare and run simplification'
 
