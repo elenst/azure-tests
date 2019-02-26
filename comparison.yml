@@ -238,10 +238,10 @@ jobs:
         RQG_GENDATA: 'conf/temporal/temporal_functions.zz'
         RQG_ENGINE: MyISAM
 
-      '032':
-        RQG_GRAMMAR: 'conf/temporal/temporal_functions.yy'
-        RQG_GENDATA: 'conf/temporal/temporal_functions-wl946.zz'
-        RQG_DURATION: 1200
+#      '032':
+#        RQG_GRAMMAR: 'conf/temporal/temporal_functions.yy'
+#        RQG_GENDATA: 'conf/temporal/temporal_functions-wl946.zz'
+#        RQG_DURATION: 1200
 
       '033':
         RQG_GRAMMAR: 'conf/mariadb/generic-dml.yy'
