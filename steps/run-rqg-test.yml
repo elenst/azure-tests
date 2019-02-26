@@ -3,7 +3,7 @@
 ########################################################################
 
 parameters:
-  condition: and(succeeded(),le(coalesce(variables['System.JobDisplayName'],'0'),coalesce(variables['MAX_JOB'],'999999')))
+  condition: succeeded()
   continueOnError: true
   TRIAL_OPTIONS: ''
   TRIAL_NO: ''
@@ -23,14 +23,14 @@ steps:
         $PAR_TRIAL_OPTIONS \
         2>&1 | tee $ENV_LOGDIR/trial.log
     displayName: RQG test ${{ parameters.TRIAL_NO }}
-    condition: ${{ parameters.condition }}
+    condition: ${{ and(parameters.condition,le(coalesce(variables['System.JobDisplayName'],'0'),coalesce(variables['MAX_JOB'],'999999'))) }}
     continueOnError: ${{ parameters.continueOnError }}
     env:
       PAR_TRIAL_OPTIONS: ${{ parameters.TRIAL_OPTIONS }}
 
   - template: rqg-test-result.yml
     parameters:
-      condition: always()
+      condition: ${{ and(always(),le(coalesce(variables['System.JobDisplayName'],'0'),coalesce(variables['MAX_JOB'],'999999'))) }}
       continueOnError: ${{ parameters.continueOnError }}
       TRIAL_NO: ${{ parameters.TRIAL_NO }}
 
