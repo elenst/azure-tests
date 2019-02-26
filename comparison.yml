@@ -63,7 +63,7 @@ jobs:
     name: 'Upload_baseline_to_FTP'
     artifactName: 'baseline'
     dependencies:
-    - 'Download_or_Build_Server'
+    - 'Download_or_Build_Baseline'
     condition: and(succeeded(), ne(dependencies.Download_or_Build_Server.outputs['ftp_download.BINARIES_FROM_FTP'], 'true'))
 
 #########
