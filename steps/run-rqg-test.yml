@@ -3,7 +3,7 @@
 ########################################################################
 
 parameters:
-  condition: and(succeeded(),le(coalesce($(System.JobDisplayName),'0'),coalesce($(MAX_JOB),'999999')))
+  condition: and(succeeded(),le(coalesce(variables['System.JobDisplayName'],'0'),coalesce(variables['MAX_JOB'],'999999')))
   continueOnError: true
   TRIAL_OPTIONS: ''
   TRIAL_NO: ''
