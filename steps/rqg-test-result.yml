@@ -37,7 +37,9 @@ steps:
       cp $ENV_LOGDIR/trial.log $ENV_RQG_HOME/rqg.info $ENV_BASEDIR/server.info $ENV_TOOLBOX_DIR/toolbox.info $summary_dir/
       cp `find $ENV_LOGDIR -name mysql*err* | xargs` $summary_dir/
       cp `find $ENV_LOGDIR -name mbackup*log* | xargs` $summary_dir/
-      cp $ENV_LOGDIR/vardir/mysql.log $repro_dir/
+      for f in $ENV_LOGDIR/vardir/mysql.log $ENV_LOGDIR/vardir1/mysql.log ; do
+        cp $f $repro_dir/
+      done
       for c in `find $ENV_LOGDIR -name core*` ; do
         echo "#################### $c ####################" >> $summary_dir/stacktraces
         echo "#################### $c ####################" >> $details_dir/threads

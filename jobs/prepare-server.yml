@@ -10,6 +10,7 @@ parameters:
 
   SERVER_REPO: 'https://github.com/MariaDB/server'
   FTP_DOWNLOAD: 'ftp://perro.askmonty.org/public/azure'
+  BUILD_ARTIFACT_NAME: 'build'
 
 jobs:
 
@@ -128,6 +129,6 @@ jobs:
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: $(Build.ArtifactStagingDirectory)
-      artifactName: 'build'
+      artifactName: ${{ parameters.BUILD_ARTIFACT_NAME }}
     displayName: 'Store build artifact'
     condition: succeeded()
