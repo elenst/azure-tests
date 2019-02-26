@@ -126,7 +126,7 @@ jobs:
       fi
       echo "We tried to reproduce the failure happened in $TRIGGERING_ARTIFACT_ID of pipeline $TRIGGERING_PIPELINE_ID, build $TRIGGERING_BUILD_ID)"
       echo "on the server " `head -n 2 $REPRO_DIR/repro.info`
-      echo "while searching for pattern:
+      echo "while searching for pattern:"
       echo "\"$SEARCH_PATTERN\""
       echo "using simplification command:"
       cat $REPRO_DIR/simplification_cmd
