@@ -12,6 +12,7 @@ parameters:
   GCOV_DIFF_FILE: ''
 
 steps:
+- $${{ le(coalesce(variables['System.JobDisplayName'],'0'),coalesce(variables['MAX_JOB'],'999999')) }}:
   - script: |
       mkdir -p $ENV_LOGDIR
       set -xo pipefail
@@ -23,14 +24,14 @@ steps:
         $PAR_TRIAL_OPTIONS \
         2>&1 | tee $ENV_LOGDIR/trial.log
     displayName: RQG test ${{ parameters.TRIAL_NO }}
-    condition: ${{ and(parameters.condition,le(coalesce(variables['System.JobDisplayName'],'0'),coalesce(variables['MAX_JOB'],'999999'))) }}
+    condition: ${{ parameters.condition }}
     continueOnError: ${{ parameters.continueOnError }}
     env:
       PAR_TRIAL_OPTIONS: ${{ parameters.TRIAL_OPTIONS }}
 
   - template: rqg-test-result.yml
     parameters:
-      condition: ${{ le(coalesce(variables['System.JobDisplayName'],'0'),coalesce(variables['MAX_JOB'],'999999')) }}
+      condition: always()
       continueOnError: ${{ parameters.continueOnError }}
       TRIAL_NO: ${{ parameters.TRIAL_NO }}
 
