@@ -299,7 +299,7 @@ jobs:
 
   - template: steps/run-rqg-test.yml
     parameters:
-      TRIAL_OPTIONS="--basedir1=$(env.BASEDIR) --basedir2=$(HOME)/baseline --vardir1=$(env.LOGDIR)/vardir1 --vardir2=$(env.LOGDIR)/vardir2"
+      TRIAL_OPTIONS: "--basedir1=$(env.BASEDIR) --basedir2=$(HOME)/baseline --vardir1=$(env.LOGDIR)/vardir1 --vardir2=$(env.LOGDIR)/vardir2"
 
 #########
 # Print summary
