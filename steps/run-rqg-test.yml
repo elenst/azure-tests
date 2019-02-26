@@ -12,7 +12,7 @@ parameters:
   GCOV_DIFF_FILE: ''
 
 steps:
-- $${{ le(coalesce(variables['System.JobDisplayName'],'0'),coalesce(variables['MAX_JOB'],'999999')) }}:
+- ${{ le(coalesce(variables['System.JobDisplayName'],'0'),coalesce(variables['MAX_JOB'],'999999')) }}:
   - script: |
       mkdir -p $ENV_LOGDIR
       set -xo pipefail
