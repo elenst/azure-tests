@@ -60,6 +60,8 @@ jobs:
 # Upload to FTP
 - template: jobs/upload-to-ftp.yml
   parameters:
+    name: 'Upload_baseline_to_FTP'
+    artifactName: 'baseline'
     dependencies:
     - 'Download_or_Build_Server'
     condition: and(succeeded(), ne(dependencies.Download_or_Build_Server.outputs['ftp_download.BINARIES_FROM_FTP'], 'true'))
@@ -77,6 +79,8 @@ jobs:
 # Upload to FTP
 - template: jobs/upload-to-ftp.yml
   parameters:
+    name: 'Upload_build_to_FTP'
+    artifactName: 'build'
     dependencies:
     - 'Download_or_Build_Server'
     condition: and(succeeded(), ne(dependencies.Download_or_Build_Server.outputs['ftp_download.BINARIES_FROM_FTP'], 'true'))
