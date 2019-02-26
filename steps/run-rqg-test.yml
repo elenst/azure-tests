@@ -30,7 +30,7 @@ steps:
 
   - template: rqg-test-result.yml
     parameters:
-      condition: ${{ and(always(),le(coalesce(variables['System.JobDisplayName'],'0'),coalesce(variables['MAX_JOB'],'999999'))) }}
+      condition: ${{ le(coalesce(variables['System.JobDisplayName'],'0'),coalesce(variables['MAX_JOB'],'999999')) }}
       continueOnError: ${{ parameters.continueOnError }}
       TRIAL_NO: ${{ parameters.TRIAL_NO }}
 
