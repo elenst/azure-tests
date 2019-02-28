@@ -41,6 +41,7 @@ jobs:
       echo "Trigger ID:            " $TRIGGER_ID
       echo "Triggering pipeline ID:" $TRIGGERING_PIPELINE_ID
       echo "Triggering build ID:   " $TRIGGERING_BUILD_ID
+      echo "Simplification options:" $SIMPLIFICATION_OPTIONS
     displayName: 'Check configuration'
 
   - task: DownloadBuildArtifacts@0
@@ -79,7 +80,7 @@ jobs:
       cd mysql-test
       mkdir suite/bug
       mv $REPRO_DIR/last_test.test $BASEDIR/mysql-test/suite/bug/repro.test
-      . $REPRO_DIR/simplification_cmd
+      . $REPRO_DIR/simplification_cmd $SIMPLIFICATION_OPTIONS
       res=$?
       cp suite/bug/repro.test $(Build.ArtifactStagingDirectory)/first_test.test
       tar zcf repro.output.tar.gz repro.output var/log/mysqld.1.err
@@ -87,15 +88,11 @@ jobs:
       last_test=`ls -tr $BASEDIR/mysql-test/suite/bug/repro.test.reproducible.* | tail -n 1`
       cp $last_test $REPRO_DIR/last_test.test
       echo "#######################################################################"
-      if [ -n "$_TEST_COMMENT" ] ; then
-        echo $_TEST_COMMENT
-        echo ""
-      fi
-      echo "we tried to continue reproducing the failure from pipeline $TRIGGERING_PIPELINE_ID, build $TRIGGERING_BUILD_ID"
-      echo "on the server"
-      cat $BASEDIR/server.info
-      echo "while running the command"
+      cat $REPRO_DIR/repro.notes
       cat $REPRO_DIR/simplification_cmd
+      if [ -n "$SIMPLIFICATION_OPTIONS" ] ; then
+        echo "with extra simplification options: $SIMPLIFICATION_OPTIONS"
+      fi
       echo ""
       echo "RESULT: $res"
       echo "#######################################################################"
