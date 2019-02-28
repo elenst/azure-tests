@@ -120,15 +120,19 @@ jobs:
       last_test=`ls -tr $BASEDIR/mysql-test/suite/bug/repro.test.reproducible.* | tail -n 1`
       cp $last_test $REPRO_DIR/last_test.test
       echo "#######################################################################"
+      notes_file=$REPRO_DIR/repro.notes
       if [ -n "$_TEST_COMMENT" ] ; then
-        echo $_TEST_COMMENT
-        echo ""
+        echo $_TEST_COMMENT >> $notes_file
+        echo "" >> $notes_file
       fi
-      echo "We tried to reproduce the failure happened in $TRIGGERING_ARTIFACT_ID of pipeline $TRIGGERING_PIPELINE_ID, build $TRIGGERING_BUILD_ID)"
-      echo "on the server " `head -n 2 $REPRO_DIR/repro.info`
-      echo "while searching for pattern:"
-      echo "\"$SEARCH_PATTERN\""
-      echo "using simplification command:"
+      echo "We tried to reproduce the failure happened in $TRIGGERING_ARTIFACT_ID of pipeline $TRIGGERING_PIPELINE_ID, build $TRIGGERING_BUILD_ID)" >> $notes_file
+      echo "initial trigger ID $TRIGGER_ID" >> $notes_file
+      echo "current simplification ID $(System.DefinitionId)-$(Build.BuildId)" >> $notes_file
+      echo "on the server " `head -n 2 $REPRO_DIR/repro.info` >> $notes_file
+      echo "while searching for pattern:" >> $notes_file
+      echo "\"$SEARCH_PATTERN\"" >> $notes_file
+      echo "using simplification command:" >> $notes_file
+      cat $notes_file
       cat $REPRO_DIR/simplification_cmd
       echo ""
       echo "RESULT: $res"
