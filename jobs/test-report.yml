@@ -48,10 +48,16 @@ jobs:
       echo ""
       number_of_printed_asserts=`grep -h -c "Warning: assertion failed" $(Build.ArtifactStagingDirectory)/*/*/test_report | awk '{s+=$1} END {print s}'`
       number_of_files_with_printed_asserts=`grep -l "Warning: assertion failed" $(Build.ArtifactStagingDirectory)/*/*/test_report | wc -l`
-      echo "$number_of_printed_asserts printed asserts found in $number_of_files_with_printed_asserts file(s):"
-      echo ""
-      grep -h "Warning: assertion failed" $(Build.ArtifactStagingDirectory)/*/*/test_report | sort | uniq -c
-      echo ""
+      if [ "$number_of_printed_asserts" != "0" ] ; then
+        echo "$number_of_printed_asserts printed asserts found in $number_of_files_with_printed_asserts file(s):"
+        echo ""
+        grep -h "Warning: assertion failed" $(Build.ArtifactStagingDirectory)/*/*/test_report | sort | uniq -c
+        echo ""
+      fi
+      if grep -h 'ATTENTION: FOUND FIXED MDEV' $(Build.ArtifactStagingDirectory)/*/*/test_report | uniq ; then
+        grep -h 'ATTENTION: FOUND FIXED MDEV' -A 1 $(Build.ArtifactStagingDirectory)/*/*/test_report | grep 'MDEV-' | uniq
+        echo "-------------------------------------"
+      fi
       for f in $(Build.ArtifactStagingDirectory)/*/*/test_report ; do
         # If test result is not OK, then
         # - if strong signature matches have been found, then the result will be a warning (succeeded with issues)
