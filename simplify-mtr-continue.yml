@@ -88,6 +88,7 @@ jobs:
       last_test=`ls -tr $BASEDIR/mysql-test/suite/bug/repro.test.reproducible.* | tail -n 1`
       cp $last_test $REPRO_DIR/last_test.test
       echo "#######################################################################"
+      echo "current simplification ID $(System.DefinitionId)-$(Build.BuildId)"
       cat $REPRO_DIR/repro.notes
       cat $REPRO_DIR/simplification_cmd
       if [ -n "$SIMPLIFICATION_OPTIONS" ] ; then

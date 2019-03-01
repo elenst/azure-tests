@@ -125,9 +125,9 @@ jobs:
         echo $_TEST_COMMENT >> $notes_file
         echo "" >> $notes_file
       fi
+      echo "current simplification ID $(System.DefinitionId)-$(Build.BuildId)"
       echo "We tried to reproduce the failure happened in $TRIGGERING_ARTIFACT_ID of pipeline $TRIGGERING_PIPELINE_ID, build $TRIGGERING_BUILD_ID)" >> $notes_file
       echo "initial trigger ID $TRIGGER_ID" >> $notes_file
-      echo "current simplification ID $(System.DefinitionId)-$(Build.BuildId)" >> $notes_file
       echo "on the server " `head -n 2 $REPRO_DIR/repro.info` >> $notes_file
       echo "while searching for pattern:" >> $notes_file
       echo "\"$SEARCH_PATTERN\"" >> $notes_file
