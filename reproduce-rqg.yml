@@ -55,11 +55,10 @@ jobs:
     vmImage: 'Ubuntu 16.04'
 
   strategy:
-    parallel: 6
     maxParallel: 2
+    parallel: 6
 
   steps:
-
   - template: steps/env.yml
 
   - task: DownloadBuildArtifacts@0
