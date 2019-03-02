@@ -1,0 +1,74 @@
+########################################################################
+# Reproduce RQG failures observed elsewhere.
+# The goal is to get the logs and binaries in the usual format,
+# for further passing them to simplifiers
+########################################################################
+
+trigger: none
+
+variables:
+
+  SERVER_BRANCH: ''
+  SERVER_REVISION: ''
+  CMAKE_OPTIONS: ''
+  RQG_OPTIONS: ''
+  RQG_BRANCH: 'elenst-dev'
+  RQG_TRIALS: 1
+  TOOLBOX_BRANCH: 'master'
+
+jobs:
+
+#########
+# Download or build server
+- template: jobs/prepare-server.yml
+  parameters:
+    name: 'Download_or_Build_Server'
+
+#########
+# Upload to FTP
+- template: jobs/upload-to-ftp.yml
+  parameters:
+    dependencies:
+    - 'Download_or_Build_Server'
+    condition: and(succeeded(), ne(dependencies.Download_or_Build_Server.outputs['ftp_download.BINARIES_FROM_FTP'], 'true'))
+
+#########
+- job: Test
+  dependsOn: Download_or_Build_Server
+  pool:
+    vmImage: 'Ubuntu 16.04'
+
+  strategy:
+    parallel:  $[ variables['RQG_TRIALS'] ]
+    maxParallel: 5
+
+  steps:
+
+  - template: steps/env.yml
+
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      artifactName: 'build'
+      downloadPath: $(Build.ArtifactStagingDirectory)
+    displayName: 'Download build from artifacts'
+
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: '$(Build.ArtifactStagingDirectory)/build/build-*.tar.gz'
+      destinationFolder: $(env.BASEDIR)
+    displayName: 'Extract build'
+
+  - template: steps/install-deb-packages.yml
+    parameters:
+      INSTALLATION_SET: 'runtime'
+
+  - template: steps/clone-test-tools.yml
+
+  - template: steps/run-rqg-test.yml
+
+#########
+# Print summary
+- template: jobs/test-report.yml
+  parameters:
+    dependencies:
+    - Test
