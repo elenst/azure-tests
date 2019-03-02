@@ -39,7 +39,7 @@ jobs:
     vmImage: 'Ubuntu 16.04'
 
   strategy:
-    parallel:  $[ variables['RQG_TRIALS'] ]
+    parallel: 5
 
   steps:
 
