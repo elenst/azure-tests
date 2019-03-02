@@ -55,7 +55,7 @@ jobs:
     vmImage: 'Ubuntu 16.04'
 
   strategy:
-    maxParallel: 2
+    parallel: 5
 
   steps:
   - template: steps/env.yml
