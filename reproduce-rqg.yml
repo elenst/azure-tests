@@ -20,7 +20,7 @@ jobs:
 #########
 - job: Info
   steps:
-    script: |
+    - script: |
       echo "#######################################################################"
       if [ -n "$_TEST_COMMENT" ] ; then
         echo $_TEST_COMMENT
