@@ -56,6 +56,9 @@ steps:
       echo "" >> $summary_dir/test_report
       echo "Test $TEST_ID" >> $summary_dir/test_report
       res=`grep 'exited with exit status' $summary_dir/trial.log | sed -e 's/.*exited with exit status STATUS_\([A-Z_]*\).*/\1/'`
+      if [ -z "$res" ] ; then
+        res=`grep 'will exit with exit status' $summary_dir/trial.log | sed -e 's/.*will exit with exit status STATUS_\([A-Z_]*\).*/\1/'`
+      fi
       echo "Test result:" $res >> $summary_dir/test_report
       echo "Trigger ID:" $(System.DefinitionId)-$(Build.BuildId)-$(Build.BuildNumber).$TEST_ID >> $summary_dir/test_report
       echo "-------------------------------------" >> $summary_dir/test_report
