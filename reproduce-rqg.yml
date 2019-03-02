@@ -40,7 +40,6 @@ jobs:
 
   strategy:
     parallel:  $[ variables['RQG_TRIALS'] ]
-    maxParallel: 5
 
   steps:
 
