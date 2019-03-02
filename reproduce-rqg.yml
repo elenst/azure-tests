@@ -21,18 +21,18 @@ jobs:
 - job: Info
   steps:
     - script: |
-      echo "#######################################################################"
-      if [ -n "$_TEST_COMMENT" ] ; then
-        echo $_TEST_COMMENT
-        echo ""
-      fi
-      echo "SERVER_BRANCH:   $SERVER_BRANCH"
-      echo "SERVER_REVISION: $SERVER_REVISION"
-      echo "CMAKE_OPTIONS:   $CMAKE_OPTIONS"
-      echo "RQG_OPTIONS:     $RQG_OPTIONS"
-      echo "RQG_BRANCH:      $RQG_BRANCH"
-      echo "TOOLBOX_BRANCH:  $TOOLBOX_BRANCH"
-      echo "#######################################################################"
+        echo "#######################################################################"
+        if [ -n "$_TEST_COMMENT" ] ; then
+          echo $_TEST_COMMENT
+          echo ""
+        fi
+        echo "SERVER_BRANCH:   $SERVER_BRANCH"
+        echo "SERVER_REVISION: $SERVER_REVISION"
+        echo "CMAKE_OPTIONS:   $CMAKE_OPTIONS"
+        echo "RQG_OPTIONS:     $RQG_OPTIONS"
+        echo "RQG_BRANCH:      $RQG_BRANCH"
+        echo "TOOLBOX_BRANCH:  $TOOLBOX_BRANCH"
+        echo "#######################################################################"
 
 #########
 # Download or build server
