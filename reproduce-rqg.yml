@@ -55,7 +55,8 @@ jobs:
     vmImage: 'Ubuntu 16.04'
 
   strategy:
-    parallel: 5
+    parallel: 6
+    maxParallel: 2
 
   steps:
 
