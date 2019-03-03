@@ -14,6 +14,7 @@ variables:
   RQG_OPTIONS: ''
   RQG_BRANCH: 'elenst-dev'
   TOOLBOX_BRANCH: 'master'
+  TRIALS: 5
 
 jobs:
 
@@ -33,6 +34,7 @@ jobs:
         echo "RQG_BRANCH:      $RQG_BRANCH"
         echo "TOOLBOX_BRANCH:  $TOOLBOX_BRANCH"
         echo "#######################################################################"
+      displayName: 'Info'
 
 #########
 # Download or build server
@@ -55,7 +57,7 @@ jobs:
     vmImage: 'Ubuntu 16.04'
 
   strategy:
-    parallel: 5
+    parallel: $[variables['TRIALS']]
 
   steps:
   - template: steps/env.yml
