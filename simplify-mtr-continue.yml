@@ -67,11 +67,14 @@ jobs:
 
   # Get tools, extract repro info, convert general log into MTR and run simplification
   - script: |
+      sudo apt-get update
+      sudo apt-get install -y -q libdbi-perl libdbd-mysql-perl libsnappy1v5 gdb valgrind
+    displayName: 'Install packages'
+
+  - script: |
       mv $(System.ArtifactsDirectory)/data/build $(System.ArtifactsDirectory)/
       mv $(System.ArtifactsDirectory)/data/repro $(System.ArtifactsDirectory)/
       rm -rf $(System.ArtifactsDirectory)/data
-      sudo apt-get update
-      sudo apt-get install -y -q libdbi-perl libdbd-mysql-perl libsnappy1v5 gdb valgrind
       git clone "https://github.com/MariaDB/randgen" --branch=elenst-dev $RQG_HOME
       git clone "https://github.com/elenst/mariadb-toolbox" $TOOLBOX_DIR
       REPRO_DIR=$(System.ArtifactsDirectory)/repro
