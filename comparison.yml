@@ -87,6 +87,7 @@ jobs:
 
 #########
 - job: Test
+  timeoutInMinutes: 0
   dependsOn: Download_or_Build_Server
   pool:
     vmImage: 'Ubuntu 16.04'
