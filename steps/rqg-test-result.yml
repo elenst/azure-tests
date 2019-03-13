@@ -35,8 +35,8 @@ steps:
       repro_dir=$(Build.ArtifactStagingDirectory)/repro-$(Build.BuildNumber).$TEST_ID
       mkdir -p $summary_dir $details_dir $repro_dir
       cp $ENV_LOGDIR/trial.log $ENV_RQG_HOME/rqg.info $ENV_BASEDIR/server.info $ENV_TOOLBOX_DIR/toolbox.info $summary_dir/
-      cp `find $ENV_LOGDIR -name mysql*err* | xargs` $summary_dir/
-      cp `find $ENV_LOGDIR -name mbackup*log* | xargs` $summary_dir/
+      cp --parents `find $ENV_LOGDIR -name mysql*err* | xargs` $summary_dir/
+      cp --parents `find $ENV_LOGDIR -name mbackup*log* | xargs` $summary_dir/
       for f in $ENV_LOGDIR/vardir/mysql.log $ENV_LOGDIR/vardir1/mysql.log ; do
         cp $f $repro_dir/
       done
@@ -76,11 +76,11 @@ steps:
       echo `cat $summary_dir/rqg.info` `cat $summary_dir/toolbox.info` >> $summary_dir/test_report
       cat $repro_dir/repro.info >> $summary_dir/test_report
       echo >> $summary_dir/test_report
-      if ! perl $ENV_TOOLBOX_DIR/travis/check_for_known_bugs.pl $summary_dir/mysql*.err* $summary_dir/stacktraces >> $summary_dir/test_report ; then
+      if ! perl $ENV_TOOLBOX_DIR/travis/check_for_known_bugs.pl `find $summary_dir -name mysql*.err*` $summary_dir/stacktraces >> $summary_dir/test_report ; then
         perl $ENV_TOOLBOX_DIR/travis/check_for_known_bugs.pl $summary_dir/trial.log >> $summary_dir/test_report
       fi
       echo >> $summary_dir/test_report
-      for f in $summary_dir/mysql*.err* ; do
+      for f in `find $summary_dir -name mysql*.err*` ; do
         echo "========== $f ==========" >> $summary_dir/test_report
         echo "Throttling:" >> $summary_dir/test_report
         echo `grep -c 'Table .* is marked as crashed and should be repaired' $f` "occurrence(s) of 'Table .* is marked as crashed and should be repaired'" >> $summary_dir/test_report
