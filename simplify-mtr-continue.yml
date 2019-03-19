@@ -12,7 +12,9 @@ trigger: none
   # - data/last_test.test -- the test case to start from
   # - simplification_cmd -- the command to run
   #
-  # Since we just continue the same job, we don't need any other parameters, only TRIGGER_ID
+  # Since we just continue the same job, we don't need any other parameters, only TRIGGER_ID.
+  # However, if MTR_OPTIONS are provided (e.g. to change the dynamics),
+  # they will be used in addition to the old ones
   
 jobs:
 
@@ -83,6 +85,11 @@ jobs:
       cd mysql-test
       mkdir suite/bug
       mv $REPRO_DIR/last_test.test $BASEDIR/mysql-test/suite/bug/repro.test
+      if [ -n "$MTR_OPTIONS" ] ; then
+        echo `cat $REPRO_DIR/simplification_cmd | sed -e "s/\$\*//"` $MTR_OPTIONS \$\* > $REPRO_DIR/simplification_cmd
+        echo "Simplification command has been adjusted:"
+        cat $REPRO_DIR/simplification_cmd
+      fi
       . $REPRO_DIR/simplification_cmd $SIMPLIFICATION_OPTIONS
       res=$?
       cp suite/bug/repro.test $(Build.ArtifactStagingDirectory)/first_test.test
