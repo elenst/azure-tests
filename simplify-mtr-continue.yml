@@ -86,7 +86,7 @@ jobs:
       mkdir suite/bug
       mv $REPRO_DIR/last_test.test $BASEDIR/mysql-test/suite/bug/repro.test
       if [ -n "$MTR_OPTIONS" ] ; then
-        echo `cat $REPRO_DIR/simplification_cmd | sed -e "s/\$\*//"` $MTR_OPTIONS \$\* > $REPRO_DIR/simplification_cmd
+        echo `cat $REPRO_DIR/simplification_cmd | sed -e "s/\$\*//"` "--options=\"$MTR_OPTIONS\"" \$\* > $REPRO_DIR/simplification_cmd
         echo "Simplification command has been adjusted:"
         cat $REPRO_DIR/simplification_cmd
       fi
