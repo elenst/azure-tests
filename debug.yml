@@ -4,10 +4,15 @@ trigger: none
 
 jobs:
 
-#- job: check_env_step
-#  steps:
-#  - template: steps/env.yml
-#  - script: printenv
+- job: check_env_step
+  steps:
+  - template: steps/env.yml
+  - script: printenv
+  - script: |
+      dpkg -l | grep -E 'cpp|gcc|clang|libasan'
+      sudo apt-get install clang
+      which gcc
+      which clang
 
 ########################################################################
 # Experiments with templates (disabled now by condition: false)
