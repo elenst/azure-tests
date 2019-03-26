@@ -9,10 +9,19 @@ jobs:
   - template: steps/env.yml
   - script: printenv
   - script: |
+      set -x
       dpkg -l | grep -E 'cpp|gcc|clang|libasan'
+      gcc --version
+      clang --version
       sudo apt-get install clang
       which gcc
       which clang
+      ls -l /usr/bin/gcc*
+      ls -l /usr/gin/g++*
+      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7.4 50
+      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7.4 50
+      gcc --version
+      g++ --version
 
 ########################################################################
 # Experiments with templates (disabled now by condition: false)
