@@ -8,42 +8,18 @@ trigger: none
 
 variables:
 
-  CMAKE_BUILD_TYPE: 'Debug'
-  CMAKE_OPTIONS: ''
+#  CMAKE_BUILD_TYPE: 'Debug'
+#  CMAKE_OPTIONS: ''
+#
+#  RQG_DURATION: 200
+#  RQG_THREADS: 6
+#  RQG_VIEWS: '--views'
+#  RQG_ENGINE: 'InnoDB,MyISAM,Aria'
 
-  RQG_DURATION: 200
-  RQG_THREADS: 6
-  RQG_VIEWS: '--views'
-  RQG_ENGINE: 'InnoDB,MyISAM,Aria'
-
-  # --redefine=conf/mariadb/modules/acl.yy disabled due to MDEV-18003
-  RQG_REDEFINES: "\
-    --redefine=conf/mariadb/bulk_insert.yy \
-    --redefine=conf/mariadb/modules/sql_mode.yy \
-    --redefine=conf/mariadb/alter_table.yy \
-    --redefine=conf/mariadb/instant_add.yy \
-    --redefine=conf/mariadb/modules/alter_table_columns.yy \
-    --redefine=conf/mariadb/modules/foreign_keys.yy \
-    --redefine=conf/mariadb/sp.yy \
-    --redefine=conf/mariadb/modules/userstat.yy \
-    --redefine=conf/mariadb/modules/admin.yy \
-    --redefine=conf/mariadb/modules/locks.yy \
-    --redefine=conf/mariadb/versioning.yy \
-    --redefine=conf/mariadb/sequences.yy \
-    --redefine=conf/mariadb/modules/locks-10.4-extra.yy \
-  "
-  RQG_OPTIONS: "\
-    --seed=time \
-    --reporters=Backtrace,ErrorLog,Deadlock \
-    --filter=conf/mariadb/10.4-combo-filter.ff \
-  "
-  MYSQLD_OPTIONS: "\
-    --mysqld=--log_output=FILE \
-    --mysqld=--loose-max-statement-time=20 \
-    --mysqld=--lock-wait-timeout=10 \
-    --mysqld=--loose-innodb-lock-wait-timeout=5 \
-    --mysqld=--loose-debug_assert_on_not_freed_memory=0 \
-  "
+#  # --redefine=conf/mariadb/modules/acl.yy disabled due to MDEV-18003
+#  RQG_REDEFINES: "--redefine=conf/mariadb/bulk_insert.yy --redefine=conf/mariadb/modules/sql_mode.yy --redefine=conf/mariadb/alter_table.yy --redefine=conf/mariadb/instant_add.yy --redefine=conf/mariadb/modules/alter_table_columns.yy --redefine=conf/mariadb/modules/foreign_keys.yy --redefine=conf/mariadb/sp.yy --redefine=conf/mariadb/modules/userstat.yy --redefine=conf/mariadb/modules/admin.yy --redefine=conf/mariadb/modules/locks.yy --redefine=conf/mariadb/versioning.yy --redefine=conf/mariadb/sequences.yy --redefine=conf/mariadb/modules/locks-10.4-extra.yy"
+#  RQG_OPTIONS: "--seed=time --reporters=Backtrace,ErrorLog,Deadlock --filter=conf/mariadb/10.4-combo-filter.ff"
+#  MYSQLD_OPTIONS: "--mysqld=--log_output=FILE --mysqld=--loose-max-statement-time=20 --mysqld=--lock-wait-timeout=10 --mysqld=--loose-innodb-lock-wait-timeout=5 --mysqld=--loose-debug_assert_on_not_freed_memory=0"
 
 jobs:
 

@@ -8,13 +8,13 @@ trigger: none
 
 variables:
 
-  SERVER_BRANCH: ''
-  SERVER_REVISION: ''
-  CMAKE_OPTIONS: ''
-  RQG_OPTIONS: ''
-  RQG_BRANCH: 'elenst-dev'
-  TOOLBOX_BRANCH: 'master'
-  TRIALS: 5
+#  SERVER_BRANCH: ''
+#  SERVER_REVISION: ''
+#  CMAKE_OPTIONS: ''
+#  RQG_OPTIONS: ''
+#  RQG_BRANCH: 'elenst-dev'
+#  TOOLBOX_BRANCH: 'master'
+#  TRIALS: 5
 
 jobs:
 
