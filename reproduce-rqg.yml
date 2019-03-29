@@ -6,7 +6,7 @@
 
 trigger: none
 
-variables:
+# variables:
 
 #  SERVER_BRANCH: ''
 #  SERVER_REVISION: ''

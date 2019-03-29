@@ -6,7 +6,7 @@
 
 trigger: none
 
-variables:
+# variables:
 
 #  BASELINE_BRANCH: ''
 #  BASELINE_REVISION: ''
