@@ -10,6 +10,9 @@ jobs:
   - script: printenv
   - script: |
       set -x
+      df -kT
+      cat /proc/cpuinfo
+      top -b -n 1
       dpkg -l | grep -E 'cpp|gcc|clang|libasan'
       gcc --version
       clang --version
