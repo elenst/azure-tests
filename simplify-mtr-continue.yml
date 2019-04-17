@@ -5,14 +5,14 @@ trigger: none
   #
   # There is no general log, the entry point is last_test.test from the previous stage.
   #
-  # TRIGGER_ID still has a form of PipelineID-BuildId,
+  # _TRIGGER_ID still has a form of PipelineID-BuildId,
   # e.g. 10-837
   # Repro info is located in artifact data, which contains 
   # - data/build (the binaries, we need them)
   # - data/last_test.test -- the test case to start from
   # - simplification_cmd -- the command to run
   #
-  # Since we just continue the same job, we don't need any other parameters, only TRIGGER_ID.
+  # Since we just continue the same job, we don't need any other parameters, only _TRIGGER_ID.
   # However, if MTR_OPTIONS are provided (e.g. to change the dynamics),
   # they will be used in addition to the old ones
   
@@ -29,10 +29,10 @@ jobs:
   steps:
 
   - script: |
-      if [ -z "$TRIGGER_ID" ] ; then
-        echo "##vso[task.complete result=Failed]\"TRIGGER_ID\" has not been specified"
+      if [ -z "$_TRIGGER_ID" ] ; then
+        echo "##vso[task.complete result=Failed]\"_TRIGGER_ID\" has not been specified"
       fi
-      IFS='-' read -r -a ids <<< $TRIGGER_ID
+      IFS='-' read -r -a ids <<< $_TRIGGER_ID
       TRIGGERING_PIPELINE_ID=${ids[0]}
       TRIGGERING_BUILD_ID=${ids[1]}
       echo "##vso[task.setvariable variable=TRIGGERING_PIPELINE_ID]$TRIGGERING_PIPELINE_ID"
@@ -40,7 +40,7 @@ jobs:
       echo "##vso[task.setvariable variable=BASEDIR]$HOME/server"
       echo "##vso[task.setvariable variable=RQG_HOME]$HOME/rqg"
       echo "##vso[task.setvariable variable=TOOLBOX_DIR]$HOME/toolbox"
-      echo "Trigger ID:            " $TRIGGER_ID
+      echo "Trigger ID:            " $_TRIGGER_ID
       echo "Triggering pipeline ID:" $TRIGGERING_PIPELINE_ID
       echo "Triggering build ID:   " $TRIGGERING_BUILD_ID
       echo "Simplification options:" $SIMPLIFICATION_OPTIONS
