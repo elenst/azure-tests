@@ -52,7 +52,7 @@ jobs:
 
       '002':
         RQG_GRAMMAR: 'conf/runtime/performance_schema.yy'
-        MYSQLD_EXTRA_OPTIONS: '--mysqld=--performance-schema'
+        MYSQLD_JOB_OPTIONS: '--mysqld=--performance-schema'
 
       '003':
         RQG_GRAMMAR: 'conf/runtime/information_schema.yy'
@@ -130,8 +130,8 @@ jobs:
 
       '019':
         RQG_GRAMMAR: 'conf/optimizer/updateable_views.yy'
-        RQG_EXTRA_OPTIONS: '--skip-gendata'
-        MYSQLD_EXTRA_OPTIONS: "--mysqld=--init-file=$ENV_RQG_HOME/conf/optimizer/updateable_views.init --mysqld=--default-storage-engine=MyISAM"
+        RQG_JOB_OPTIONS: '--skip-gendata'
+        MYSQLD_JOB_OPTIONS: "--mysqld=--init-file=$ENV_RQG_HOME/conf/optimizer/updateable_views.init --mysqld=--default-storage-engine=MyISAM"
         RQG_ENGINE: MyISAM
 
       '020':
@@ -173,12 +173,12 @@ jobs:
 
       '028':
         RQG_GRAMMAR: 'conf/engines/heap/heap_dml_single.yy'
-        RQG_EXTRA_OPTIONS: '--skip-gendata'
-        MYSQLD_EXTRA_OPTIONS: "--mysqld=--init-file=$ENV_RQG_HOME/conf/engines/heap/heap_dml_single.init"
+        RQG_JOB_OPTIONS: '--skip-gendata'
+        MYSQLD_JOB_OPTIONS: "--mysqld=--init-file=$ENV_RQG_HOME/conf/engines/heap/heap_dml_single.init"
 
       '029':
         RQG_GRAMMAR: 'conf/engines/heap/heap_ddl_multi.yy'
-        RQG_EXTRA_OPTIONS: '--skip-gendata'
+        RQG_JOB_OPTIONS: '--skip-gendata'
 
       '030':
         RQG_GRAMMAR: 'conf/temporal/temporal_functions.yy'
@@ -198,25 +198,25 @@ jobs:
       '033':
         RQG_GRAMMAR: 'conf/mariadb/generic-dml.yy'
         RQG_GENDATA: '--gendata-advanced'
-        RQG_EXTRA_OPTIONS: '--skip-gendata'
+        RQG_JOB_OPTIONS: '--skip-gendata'
         RQG_ENGINE: InnoDB
 
       '034':
         RQG_GRAMMAR: 'conf/mariadb/generic-dml.yy'
         RQG_GENDATA: '--gendata-advanced'
-        RQG_EXTRA_OPTIONS: '--skip-gendata'
+        RQG_JOB_OPTIONS: '--skip-gendata'
         RQG_ENGINE: MyISAM
 
       '035':
         RQG_GRAMMAR: 'conf/mariadb/generic-dml.yy'
         RQG_GENDATA: '--gendata-advanced'
-        RQG_EXTRA_OPTIONS: '--skip-gendata'
+        RQG_JOB_OPTIONS: '--skip-gendata'
         RQG_ENGINE: Aria
 
       '036':
         RQG_GRAMMAR: 'conf/mariadb/generic-dml.yy'
         RQG_GENDATA: '--gendata-advanced'
-        RQG_EXTRA_OPTIONS: '--skip-gendata'
+        RQG_JOB_OPTIONS: '--skip-gendata'
         RQG_ENGINE: HEAP
 
   steps:
