@@ -65,7 +65,7 @@ jobs:
       '005':
         RQG_GRAMMAR: 'conf/engines/many_indexes.yy'
         RQG_GENDATA: 'conf/engines/many_indexes.zz'
-        RQG_ENGINE: Aria
+        RQG_ENGINE: Aria,MyISAM
 
       '006':
         RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
@@ -147,14 +147,16 @@ jobs:
       '022':
         RQG_GRAMMAR: 'conf/mariadb/oltp.yy'
         RQG_GENDATA: 'conf/mariadb/oltp.zz'
-        RQG_ENGINE: MyISAM
+        RQG_ENGINE: MyISAM,Aria
 
       '023':
         RQG_GRAMMAR: 'conf/mariadb/functions.yy'
+        RQG_ENGINE: InnoDB,MyISAM,Aria,HEAP
 
       '024':
         RQG_GRAMMAR: 'conf/runtime/alter_online.yy'
         RQG_GENDATA: 'conf/runtime/alter_online.zz'
+        RQG_ENGINE: InnoDB,Aria,MyISAM,HEAP
 
       '025':
         RQG_GRAMMAR: 'conf/engines/innodb/full_text_search.yy'
@@ -164,12 +166,12 @@ jobs:
       '026':
         RQG_GRAMMAR: 'conf/engines/innodb/full_text_search.yy'
         RQG_GENDATA: 'conf/engines/innodb/full_text_search.zz'
-        RQG_ENGINE: MyISAM
+        RQG_ENGINE: Aria,MyISAM
 
       '027':
         RQG_GRAMMAR: 'conf/engines/innodb/full_text_search.yy'
-        RQG_GENDATA: 'conf/engines/innodb/full_text_search.zz'
-        RQG_ENGINE: Aria
+        RQG_GENDATA: 'conf/partitioning/partition_pruning.zz'
+        RQG_ENGINE: InnoDB,MyISAM,Aria
 
       '028':
         RQG_GRAMMAR: 'conf/engines/heap/heap_dml_single.yy'
@@ -205,19 +207,17 @@ jobs:
         RQG_GRAMMAR: 'conf/mariadb/generic-dml.yy'
         RQG_GENDATA: '--gendata-advanced'
         RQG_JOB_OPTIONS: '--skip-gendata'
-        RQG_ENGINE: MyISAM
+        RQG_ENGINE: MyISAM,Aria,HEAP
 
       '035':
-        RQG_GRAMMAR: 'conf/mariadb/generic-dml.yy'
-        RQG_GENDATA: '--gendata-advanced'
-        RQG_JOB_OPTIONS: '--skip-gendata'
-        RQG_ENGINE: Aria
+        RQG_GRAMMAR: 'conf/partitioning/partitions.yy'
+        RQG_ENGINE: MyISAM,Aria
 
       '036':
-        RQG_GRAMMAR: 'conf/mariadb/generic-dml.yy'
-        RQG_GENDATA: '--gendata-advanced'
-        RQG_JOB_OPTIONS: '--skip-gendata'
-        RQG_ENGINE: HEAP
+        RQG_GRAMMAR: 'conf/partitioning/partition_pruning.yy'
+        RQG_GENDATA: 'conf/partitioning/partition_pruning.zz'
+        RQG_ENGINE: MyISAM,Aria
+
 
   steps:
 
