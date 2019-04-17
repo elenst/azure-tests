@@ -13,7 +13,9 @@ trigger: none
 #  CMAKE_OPTIONS: ''
 #  RQG_OPTIONS: ''
 #  RQG_BRANCH: 'elenst-dev'
+#  RQG_REVISION: ''
 #  TOOLBOX_BRANCH: 'master'
+#  TOOLBOX_REVISION: ''
 #  TRIALS: 5
 
 jobs:
@@ -27,12 +29,14 @@ jobs:
           echo $_TEST_COMMENT
           echo ""
         fi
-        echo "SERVER_BRANCH:   $SERVER_BRANCH"
-        echo "SERVER_REVISION: $SERVER_REVISION"
-        echo "CMAKE_OPTIONS:   $CMAKE_OPTIONS"
-        echo "RQG_OPTIONS:     $RQG_OPTIONS"
-        echo "RQG_BRANCH:      $RQG_BRANCH"
-        echo "TOOLBOX_BRANCH:  $TOOLBOX_BRANCH"
+        echo "SERVER_BRANCH:    $SERVER_BRANCH"
+        echo "SERVER_REVISION:  SERVER_REVISION"
+        echo "CMAKE_OPTIONS:    $CMAKE_OPTIONS"
+        echo "RQG_OPTIONS:      $RQG_OPTIONS"
+        echo "RQG_BRANCH:       $RQG_BRANCH"
+        echo "RQG_REVISION:     $RQG_REVISION"
+        echo "TOOLBOX_BRANCH:   $TOOLBOX_BRANCH"
+        echo "TOOLBOX_REVISION: $TOOLBOX_REVISION"
         echo "#######################################################################"
       displayName: 'Info'
 

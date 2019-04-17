@@ -8,11 +8,25 @@ parameters:
 steps:
   - script: |
       set -x
-      git clone "https://github.com/elenst/mariadb-toolbox" --depth=1 --branch=$ENV_TOOLBOX_BRANCH $ENV_TOOLBOX_DIR
-      git clone "https://github.com/MariaDB/randgen" --depth=1 --branch=$ENV_RQG_BRANCH $ENV_RQG_HOME
-      cd $ENV_RQG_HOME
-      echo $ENV_RQG_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_RQG_HOME/rqg.info
+      curdir=`pwd`
+      if [ -z "$ENV_TOOLBOX_REVISION" ] ; then
+        git clone "https://github.com/elenst/mariadb-toolbox" --depth=1 --branch=$ENV_TOOLBOX_BRANCH $ENV_TOOLBOX_DIR
+      else
+        git clone "https://github.com/elenst/mariadb-toolbox" --branch=$ENV_TOOLBOX_BRANCH $ENV_TOOLBOX_DIR
+        cd $ENV_TOOLBOX_DIR
+        git checkout $ENV_TOOLBOX_REVISION
+      fi
       cd $ENV_TOOLBOX_DIR
       echo $ENV_TOOLBOX_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_TOOLBOX_DIR/toolbox.info
+      cd $curdir
+      if [ -z "$ENV_RQG_REVISION" ] ; then
+        git clone "https://github.com/MariaDB/randgen" --depth=1 --branch=$ENV_RQG_BRANCH $ENV_RQG_HOME
+      else
+        git clone "https://github.com/MariaDB/randgen" --branch=$ENV_RQG_BRANCH $ENV_RQG_HOME
+        cd $ENV_RQG_HOME
+        git checkout $ENV_RQG_REVISION
+      fi
+      cd $ENV_RQG_HOME
+      echo $ENV_RQG_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_RQG_HOME/rqg.info
     displayName: 'Clone tools and get versions'
     condition: ${{ parameters.condition }}
