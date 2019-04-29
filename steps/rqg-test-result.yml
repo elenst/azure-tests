@@ -92,6 +92,7 @@ steps:
         echo `grep -c 'Table .* is marked as crashed and should be repaired' $f` "occurrence(s) of 'Table .* is marked as crashed and should be repaired'" >> $summary_dir/test_report
         echo `grep -c 'mysqld: The table .* is full' $f` "occurrence(s) of 'mysqld: The table .* is full'" >> $summary_dir/test_report
         echo `grep -c 'Failed to load table .* which has a foreign key constraint with table .*' $f` "occurrence(s) of 'Failed to load table .* which has a foreign key constraint with table .*'" >> $summary_dir/test_report
+        echo `grep -c "mysqld: Can't find record in" $f` "occurrence(s) of 'mysqld: Can't find record in'" >> $summary_dir/test_report
         echo "" >> $summary_dir/test_report
         cat $f | \
           grep -v -f $ENV_TOOLBOX_DIR/travis/server_warnings.supp | \
