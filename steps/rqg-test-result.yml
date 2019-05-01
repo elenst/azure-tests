@@ -101,6 +101,7 @@ steps:
           grep -v 'Table .* is marked as crashed and should be repaired' | \
           grep -v 'mysqld: The table .* is full' | \
           grep -v 'Failed to load table .* which has a foreign key constraint with table .*' | \
+          grep -v "mysqld: Can't find record in" | \
           grep -v "^$" | \
           cut -c 1-4096 >> $summary_dir/test_report
         echo "" >> $summary_dir/test_report
