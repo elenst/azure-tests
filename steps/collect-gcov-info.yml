@@ -19,8 +19,8 @@ steps:
       testname=${PART_TEST_ID:-$TEST_ID}
       lcov_file=$PAR_SUMMARY_FOLDER/$testname.lcov
       totals_suffix=$(Build.BuildNumber)
-      if [ "$SYSTEM_JOBDISPLAYNAME" != "Job" ] ; then
-        totals_suffix=$totals_suffix.$SYSTEM_JOBDISPLAYNAME
+      if [ "$SYSTEM_JOBNAME" != "Job" ] ; then
+        totals_suffix=$totals_suffix.$SYSTEM_JOBNAME
       fi
       lcov --quiet --directory $ENV_BASEDIR --capture --rc lcov_branch_coverage=1 --output-file $lcov_file
       if [ -e $PAR_DIFF_FILE ] ; then

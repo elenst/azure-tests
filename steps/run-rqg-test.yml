@@ -12,9 +12,9 @@ parameters:
   GCOV_DIFF_FILE: ''
 
 steps:
-- ${{ if le(coalesce(variables['System.JobDisplayName'],'0'),coalesce(variables['MAX_JOB'],'999999')) }}:
+- ${{ if le(coalesce(variables['System.JobName'],'0'),coalesce(variables['MAX_JOB'],'999999')) }}:
   - script: |
-      echo "JobDisplayName: $SYSTEM_JOBDISPLAYNAME, MAX_JOB: $MAX_JOB"
+      echo "JobName: $SYSTEM_JOBNAME, MAX_JOB: $MAX_JOB"
       mkdir -p $ENV_LOGDIR
       set -xo pipefail
       cd $ENV_RQG_HOME

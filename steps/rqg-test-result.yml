@@ -9,7 +9,6 @@ parameters:
 
 steps:
   - script: |
-      set -x
       # If Trial ID is defined via parameters, we will use it.
       # Otherwise, we will initialize a variable and will use it within the job
       if [ -n "$PAR_TRIAL_NO" ] ; then
@@ -24,10 +23,10 @@ steps:
       fi
       # If we are using a matrix, we also need a job name for the unique
       # suffix. Otherwise, only trial ID
-      if [ "$SYSTEM_JOBDISPLAYNAME" == "Job" ] ; then
+      if [ "$SYSTEM_JOBNAME" == "Job" ] ; then
         TEST_ID=$TRIAL_NO
       else
-        TEST_ID=${SYSTEM_JOBDISPLAYNAME}.${TRIAL_NO}
+        TEST_ID=${SYSTEM_JOBNAME}.${TRIAL_NO}
       fi
       echo "##vso[task.setvariable variable=TEST_ID]$TEST_ID"
       rm -rf $(Build.ArtifactStagingDirectory)/*
@@ -102,6 +101,7 @@ steps:
           grep -v 'Table .* is marked as crashed and should be repaired' | \
           grep -v 'mysqld: The table .* is full' | \
           grep -v 'Failed to load table .* which has a foreign key constraint with table .*' | \
+          grep -v "mysqld: Can't find record in" | \
           grep -v "^$" | \
           cut -c 1-4096 >> $summary_dir/test_report
         echo "" >> $summary_dir/test_report
