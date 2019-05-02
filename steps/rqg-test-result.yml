@@ -9,6 +9,7 @@ parameters:
 
 steps:
   - script: |
+      set -x
       # If Trial ID is defined via parameters, we will use it.
       # Otherwise, we will initialize a variable and will use it within the job
       if [ -n "$PAR_TRIAL_NO" ] ; then
