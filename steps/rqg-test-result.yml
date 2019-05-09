@@ -67,6 +67,10 @@ steps:
       fi
       echo "Test result:" $res >> $summary_dir/test_report
       echo "Trigger ID:" $(System.DefinitionId)-$(Build.BuildId)-$(Build.BuildNumber).$TEST_ID >> $summary_dir/test_report
+      echo "" >> $summary_dir/test_report
+      echo "Query result summary:" >> $summary_dir/test_report
+      perl $ENV_TOOLBOX_DIR/scripts/rqg_statuses_summary.pl $summary_dir/trial.log >> $summary_dir/test_report
+      echo "" >> $summary_dir/test_report
       echo "-------------------------------------" >> $summary_dir/test_report
       echo "" >> $summary_dir/test_report
       cp $summary_dir/server.info $repro_dir/repro.info
@@ -77,6 +81,7 @@ steps:
           mysqld_options="$mysqld_options $o"
         fi
       done
+      echo "" >> $repro_dir/repro.info
       echo "RQG command line: $rqg_cmd" >> $repro_dir/repro.info
       echo "MySQLd options: $mysqld_options" >> $repro_dir/repro.info
       echo `cat $summary_dir/rqg.info` `cat $summary_dir/toolbox.info` >> $summary_dir/test_report
