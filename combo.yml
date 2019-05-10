@@ -218,6 +218,20 @@ jobs:
         RQG_GENDATA: 'conf/partitioning/partition_pruning.zz'
         RQG_ENGINE: MyISAM,Aria
 
+      '037':
+        RQG_GRAMMAR: 'conf/percona_qa/AL-19549/AL-19549.yy'
+        RQG_GENDATA: 'conf/percona_qa/AL-19549/AL-19549.zz'
+        RQG_ENGINE: InnoDB
+
+      '038':
+        RQG_GRAMMAR: 'conf/percona_qa/BT-16274/BT-16274.yy'
+        RQG_GENDATA: 'conf/percona_qa/BT-16274/BT-16274.zz'
+        RQG_ENGINE: InnoDB
+
+      '039':
+        RQG_GRAMMAR: 'conf/percona_qa/5.6/5.6.yy'
+        RQG_GENDATA: 'conf/percona_qa/percona_qa.zz'
+        RQG_ENGINE: InnoDB
 
   steps:
 
