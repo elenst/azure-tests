@@ -119,6 +119,10 @@ steps:
     continueOnError: ${{ parameters.continueOnError }}
     env:
       PAR_TRIAL_NO: ${{ parameters.TRIAL_NO }}
+      DB_HOST: ${DbHost}
+      DB_PORT: ${DbPort}
+      DB_USER: ${DbUser}
+      DBP: ${DbPwd}
 
   - task: PublishBuildArtifacts@1
     inputs:
