@@ -66,6 +66,7 @@ steps:
         res=`grep 'GenTest will exit with exit status' $summary_dir/trial.log | sed -e 's/.*will exit with exit status STATUS_\([A-Z_]*\).*/\1/'`
       fi
       echo "Test result:" $res >> $summary_dir/test_report
+      export TEST_RESULT=$res
       echo "Trigger ID:" $(System.DefinitionId)-$(Build.BuildId)-$(Build.BuildNumber).$RUN_ID >> $summary_dir/test_report
       echo "" >> $summary_dir/test_report
       echo "Query result summary:" >> $summary_dir/test_report
