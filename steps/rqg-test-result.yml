@@ -88,7 +88,7 @@ steps:
       cat $repro_dir/repro.info >> $summary_dir/test_report
       export TEST_ID=$(Build.BuildId).$RUN_ID
       echo >> $summary_dir/test_report
-      perl $ENV_TOOLBOX_DIR/travis/check_for_known_bugs.pl `find $summary_dir -name mysql*.err*` $summary_dir/stacktraces $summary_dir/trial.log >> $summary_dir/test_report
+      perl $ENV_TOOLBOX_DIR/travis/check_for_known_bugs.pl `find $summary_dir -name mysql*.err*` $summary_dir/stacktraces --last=$summary_dir/trial.log >> $summary_dir/test_report
       echo >> $summary_dir/test_report
       for f in `find $summary_dir -name mysql*.err*` ; do
         echo "========== $f ==========" >> $summary_dir/test_report
