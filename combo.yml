@@ -229,9 +229,10 @@ jobs:
         RQG_ENGINE: InnoDB
 
       '039':
-        RQG_GRAMMAR: 'conf/percona_qa/5.6/5.6.yy'
-        RQG_GENDATA: 'conf/percona_qa/percona_qa.zz'
+        RQG_GRAMMAR: 'conf/runtime/percona/5.6.yy'
+        RQG_GENDATA: 'conf/runtime/percona/percona_qa.zz'
         RQG_ENGINE: InnoDB
+        RQG_JOB_OPTIONS: '--gendata=conf/runtime/percona/percona_qa_part.zz'
 
   steps:
 
