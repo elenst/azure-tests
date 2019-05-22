@@ -234,6 +234,28 @@ jobs:
         RQG_ENGINE: InnoDB
         RQG_JOB_OPTIONS: '--gendata=conf/runtime/percona/percona_qa_part.zz'
 
+      '040':
+        RQG_GRAMMAR: 'conf/partitioning/partitions-99-hash.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata'
+
+      '041':
+        RQG_GRAMMAR: 'conf/partitioning/partitions-99-range.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata'
+
+      '042':
+        RQG_GRAMMAR: 'conf/partitioning/partitions-ddl.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata'
+
+      '043':
+        RQG_GRAMMAR: 'conf/optimizer/range_access.yy'
+        RQG_GENDATA: 'conf/optimizer/range_access.zz'
+        RQG_ENGINE: InnoDB,MyISAM,Aria
+
+      '044':
+        RQG_GRAMMAR: 'conf/optimizer/range_access2.yy'
+        RQG_GENDATA: 'conf/optimizer/range_access2.zz'
+        RQG_ENGINE: InnoDB,MyISAM,Aria
+
   steps:
 
   - template: steps/env.yml
