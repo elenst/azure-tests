@@ -11,6 +11,8 @@ jobs:
   - script: |
       set -x
       df -kT
+      ulimit -a
+      ulimit -Ha
       cat /proc/cpuinfo
       top -b -n 1
       dpkg -l | grep -E 'cpp|gcc|clang|libasan'
