@@ -234,9 +234,10 @@ jobs:
         RQG_ENGINE: InnoDB
         RQG_JOB_OPTIONS: '--gendata=conf/runtime/percona/percona_qa_part.zz'
 
-      '040':
-        RQG_GRAMMAR: 'conf/partitioning/partitions-99-hash.yy'
-        RQG_JOB_OPTIONS: '--skip-gendata'
+# Not enough open files in system limits
+#      '040':
+#        RQG_GRAMMAR: 'conf/partitioning/partitions-99-hash.yy'
+#        RQG_JOB_OPTIONS: '--skip-gendata'
 
       '041':
         RQG_GRAMMAR: 'conf/partitioning/partitions-99-range.yy'
