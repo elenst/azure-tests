@@ -71,6 +71,7 @@ jobs:
         RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
         RQG_GENDATA: 'conf/engines/engine_stress.zz'
         RQG_ENGINE: InnoDB
+        MYSQLD_JOB_OPTIONS: '--mysqld=--innodb-buffer-pool-size=2G'
 
       '007':
         RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
@@ -257,6 +258,41 @@ jobs:
         RQG_GRAMMAR: 'conf/optimizer/range_access2.yy'
         RQG_GENDATA: 'conf/optimizer/range_access2.zz'
         RQG_ENGINE: InnoDB,MyISAM,Aria
+
+      '045':
+        RQG_GRAMMAR: 'conf/runtime/performance_schema.yy'
+        RQG_GENDATA: 'conf/mariadb/innodb.zz'
+        MYSQLD_JOB_OPTIONS: '--mysqld=--performance-schema'
+        RQG_JOB_OPTIONS: '--short-column-names'
+
+      '046':
+        RQG_GRAMMAR: 'conf/runtime/information_schema.yy'
+        RQG_GENDATA: 'conf/mariadb/innodb.zz'
+        RQG_JOB_OPTIONS: '--short-column-names'
+
+      '047':
+        RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
+        RQG_GENDATA: 'conf/mariadb/innodb.zz'
+        RQG_ENGINE: InnoDB
+        MYSQLD_JOB_OPTIONS: '--mysqld=--innodb-page-size=8K'
+
+      '048':
+        RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
+        RQG_GENDATA: 'conf/mariadb/innodb.zz'
+        RQG_ENGINE: InnoDB
+        MYSQLD_JOB_OPTIONS: '--mysqld=--innodb-page-size=4K'
+
+      '049':
+        RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
+        RQG_GENDATA: 'conf/mariadb/innodb.zz'
+        RQG_ENGINE: InnoDB
+        MYSQLD_JOB_OPTIONS: '--mysqld=--innodb-page-size=32K --mysqld=--innodb-buffer-pool-size=2G'
+
+      '050':
+        RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
+        RQG_GENDATA: 'conf/mariadb/innodb.zz'
+        RQG_ENGINE: InnoDB
+        MYSQLD_JOB_OPTIONS: '--mysqld=--innodb-page-size=64K --mysqld=--innodb-buffer-pool-size=2G'
 
   steps:
 
