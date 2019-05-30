@@ -219,9 +219,10 @@ jobs:
         RQG_ENGINE: MyISAM,Aria
 
       '037':
-        RQG_GRAMMAR: 'conf/percona_qa/AL-19549/AL-19549.yy'
-        RQG_GENDATA: 'conf/percona_qa/AL-19549/AL-19549.zz'
+        RQG_GRAMMAR: 'conf/runtime/percona/AL-19549.yy'
+        RQG_GENDATA: 'conf/runtime/percona/AL-19549.zz'
         RQG_ENGINE: InnoDB
+        RQG_JOB_OPTIONS: '--gendata=conf/runtime/percona/AL-19549-part.zz'
 
       '038':
         RQG_GRAMMAR: 'conf/percona_qa/BT-16274/BT-16274.yy'
