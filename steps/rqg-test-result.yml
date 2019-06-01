@@ -108,6 +108,7 @@ steps:
           grep -v 'Failed to load table .* which has a foreign key constraint with table .*' | \
           grep -v "mysqld: Can't find record in" | \
           grep -v "^$" | \
+          grep -v "server_audit: SysLog facility was changed" | \
           cut -c 1-4096 >> $summary_dir/test_report
         echo "" >> $summary_dir/test_report
       done
