@@ -189,12 +189,12 @@ jobs:
 #        RQG_GENDATA: 'conf/temporal/temporal_functions-wl946.zz'
 #        RQG_DURATION: 1200
 
-      '024':
-        RQG_GRAMMAR: 'conf/mariadb/generic-dml.yy'
-        RQG_GENDATA: '--gendata-advanced'
-        RQG_JOB_OPTIONS: '--skip-gendata'
-        RQG_ENGINE: InnoDB,MyISAM,Aria,HEAP
-        RQG_THREADS: 1
+#      '024':
+#        RQG_GRAMMAR: 'conf/mariadb/generic-dml.yy'
+#        RQG_GENDATA: '--gendata-advanced'
+#        RQG_JOB_OPTIONS: '--skip-gendata'
+#        RQG_ENGINE: InnoDB,MyISAM,Aria,HEAP
+#        RQG_THREADS: 1
 
   steps:
 
