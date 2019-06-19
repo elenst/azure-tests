@@ -172,17 +172,17 @@ jobs:
         RQG_JOB_OPTIONS: '--skip-gendata'
         RQG_THREADS: 1
 
-      '022':
-        RQG_GRAMMAR: 'conf/temporal/temporal_functions.yy'
-        RQG_GENDATA: 'conf/temporal/temporal_functions.zz'
-        RQG_ENGINE: InnoDB,MyISAM
-        RQG_THREADS: 1
+#      '022':
+#        RQG_GRAMMAR: 'conf/temporal/temporal_functions.yy'
+#        RQG_GENDATA: 'conf/temporal/temporal_functions.zz'
+#        RQG_ENGINE: InnoDB,MyISAM
+#        RQG_THREADS: 1
 
-      '023':
-        RQG_GRAMMAR: 'conf/temporal/temporal_functions.yy'
-        RQG_GENDATA: 'conf/temporal/temporal_functions.zz'
-        RQG_ENGINE: MyISAM
-        RQG_THREADS: 1
+#      '023':
+#        RQG_GRAMMAR: 'conf/temporal/temporal_functions.yy'
+#        RQG_GENDATA: 'conf/temporal/temporal_functions.zz'
+#        RQG_ENGINE: MyISAM
+#        RQG_THREADS: 1
 
 #      '032':
 #        RQG_GRAMMAR: 'conf/temporal/temporal_functions.yy'
