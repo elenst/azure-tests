@@ -1,0 +1,324 @@
+########################################################################
+# RQG integration tests with DML and DDL, different engines.
+# The default set is big bang, but it can be narrowed down through
+# configuration parameters
+########################################################################
+
+# variables:
+
+#  CMAKE_BUILD_TYPE: ''
+#  CMAKE_OPTIONS: ''
+#
+#  RQG_DURATION: 400
+#  RQG_THREADS: 6
+#  RQG_VIEWS: '--views'
+#
+#  # --redefine=conf/mariadb/modules/acl.yy disabled due to MDEV-18003
+#  RQG_REDEFINES: "--redefine=conf/mariadb/bulk_insert.yy --redefine=conf/mariadb/modules/sql_mode.yy --redefine=conf/mariadb/alter_table.yy --redefine=conf/mariadb/instant_add.yy --redefine=conf/mariadb/modules/alter_table_columns.yy --redefine=conf/mariadb/modules/foreign_keys.yy --redefine=conf/mariadb/sp.yy --redefine=conf/mariadb/modules/userstat.yy --redefine=conf/mariadb/modules/admin.yy --redefine=conf/mariadb/modules/locks.yy --redefine=conf/mariadb/versioning.yy --redefine=conf/mariadb/sequences.yy --redefine=conf/mariadb/modules/locks-10.4-extra.yy"
+#  RQG_OPTIONS: "--seed=time --reporters=Backtrace,ErrorLog,Deadlock --filter=conf/mariadb/10.4-combo-filter.ff"
+#  MYSQLD_OPTIONS: "--mysqld=--log_output=FILE --mysqld=--loose-max-statement-time=20 --mysqld=--lock-wait-timeout=10 --mysqld=--loose-innodb-lock-wait-timeout=5 --mysqld=--loose-debug_assert_on_not_freed_memory=0"
+
+jobs:
+
+#########
+# Download or build server
+- template: jobs/prepare-server.yml
+  parameters:
+    name: 'Download_or_Build_Server'
+
+#########
+# Upload to FTP
+- template: jobs/upload-to-ftp.yml
+  parameters:
+    dependencies:
+    - 'Download_or_Build_Server'
+    condition: and(succeeded(), ne(dependencies.Download_or_Build_Server.outputs['ftp_download.BINARIES_FROM_FTP'], 'true'))
+
+#########
+- job: Test
+  timeoutInMinutes: 60
+  dependsOn: Download_or_Build_Server
+  pool:
+    vmImage: 'Ubuntu 16.04'
+
+  strategy:
+    matrix:
+
+      '001':
+        RQG_GRAMMAR: 'conf/runtime/metadata_stability.yy'
+        RQG_GENDATA: 'conf/runtime/metadata_stability.zz'
+
+      '002':
+        RQG_GRAMMAR: 'conf/runtime/performance_schema.yy'
+        MYSQLD_JOB_OPTIONS: '--mysqld=--performance-schema'
+
+      '003':
+        RQG_GRAMMAR: 'conf/runtime/information_schema.yy'
+
+      '004':
+        RQG_GRAMMAR: 'conf/engines/many_indexes.yy'
+        RQG_GENDATA: 'conf/engines/many_indexes.zz'
+        RQG_ENGINE: InnoDB
+
+      '005':
+        RQG_GRAMMAR: 'conf/engines/many_indexes.yy'
+        RQG_GENDATA: 'conf/engines/many_indexes.zz'
+        RQG_ENGINE: Aria,MyISAM
+
+      '006':
+        RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
+        RQG_GENDATA: 'conf/engines/engine_stress.zz'
+        RQG_ENGINE: InnoDB
+        MYSQLD_JOB_OPTIONS: '--mysqld=--innodb-buffer-pool-size=2G'
+
+      '007':
+        RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
+        RQG_GENDATA: 'conf/engines/engine_stress.zz'
+        RQG_ENGINE: Aria
+
+      '008':
+        RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
+        RQG_GENDATA: 'conf/engines/engine_stress.zz'
+        RQG_ENGINE: MyISAM
+
+      '009':
+        RQG_GRAMMAR: 'conf/partitioning/partitions.yy'
+        RQG_ENGINE: InnoDB
+
+      '010':
+        RQG_GRAMMAR: 'conf/partitioning/partition_pruning.yy'
+        RQG_GENDATA: 'conf/partitioning/partition_pruning.zz'
+        RQG_ENGINE: InnoDB
+
+      '011':
+        RQG_GRAMMAR: 'conf/replication/replication.yy'
+        RQG_GENDATA: 'conf/replication/replication-5.1.zz'
+        RQG_ENGINE: InnoDB
+
+      '012':
+        RQG_GRAMMAR: 'conf/replication/replication-ddl_sql.yy'
+        RQG_GENDATA: 'conf/replication/replication-ddl_data.zz'
+        RQG_ENGINE: InnoDB
+
+      '013':
+        RQG_GRAMMAR: 'conf/replication/replication-dml_sql.yy'
+        RQG_GENDATA: 'conf/replication/replication-dml_data.zz'
+        RQG_ENGINE: InnoDB
+
+      '014':
+        RQG_GRAMMAR: 'conf/runtime/connect_kill_sql.yy'
+        RQG_GENDATA: 'conf/runtime/connect_kill_data.zz'
+        RQG_ENGINE: InnoDB
+
+      '015':
+        RQG_GRAMMAR: 'conf/runtime/WL5004_sql.yy'
+        RQG_GENDATA: 'conf/runtime/WL5004_data.zz'
+        RQG_ENGINE: InnoDB
+
+      '016':
+        RQG_GRAMMAR: 'conf/mariadb/optimizer.yy'
+        RQG_ENGINE: InnoDB
+
+      '017':
+        RQG_GRAMMAR: 'conf/mariadb/optimizer.yy'
+        RQG_ENGINE: Aria
+
+      '018':
+        RQG_GRAMMAR: 'conf/mariadb/optimizer.yy'
+        RQG_ENGINE: MyISAM
+
+      '019':
+        RQG_GRAMMAR: 'conf/optimizer/updateable_views.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata'
+        MYSQLD_JOB_OPTIONS: "--mysqld=--init-file=$ENV_RQG_HOME/conf/optimizer/updateable_views.init --mysqld=--default-storage-engine=MyISAM"
+        RQG_ENGINE: MyISAM
+
+      '020':
+        RQG_GRAMMAR: 'conf/mariadb/oltp-transactional.yy'
+        RQG_GENDATA: 'conf/mariadb/oltp.zz'
+        RQG_ENGINE: InnoDB
+
+      '021':
+        RQG_GRAMMAR: 'conf/mariadb/oltp-transactional.yy'
+        RQG_GENDATA: 'conf/mariadb/oltp.zz'
+        RQG_ENGINE: Aria
+
+      '022':
+        RQG_GRAMMAR: 'conf/mariadb/oltp.yy'
+        RQG_GENDATA: 'conf/mariadb/oltp.zz'
+        RQG_ENGINE: MyISAM,Aria
+
+      '023':
+        RQG_GRAMMAR: 'conf/mariadb/functions.yy'
+        RQG_ENGINE: InnoDB,MyISAM,Aria,HEAP
+
+      '024':
+        RQG_GRAMMAR: 'conf/runtime/alter_online.yy'
+        RQG_GENDATA: 'conf/runtime/alter_online.zz'
+        RQG_ENGINE: InnoDB,Aria,MyISAM,HEAP
+
+      '025':
+        RQG_GRAMMAR: 'conf/engines/innodb/full_text_search.yy'
+        RQG_GENDATA: 'conf/engines/innodb/full_text_search.zz'
+        RQG_ENGINE: InnoDB
+
+      '026':
+        RQG_GRAMMAR: 'conf/engines/innodb/full_text_search.yy'
+        RQG_GENDATA: 'conf/engines/innodb/full_text_search.zz'
+        RQG_ENGINE: Aria,MyISAM
+
+      '027':
+        RQG_GRAMMAR: 'conf/engines/innodb/full_text_search.yy'
+        RQG_GENDATA: 'conf/partitioning/partition_pruning.zz'
+        RQG_ENGINE: InnoDB,MyISAM,Aria
+
+      '028':
+        RQG_GRAMMAR: 'conf/engines/heap/heap_dml_single.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata'
+        MYSQLD_JOB_OPTIONS: "--mysqld=--init-file=$ENV_RQG_HOME/conf/engines/heap/heap_dml_single.init"
+
+      '029':
+        RQG_GRAMMAR: 'conf/engines/heap/heap_ddl_multi.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata'
+
+      '030':
+        RQG_GRAMMAR: 'conf/temporal/temporal_functions.yy'
+        RQG_GENDATA: 'conf/temporal/temporal_functions.zz'
+        RQG_ENGINE: InnoDB
+
+      '031':
+        RQG_GRAMMAR: 'conf/temporal/temporal_functions.yy'
+        RQG_GENDATA: 'conf/temporal/temporal_functions.zz'
+        RQG_ENGINE: MyISAM
+
+      '032':
+        RQG_GRAMMAR: 'conf/temporal/temporal_functions.yy'
+        RQG_GENDATA: 'conf/temporal/temporal_functions-wl946.zz'
+        RQG_DURATION: 1200
+
+      '033':
+        RQG_GRAMMAR: 'conf/mariadb/generic-dml.yy'
+        RQG_GENDATA: '--gendata-advanced'
+        RQG_JOB_OPTIONS: '--skip-gendata'
+        RQG_ENGINE: InnoDB
+
+      '034':
+        RQG_GRAMMAR: 'conf/mariadb/generic-dml.yy'
+        RQG_GENDATA: '--gendata-advanced'
+        RQG_JOB_OPTIONS: '--skip-gendata'
+        RQG_ENGINE: MyISAM,Aria,HEAP
+
+      '035':
+        RQG_GRAMMAR: 'conf/partitioning/partitions.yy'
+        RQG_ENGINE: MyISAM,Aria
+
+      '036':
+        RQG_GRAMMAR: 'conf/partitioning/partition_pruning.yy'
+        RQG_GENDATA: 'conf/partitioning/partition_pruning.zz'
+        RQG_ENGINE: MyISAM,Aria
+
+      '037':
+        RQG_GRAMMAR: 'conf/runtime/percona/AL-19549.yy'
+        RQG_GENDATA: 'conf/runtime/percona/AL-19549.zz'
+        RQG_ENGINE: InnoDB
+        RQG_JOB_OPTIONS: '--gendata=conf/runtime/percona/AL-19549-part.zz'
+
+      '038':
+        RQG_GRAMMAR: 'conf/percona_qa/BT-16274/BT-16274.yy'
+        RQG_GENDATA: 'conf/percona_qa/BT-16274/BT-16274.zz'
+        RQG_ENGINE: InnoDB
+
+      '039':
+        RQG_GRAMMAR: 'conf/runtime/percona/5.6.yy'
+        RQG_GENDATA: 'conf/runtime/percona/percona_qa.zz'
+        RQG_ENGINE: InnoDB
+        RQG_JOB_OPTIONS: '--gendata=conf/runtime/percona/percona_qa_part.zz'
+
+# Not enough open files in system limits
+#      '040':
+#        RQG_GRAMMAR: 'conf/partitioning/partitions-99-hash.yy'
+#        RQG_JOB_OPTIONS: '--skip-gendata'
+
+      '041':
+        RQG_GRAMMAR: 'conf/partitioning/partitions-99-range.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata'
+
+      '042':
+        RQG_GRAMMAR: 'conf/partitioning/partitions-ddl.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata'
+
+      '043':
+        RQG_GRAMMAR: 'conf/optimizer/range_access.yy'
+        RQG_GENDATA: 'conf/optimizer/range_access.zz'
+        RQG_ENGINE: InnoDB,MyISAM,Aria
+
+      '044':
+        RQG_GRAMMAR: 'conf/optimizer/range_access2.yy'
+        RQG_GENDATA: 'conf/optimizer/range_access2.zz'
+        RQG_ENGINE: InnoDB,MyISAM,Aria
+
+      '045':
+        RQG_GRAMMAR: 'conf/runtime/performance_schema.yy'
+        RQG_GENDATA: 'conf/mariadb/innodb.zz'
+        MYSQLD_JOB_OPTIONS: '--mysqld=--performance-schema'
+        RQG_JOB_OPTIONS: '--short-column-names'
+
+      '046':
+        RQG_GRAMMAR: 'conf/runtime/information_schema.yy'
+        RQG_GENDATA: 'conf/mariadb/innodb.zz'
+        RQG_JOB_OPTIONS: '--short-column-names'
+
+      '047':
+        RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
+        RQG_GENDATA: 'conf/mariadb/innodb.zz'
+        RQG_ENGINE: InnoDB
+        MYSQLD_JOB_OPTIONS: '--mysqld=--innodb-page-size=8K'
+
+      '048':
+        RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
+        RQG_GENDATA: 'conf/mariadb/innodb.zz'
+        RQG_ENGINE: InnoDB
+        MYSQLD_JOB_OPTIONS: '--mysqld=--innodb-page-size=4K'
+
+      '049':
+        RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
+        RQG_GENDATA: 'conf/mariadb/innodb.zz'
+        RQG_ENGINE: InnoDB
+        MYSQLD_JOB_OPTIONS: '--mysqld=--innodb-page-size=32K --mysqld=--innodb-buffer-pool-size=2G'
+
+      '050':
+        RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
+        RQG_GENDATA: 'conf/mariadb/innodb.zz'
+        RQG_ENGINE: InnoDB
+        MYSQLD_JOB_OPTIONS: '--mysqld=--innodb-page-size=64K --mysqld=--innodb-buffer-pool-size=2G'
+
+  steps:
+
+  - template: steps/env.yml
+
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      artifactName: 'build'
+      downloadPath: $(Build.ArtifactStagingDirectory)
+    displayName: 'Download build from artifacts'
+
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: '$(Build.ArtifactStagingDirectory)/build/build-*.tar.gz'
+      destinationFolder: $(env.BASEDIR)
+    displayName: 'Extract build'
+
+  - template: steps/install-deb-packages.yml
+    parameters:
+      INSTALLATION_SET: 'runtime'
+
+  - template: steps/clone-test-tools.yml
+
+  - template: steps/run-rqg-test.yml
+
+#########
+# Print summary
+- template: jobs/test-report.yml
+  parameters:
+    dependencies:
+    - Test
