@@ -1,11 +1,12 @@
 trigger: none
 
 schedules:
-- cron: "0 * * * *"
+- cron: "0 15 * * *"
   displayName: 10.5 Debug combo
   branches:
     include:
     - master
+  always: true
 
 jobs:
 
