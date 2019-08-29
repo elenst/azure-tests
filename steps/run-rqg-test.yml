@@ -18,6 +18,7 @@ steps:
       mkdir -p $ENV_LOGDIR
       set -xo pipefail
       cd $ENV_RQG_HOME
+      export ASAN_OPTIONS=abort_on_error=1,disable_coredump=0"
       perl ./runall-new.pl \
         --basedir=$ENV_BASEDIR \
         --vardir=$ENV_LOGDIR/vardir \
