@@ -22,11 +22,11 @@ steps:
         echo "##vso[task.setvariable variable=TRIAL_NO]$TRIAL_NO"
       fi
       # If we are using a matrix, we also need a job name for the unique
-      # suffix. Otherwise, only trial ID
-      if [ "$SYSTEM_JOBNAME" == "Job" ] ; then
+      # suffix. Otherwise, only trial ID.
+      if [ "$SYSTEM_JOBDISPLAYNAME" == "$ENV_REAL_JOBNAME" ] ; then
         RUN_ID=$TRIAL_NO
       else
-        RUN_ID=${SYSTEM_JOBNAME}.${TRIAL_NO}
+        RUN_ID=${ENV_REAL_JOBNAME}.${TRIAL_NO}
       fi
       echo "##vso[task.setvariable variable=RUN_ID]$RUN_ID"
       rm -rf $(Build.ArtifactStagingDirectory)/*
