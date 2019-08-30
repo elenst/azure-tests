@@ -1,0 +1,139 @@
+########################################################################
+# RQG integration tests with DML and DDL, different engines.
+# The default set is big bang, but it can be narrowed down through
+# configuration parameters
+########################################################################
+
+trigger: none
+
+# variables:
+
+#  CMAKE_BUILD_TYPE: ''
+#  CMAKE_OPTIONS: ''
+#
+#  RQG_DURATION: 400
+#  RQG_THREADS: 6
+#  RQG_VIEWS: '--views'
+#
+#  # --redefine=conf/mariadb/modules/acl.yy disabled due to MDEV-18003
+#  RQG_REDEFINES: "--redefine=conf/mariadb/bulk_insert.yy --redefine=conf/mariadb/modules/sql_mode.yy --redefine=conf/mariadb/alter_table.yy --redefine=conf/mariadb/instant_add.yy --redefine=conf/mariadb/modules/alter_table_columns.yy --redefine=conf/mariadb/modules/foreign_keys.yy --redefine=conf/mariadb/sp.yy --redefine=conf/mariadb/modules/userstat.yy --redefine=conf/mariadb/modules/admin.yy --redefine=conf/mariadb/modules/locks.yy --redefine=conf/mariadb/versioning.yy --redefine=conf/mariadb/sequences.yy --redefine=conf/mariadb/modules/locks-10.4-extra.yy"
+#  RQG_OPTIONS: "--seed=time --reporters=Backtrace,ErrorLog,Deadlock --filter=conf/mariadb/10.4-combo-filter.ff"
+#  MYSQLD_OPTIONS: "--mysqld=--log_output=FILE --mysqld=--loose-max-statement-time=20 --mysqld=--lock-wait-timeout=10 --mysqld=--loose-innodb-lock-wait-timeout=5 --mysqld=--loose-debug_assert_on_not_freed_memory=0"
+
+jobs:
+
+#########
+# Download or build server
+- template: jobs/prepare-server.yml
+  parameters:
+    name: 'Download_or_Build_Server'
+
+#########
+# Upload to FTP
+- template: jobs/upload-to-ftp.yml
+  parameters:
+    dependencies:
+    - 'Download_or_Build_Server'
+    condition: and(succeeded(), ne(dependencies.Download_or_Build_Server.outputs['ftp_download.BINARIES_FROM_FTP'], 'true'))
+
+#########
+- job: Test
+  timeoutInMinutes: 60
+  dependsOn: Download_or_Build_Server
+  pool:
+    vmImage: 'Ubuntu 16.04'
+
+  strategy:
+    matrix:
+
+      '001':
+        RQG_GRAMMAR: 'conf/mariadb/optimizer.yy'
+        RQG_GENDATA: 'conf/mariadb/optimizer.zz'
+        RQG_ENGINE: InnoDB,MyISAM,Aria
+
+      '002':
+        RQG_GRAMMAR: 'conf/mariadb/optimizer.yy'
+        RQG_ENGINE: InnoDB,MyISAM,Aria
+
+      '003':
+        RQG_GRAMMAR: 'conf/mariadb/optimizer.yy'
+        RQG_GENDATA: '--gendata-advanced'
+        RQG_ENGINE: InnoDB,MyISAM,Aria
+        RQG_JOB_OPTIONS: '--skip-gendata'
+
+      '004':
+        RQG_GRAMMAR: 'conf/mariadb/optimizer.yy'
+        RQG_ENGINE: InnoDB,MyISAM,Aria
+        RQG_JOB_OPTIONS: '--not-null'
+
+      '005':
+        RQG_GRAMMAR: 'conf/mariadb/optimizer.yy'
+        RQG_ENGINE: MyISAM
+        RQG_JOB_OPTIONS: '--skip-gendata'
+        MYSQLD_JOB_OPTIONS: '--mysqld=--init-file=$ENV_RQG_HOME/conf/mariadb/world.sql'
+
+      '006':
+        RQG_GRAMMAR: 'conf/optimizer/range_access2.yy'
+        RQG_GENDATA: 'conf/optimizer/range_access2.zz'
+        RQG_ENGINE: InnoDB,MyISAM,Aria
+
+      '007':
+        RQG_GRAMMAR: 'conf/optimizer/range_access.yy'
+        RQG_GENDATA: 'conf/optimizer/range_access.zz'
+        RQG_ENGINE: InnoDB,MyISAM,Aria
+
+      '008':
+        RQG_GRAMMAR: 'conf/optimizer/outer_join.yy'
+        RQG_GENDATA: 'conf/optimizer/outer_join.zz'
+        RQG_ENGINE: InnoDB,MyISAM,Aria
+
+      '009':
+        RQG_GRAMMAR: 'conf/optimizer/optimizer_access_exp.yy'
+        RQG_GENDATA: 'conf/optimizer/range_access.zz'
+        RQG_ENGINE: InnoDB,MyISAM,Aria
+
+      '010':
+        RQG_GRAMMAR: 'conf/optimizer/optimizer_access_exp.yy'
+        RQG_ENGINE: InnoDB,MyISAM,Aria
+        RQG_JOB_OPTIONS: '--notnull'
+
+      '011':
+        RQG_GRAMMAR: 'conf/optimizer/optimizer_access_exp.yy'
+        RQG_ENGINE: InnoDB,MyISAM,Aria
+
+      '012':
+        RQG_GRAMMAR: 'conf/optimizer/optimizer_access_exp.yy'
+        RQG_ENGINE: MyISAM
+        RQG_JOB_OPTIONS: '--skip-gendata'
+        MYSQLD_JOB_OPTIONS: '--mysqld=--init-file=$ENV_RQG_HOME/conf/mariadb/world.sql'
+
+  steps:
+
+  - template: steps/env.yml
+
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      artifactName: 'build'
+      downloadPath: $(Build.ArtifactStagingDirectory)
+    displayName: 'Download build from artifacts'
+
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: '$(Build.ArtifactStagingDirectory)/build/build-*.tar.gz'
+      destinationFolder: $(env.BASEDIR)
+    displayName: 'Extract build'
+
+  - template: steps/install-deb-packages.yml
+    parameters:
+      INSTALLATION_SET: 'runtime'
+
+  - template: steps/clone-test-tools.yml
+
+  - template: steps/run-rqg-test.yml
+
+#########
+# Print summary
+- template: jobs/test-report.yml
+  parameters:
+    dependencies:
+    - Test
