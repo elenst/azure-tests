@@ -57,51 +57,45 @@ jobs:
 
       '003':
         RQG_GRAMMAR: 'conf/mariadb/optimizer.yy'
-        RQG_GENDATA: '--gendata-advanced'
         RQG_ENGINE: InnoDB,MyISAM,Aria
-        RQG_JOB_OPTIONS: '--skip-gendata'
+        RQG_JOB_OPTIONS: '--notnull'
 
       '004':
-        RQG_GRAMMAR: 'conf/mariadb/optimizer.yy'
-        RQG_ENGINE: InnoDB,MyISAM,Aria
-        RQG_JOB_OPTIONS: '--not-null'
-
-      '005':
         RQG_GRAMMAR: 'conf/mariadb/optimizer.yy'
         RQG_ENGINE: MyISAM
         RQG_JOB_OPTIONS: '--skip-gendata'
         MYSQLD_JOB_OPTIONS: '--mysqld=--init-file=$ENV_RQG_HOME/conf/mariadb/world.sql'
 
-      '006':
+      '005':
         RQG_GRAMMAR: 'conf/optimizer/range_access2.yy'
         RQG_GENDATA: 'conf/optimizer/range_access2.zz'
         RQG_ENGINE: InnoDB,MyISAM,Aria
 
-      '007':
+      '006':
         RQG_GRAMMAR: 'conf/optimizer/range_access.yy'
         RQG_GENDATA: 'conf/optimizer/range_access.zz'
         RQG_ENGINE: InnoDB,MyISAM,Aria
 
-      '008':
+      '007':
         RQG_GRAMMAR: 'conf/optimizer/outer_join.yy'
         RQG_GENDATA: 'conf/optimizer/outer_join.zz'
         RQG_ENGINE: InnoDB,MyISAM,Aria
 
-      '009':
+      '008':
         RQG_GRAMMAR: 'conf/optimizer/optimizer_access_exp.yy'
         RQG_GENDATA: 'conf/optimizer/range_access.zz'
         RQG_ENGINE: InnoDB,MyISAM,Aria
 
-      '010':
+      '009':
         RQG_GRAMMAR: 'conf/optimizer/optimizer_access_exp.yy'
         RQG_ENGINE: InnoDB,MyISAM,Aria
         RQG_JOB_OPTIONS: '--notnull'
 
-      '011':
+      '010':
         RQG_GRAMMAR: 'conf/optimizer/optimizer_access_exp.yy'
         RQG_ENGINE: InnoDB,MyISAM,Aria
 
-      '012':
+      '011':
         RQG_GRAMMAR: 'conf/optimizer/optimizer_access_exp.yy'
         RQG_ENGINE: MyISAM
         RQG_JOB_OPTIONS: '--skip-gendata'
