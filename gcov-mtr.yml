@@ -89,6 +89,7 @@ jobs:
 
   - download: current
     artifact: build
+    patterns: '**'
 
   - bash: |
       mv $PIPELINE_WORKSPACE/build $ENV_BASEDIR
@@ -115,6 +116,7 @@ jobs:
 
   - download: current
     artifact: build
+    patterns: '**'
 
   - bash: |
       mv $PIPELINE_WORKSPACE/build $ENV_BASEDIR
@@ -142,6 +144,7 @@ jobs:
 
   - download: current
     artifact: build
+    patterns: '**'
 
   - bash: |
       mv $PIPELINE_WORKSPACE/build $ENV_BASEDIR
