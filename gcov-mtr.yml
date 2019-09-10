@@ -36,7 +36,7 @@ jobs:
         elif wget $FTP_DOWNLOAD/$filename ; then
           baseline_revno=`cat $filename`
         fi
-        if [ -z "$basline_revno" ] ; then
+        if [ -z "$baseline_revno" ] ; then
           echo "##vso[task.complete result=Failed]Baseline revision has not been specified"
         else
           git clone $SERVER_REPO --branch=$ENV_SERVER_BRANCH $ENV_BASEDIR
