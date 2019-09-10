@@ -1,0 +1,157 @@
+########################################################################
+# GCOV report for MTR tests
+########################################################################
+
+trigger: none
+
+# Expects SERVER_BRANCH in the environment
+
+jobs:
+
+#########
+- job: Build
+  pool:
+    vmImage: 'Ubuntu 16.04'
+  timeoutInMinutes: 0
+  strategy:
+    parallel: 1
+
+  steps:
+
+  - template: steps/env.yml
+
+  - template: steps/install-deb-packages.yml
+    parameters:
+      INSTALLATION_SET: 'all'
+      EXTRA_PACKAGES: 'lcov'
+
+  - bash: |
+      if [ -z "$ENV_SERVER_BRANCH" ]; then
+        echo "##vso[task.complete result=Failed]\"SERVER_BRANCH\" has not been specified"
+      else
+        filename=gcov-last-revno.$ENV_SERVER_BRANCH
+        if [ -n "$ENV_BASELINE_REVISION" ]; then
+          baseline_revno=$ENV_BASELINE_REVISION
+        elif wget $FTP_DOWNLOAD/$filename ; then
+          baseline_revno=`cat $filename`
+        fi
+        if [ -z "$basline_revno" ] ; then
+          echo "##vso[task.complete result=Failed]Baseline revision has not been specified"
+        else
+          git clone $SERVER_REPO --branch=$ENV_SERVER_BRANCH $ENV_BASEDIR
+          cd $ENV_BASEDIR
+          current_revno=`git log -1 --abbrev=8 --pretty="%h"`
+          echo "Baseline revision: $baseline_revno Current_revison: $current_revno"
+          if [[ "$baseline_revno" =~ ^"$current_revno" ]] ; then
+            echo "##vso[task.complete result=Skipped]Baseline revision is the same as current revision"
+          else
+            echo "##vso[task.setvariable variable=BASELINE_FILENAME;isOutput=true]$filename"
+            echo "##vso[task.setvariable variable=BASELINE_REVISION;isOutput=true]$baseline_revno"
+            echo "##vso[task.setvariable variable=INFODIR;isOutput=true]$HOME/gcov_info"
+          fi
+        fi
+      fi
+    displayName: Prepare
+    env:
+      FTP_DOWNLOAD: 'ftp://perro.askmonty.org/public/azure'
+      SERVER_REPO: 'https://github.com/MariaDB/server'
+    name: prep
+
+  # Build the server in-source
+  - bash: |
+      set -x
+      cd $ENV_BASEDIR
+      cmake_options="$ENV_CMAKE_OPTIONS -DCMAKE_BUILD_TYPE=Debug -DENABLE_GCOV=ON"
+      cmake . $cmake_options
+      make -j5
+      echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_BASEDIR/server.info
+      echo $cmake_options >> $ENV_BASEDIR/server.info
+    displayName: 'Build server'
+    name: build_server
+
+  - publish: $(env.Basedir)
+    artifact: build
+
+#########
+- job: MTR-nm
+  pool:
+    vmImage: 'Ubuntu 16.04'
+  timeoutInMinutes: 0
+  strategy:
+    parallel: 1
+
+  steps:
+
+  - download: current
+    artifact: build
+
+  - bash: |
+      mv $PIPELINE_WORKSPACE/build $ENV_BASEDIR
+      cd $ENV_BASEDIR/mysql-test
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0
+    name: mtr_nm
+
+  - publish: $(env.Basedir)
+    artifact: build
+
+#########
+- job: MTR-ps
+  pool:
+    vmImage: 'Ubuntu 16.04'
+  timeoutInMinutes: 0
+  strategy:
+    parallel: 1
+
+  steps:
+
+  - download: current
+    artifact: build
+
+  - bash: |
+      mv $PIPELINE_WORKSPACE/build $ENV_BASEDIR
+      cd $ENV_BASEDIR/mysql-test
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --ps-protocol
+    name: mtr_ps
+
+  - publish: $(env.Basedir)
+    artifact: build
+
+#########
+- job: GCOV_report
+  pool:
+    vmImage: 'Ubuntu 16.04'
+  timeoutInMinutes: 0
+  strategy:
+    parallel: 1
+
+  steps:
+
+  - download: current
+    artifact: build
+
+  - bash: |
+      mv $PIPELINE_WORKSPACE/build $ENV_BASEDIR
+      mkdir $PREP_INFODIR
+      cd $HOME
+      git clone https://github.com/elenst/mariadb-toolbox
+      cd $ENV_BASEDIR
+      git diff $PREP_BASELINE_REVISION > $PREP_INFODIR/gcov.diff
+      lcov --rc lcov_branch_coverage=1 --quiet --directory $ENV_BASEDIR --capture --output-file $PREP_INFODIR/lcov.info
+      perl $HOME/mariadb-toolbox/scripts/coverage_for_patch.pl --basedir=$ENV_BASEDIR --diff-file=$PREP_INFODIR/gcov.diff --lcov-info=$PREP_INFODIR/lcov.info --branch-info 1>coverage 2>missings
+    name: gcov_report
+
+  - publish: $(Prep.Infodir)
+    artifact: gcov_info
+
+  - publish: $(Prep.Filename)
+    artifact: baseline
+
+#########
+# Upload to FTP
+- template: jobs/upload-to-ftp.yml
+  parameters:
+    name: 'Upload_new_baseline_to_FTP'
+    artifactName: 'baseline'
+    dependencies:
+    - 'GCOV_report'
+    condition: succeeded()
