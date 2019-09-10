@@ -26,12 +26,13 @@ jobs:
       EXTRA_PACKAGES: 'lcov'
 
   - bash: |
+      set -x
       if [ -z "$ENV_SERVER_BRANCH" ]; then
         echo "##vso[task.complete result=Failed]\"SERVER_BRANCH\" has not been specified"
       else
         filename=gcov-last-revno.$ENV_SERVER_BRANCH
-        if [ -n "$ENV_BASELINE_REVISION" ]; then
-          baseline_revno=$ENV_BASELINE_REVISION
+        if [ -n "$BASELINE_REVISION" ]; then
+          baseline_revno=$BASELINE_REVISION
         elif wget $FTP_DOWNLOAD/$filename ; then
           baseline_revno=`cat $filename`
         fi
