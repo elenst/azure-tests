@@ -85,6 +85,8 @@ jobs:
 
   steps:
 
+  - template: steps/env.yml
+
   - download: current
     artifact: build
 
@@ -108,6 +110,8 @@ jobs:
     parallel: 1
 
   steps:
+
+  - template: steps/env.yml
 
   - download: current
     artifact: build
@@ -133,6 +137,8 @@ jobs:
   - 'MTR_ps'
 
   steps:
+
+  - template: steps/env.yml
 
   - download: current
     artifact: build
