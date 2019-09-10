@@ -73,10 +73,12 @@ jobs:
     artifact: build
 
 #########
-- job: MTR-nm
+- job: MTR_normal
   pool:
     vmImage: 'Ubuntu 16.04'
   timeoutInMinutes: 0
+  dependencies:
+  - 'Build'
   strategy:
     parallel: 1
 
@@ -95,10 +97,12 @@ jobs:
     artifact: build
 
 #########
-- job: MTR-ps
+- job: MTR_ps
   pool:
     vmImage: 'Ubuntu 16.04'
   timeoutInMinutes: 0
+  dependencies:
+  - 'Build'
   strategy:
     parallel: 1
 
@@ -123,6 +127,9 @@ jobs:
   timeoutInMinutes: 0
   strategy:
     parallel: 1
+  dependencies:
+  - 'MTR_normal'
+  - 'MTR_ps'
 
   steps:
 
