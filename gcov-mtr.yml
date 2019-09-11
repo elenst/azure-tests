@@ -91,7 +91,7 @@ jobs:
 
   - template: steps/install-deb-packages.yml
     parameters:
-      INSTALLATION_SET: 'runtime'
+      INSTALLATION_SET: 'all'
       EXTRA_PACKAGES: 'lcov'
 
   - download: current
@@ -108,7 +108,7 @@ jobs:
     name: mtr_nm
 
   - publish: $(Build.ArtifactStagingDirectory)
-    artifact: build
+    artifact: build_nm
 
 #########
 - job: MTR_ps
@@ -126,11 +126,11 @@ jobs:
 
   - template: steps/install-deb-packages.yml
     parameters:
-      INSTALLATION_SET: 'runtime'
+      INSTALLATION_SET: 'all'
       EXTRA_PACKAGES: 'lcov'
 
   - download: current
-    artifact: build
+    artifact: build_nm
 
   - bash: |
       cd $HOME
@@ -143,7 +143,7 @@ jobs:
     name: mtr_ps
 
   - publish: $(Build.ArtifactStagingDirectory)
-    artifact: build
+    artifact: build_ps
 
 #########
 - job: GCOV_report
@@ -162,11 +162,11 @@ jobs:
 
   - template: steps/install-deb-packages.yml
     parameters:
-      INSTALLATION_SET: 'runtime'
+      INSTALLATION_SET: 'all'
       EXTRA_PACKAGES: 'lcov'
 
   - download: current
-    artifact: build
+    artifact: build_ps
 
   - bash: |
       cd $HOME
@@ -177,6 +177,10 @@ jobs:
       git diff $PREP_BASELINE_REVISION > $PREP_INFODIR/gcov.diff
       lcov --rc lcov_branch_coverage=1 --quiet --directory $HOME/server --capture --output-file $PREP_INFODIR/lcov.info
       perl $HOME/mariadb-toolbox/scripts/coverage_for_patch.pl --basedir=$HOME/server --diff-file=$PREP_INFODIR/gcov.diff --lcov-info=$PREP_INFODIR/lcov.info --branch-info 1>coverage 2>missings
+      echo "#################"
+      echo "Missing coverage:"
+      echo "#################"
+      cat missings
     name: gcov_report
 
   - publish: $(Prep.Infodir)
