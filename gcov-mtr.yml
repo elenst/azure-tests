@@ -39,8 +39,8 @@ jobs:
         if [ -z "$baseline_revno" ] ; then
           echo "##vso[task.complete result=Failed]Baseline revision has not been specified"
         else
-          git clone $SERVER_REPO --branch=$ENV_SERVER_BRANCH $ENV_BASEDIR
-          cd $ENV_BASEDIR
+          git clone $SERVER_REPO --branch=$ENV_SERVER_BRANCH $HOME/server
+          cd $HOME/server
           current_revno=`git log -1 --abbrev=8 --pretty="%h"`
           echo "Baseline revision: $baseline_revno Current_revison: $current_revno"
           if [[ "$baseline_revno" =~ ^"$current_revno" ]] ; then
@@ -61,14 +61,14 @@ jobs:
   # Build the server in-source
   - bash: |
       set -x
-      cd $ENV_BASEDIR
+      cd $HOME/server
       cmake_options="$ENV_CMAKE_OPTIONS -DCMAKE_BUILD_TYPE=Debug -DENABLE_GCOV=ON"
       cmake . $cmake_options
       make -j5
-      echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_BASEDIR/server.info
-      echo $cmake_options >> $ENV_BASEDIR/server.info
-      cd $HOME
-      tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz $ENV_BASEDIR
+      echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $HOME/server/server.info
+      echo $cmake_options >> $HOME/server/server.info
+      cd ..
+      tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz server
     displayName: 'Build'
     name: build_server
 
@@ -98,13 +98,11 @@ jobs:
       ls -l $PIPELINE_WORKSPACE/build
       tar zxf $PIPELINE_WORKSPACE/build/build.tar.gz
       ls -l
-      ls -l build
-      mv build $ENV_BASEDIR
-      cd $ENV_BASEDIR/mysql-test
+      cd $HOME/server/mysql-test
       perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0
       cd $HOME
-      rm build.tar.gz
-      tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz $ENV_BASEDIR
+      rm $PIPELINE_WORKSPACE/build/build.tar.gz
+      tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz server
     name: mtr_nm
 
   - publish: $(Build.ArtifactStagingDirectory)
