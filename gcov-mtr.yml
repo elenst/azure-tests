@@ -68,11 +68,11 @@ jobs:
       echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_BASEDIR/server.info
       echo $cmake_options >> $ENV_BASEDIR/server.info
       cd $HOME
-      tar zcf build.tar.gz $ENV_BASEDIR
+      tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz $ENV_BASEDIR
     displayName: 'Build'
     name: build_server
 
-  - publish: $(Home)/build.tar.gz
+  - publish: $(Build.ArtifactStagingDirectory)
     artifact: build
 
 #########
@@ -103,10 +103,10 @@ jobs:
       perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0
       cd $HOME
       rm build.tar.gz
-      tar zcf build.tar.gz $ENV_BASEDIR
+      tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz $ENV_BASEDIR
     name: mtr_nm
 
-  - publish: $(Home)/build.tar.gz
+  - publish: $(Build.ArtifactStagingDirectory)
     artifact: build
 
 #########
@@ -138,10 +138,10 @@ jobs:
       perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --ps-protocol
       cd $HOME
       rm build.tar.gz
-      tar zcf build.tar.gz $ENV_BASEDIR
+      tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz $ENV_BASEDIR
     name: mtr_ps
 
-  - publish: $(Home)/build.tar.gz
+  - publish: $(Build.ArtifactStagingDirectory)
     artifact: build
 
 #########
