@@ -95,7 +95,8 @@ jobs:
   - bash: |
       cd $HOME
       ls -l $PIPELINE_WORKSPACE
-      tar zxf $PIPELINE_WORKSPACE/build.tar.gz
+      ls -l $PIPELINE_WORKSPACE/build
+      tar zxf $PIPELINE_WORKSPACE/build/build.tar.gz
       ls -l
       ls -l build
       mv build $ENV_BASEDIR
