@@ -134,11 +134,11 @@ jobs:
 
   - bash: |
       cd $HOME
-      tar zxf $PIPELINE_WORKSPACE/build/build.tar.gz
+      tar zxf $PIPELINE_WORKSPACE/build_nm/build.tar.gz
       cd $HOME/server/mysql-test
       perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --ps-protocol
       cd $HOME
-      rm $PIPELINE_WORKSPACE/build/build.tar.gz
+      rm $PIPELINE_WORKSPACE/build_nm/build.tar.gz
       tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz server
     name: mtr_ps
 
@@ -172,7 +172,7 @@ jobs:
       cd $HOME
       mkdir $PREP_INFODIR
       git clone https://github.com/elenst/mariadb-toolbox
-      tar zxf $PIPELINE_WORKSPACE/build/build.tar.gz
+      tar zxf $PIPELINE_WORKSPACE/build_ps/build.tar.gz
       cd server
       git diff $PREP_BASELINE_REVISION > $PREP_INFODIR/gcov.diff
       lcov --rc lcov_branch_coverage=1 --quiet --directory $HOME/server --capture --output-file $PREP_INFODIR/lcov.info
