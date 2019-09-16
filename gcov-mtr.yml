@@ -197,7 +197,7 @@ jobs:
     name: store_baseline
 
   - publish: $(Build.ArtifactStagingDirectory)
-    artifact: gcov_baseline_revision_$(Server.Branch)
+    artifact: gcov_baseline_revision
     name: publish_baseline
 
 #########
@@ -205,7 +205,7 @@ jobs:
 - template: jobs/upload-to-ftp.yml
   parameters:
     name: 'Upload_new_baseline_to_FTP'
-    artifactName: gcov_baseline_revision_$(Server.Branch)
+    artifactName: gcov_baseline_revision
     dependencies:
     - 'GCOV_report'
     condition: succeeded()
