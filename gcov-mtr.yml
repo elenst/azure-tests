@@ -185,14 +185,20 @@ jobs:
       echo "Missing coverage:"
       echo "#################"
       cat $infodir/missings
-      mv baseline.revision $BUILD_ARTIFACTSTAGINGDIRECTORY/gcov_baseline_revision_$SERVER_BRANCH
     name: gcov_report
 
   - publish: $(Build.ArtifactStagingDirectory)
     artifact: gcov_info
+    name: publish_gcov_info
 
-  - publish: $(Build.ArtifactStagingDirectory)/gcov_baseline_revision_$(Server.Branch)
+  - bash: |
+      rm -rf $BUILD_ARTIFACTSTAGINGDIRECTORY/*
+      mv $HOME/server/baseline.revision $BUILD_ARTIFACTSTAGINGDIRECTORY/gcov_baseline_revision_$SERVER_BRANCH
+    name: store_baseline
+
+  - publish: $(Build.ArtifactStagingDirectory)
     artifact: gcov_baseline_revision_$(Server.Branch)
+    name: publish_baseline
 
 #########
 # Upload to FTP
