@@ -33,6 +33,7 @@ jobs:
         filename=gcov-last-revno.$ENV_SERVER_BRANCH
         if [ -n "$BASELINE_REVISION" ]; then
           baseline_revno=$BASELINE_REVISION
+          echo $baseline_revno > $filename
         elif wget $FTP_DOWNLOAD/$filename ; then
           baseline_revno=`cat $filename`
         fi
@@ -46,9 +47,9 @@ jobs:
           if [[ "$baseline_revno" =~ ^"$current_revno" ]] ; then
             echo "##vso[task.complete result=Skipped]Baseline revision is the same as current revision"
           else
-            echo "##vso[task.setvariable variable=BASELINE_FILENAME;isOutput=true]$filename"
+            rm -rf $BUILD_ARTIFACTSTAGINGDIRECTORY/*
+            mv $filename $BUILD_ARTIFACTSTAGINGDIRECTORY/
             echo "##vso[task.setvariable variable=BASELINE_REVISION;isOutput=true]$baseline_revno"
-            echo "##vso[task.setvariable variable=INFODIR;isOutput=true]$HOME/gcov_info"
           fi
         fi
       fi
@@ -57,6 +58,9 @@ jobs:
       FTP_DOWNLOAD: 'ftp://perro.askmonty.org/public/azure'
       SERVER_REPO: 'https://github.com/MariaDB/server'
     name: prep
+
+  - publish: $(Build.ArtifactStagingDirectory)
+    artifact: baseline
 
   # Build the server in-source
   - bash: |
@@ -68,6 +72,7 @@ jobs:
       echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $HOME/server/server.info
       echo $cmake_options >> $HOME/server/server.info
       cd ..
+      rm -rf $BUILD_ARTIFACTSTAGINGDIRECTORY/*
       tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz server
     displayName: 'Build'
     name: build_server
@@ -101,7 +106,7 @@ jobs:
       cd $HOME
       tar zxf $PIPELINE_WORKSPACE/build/build.tar.gz
       cd $HOME/server/mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 main.1st
       cd $HOME
       rm $PIPELINE_WORKSPACE/build/build.tar.gz
       tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz server
@@ -136,7 +141,7 @@ jobs:
       cd $HOME
       tar zxf $PIPELINE_WORKSPACE/build_nm/build.tar.gz
       cd $HOME/server/mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --ps-protocol
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --ps-protocol main.1st
       cd $HOME
       rm $PIPELINE_WORKSPACE/build_nm/build.tar.gz
       tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz server
@@ -169,25 +174,25 @@ jobs:
     artifact: build_ps
 
   - bash: |
+      set -x
       cd $HOME
-      mkdir $PREP_INFODIR
       git clone https://github.com/elenst/mariadb-toolbox
       tar zxf $PIPELINE_WORKSPACE/build_ps/build.tar.gz
       cd server
-      git diff $PREP_BASELINE_REVISION > $PREP_INFODIR/gcov.diff
-      lcov --rc lcov_branch_coverage=1 --quiet --directory $HOME/server --capture --output-file $PREP_INFODIR/lcov.info
-      perl $HOME/mariadb-toolbox/scripts/coverage_for_patch.pl --basedir=$HOME/server --diff-file=$PREP_INFODIR/gcov.diff --lcov-info=$PREP_INFODIR/lcov.info --branch-info 1>coverage 2>missings
+      rm -rf $BUILD_ARTIFACTSTAGINGDIRECTORY/*
+      infodir=$BUILD_ARTIFACTSTAGINGDIRECTORY/gcov_info
+      mkdir $infodir
+      git diff $PREP_BASELINE_REVISION > $infodir/gcov.diff
+      lcov --rc lcov_branch_coverage=1 --quiet --directory $HOME/server --capture --output-file $infodir/lcov.info
+      perl $HOME/mariadb-toolbox/scripts/coverage_for_patch.pl --basedir=$HOME/server --diff-file=$infodir/gcov.diff --lcov-info=$infodir/lcov.info --branch-info 1>$infodir/coverage 2>$infodir/missings
       echo "#################"
       echo "Missing coverage:"
       echo "#################"
-      cat missings
+      cat $infodir/missings
     name: gcov_report
 
-  - publish: $(Prep.Infodir)
+  - publish: $(Build.ArtifactStagingDirectory)
     artifact: gcov_info
-
-  - publish: $(Prep.Filename)
-    artifact: baseline
 
 #########
 # Upload to FTP
