@@ -33,6 +33,10 @@ jobs:
       artifactName: ${{ parameters.artifactName }}
       downloadPath: $(Build.ArtifactStagingDirectory)
 
+  - bash: |
+      ls -l $BUILD_ARTIFACTSTAGINGDIRECTORY/
+      ls -l $BUILD_ARTIFACTSTAGINGDIRECTORY/gcov_baseline_revision
+
   # Upload to FTP
   - task: FtpUpload@1
     inputs:
