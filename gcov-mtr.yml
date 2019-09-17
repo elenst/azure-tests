@@ -56,7 +56,7 @@ jobs:
   - bash: |
       set -x
       cd $HOME/server
-      cmake_options="$ENV_CMAKE_OPTIONS -DCMAKE_BUILD_TYPE=Debug -DENABLE_GCOV=ON -DPLUGIN_ROCKSDB=NO -DPLUGIN_SPHINX=NO -DPLUGIN_SPIDER=NO -DPLUGIN_MROONGA=NO -DPLUGIN_TOKUDB=NO -DPLUGIN_FEDERATEDX=NO -DPLUGIN_CONNECT=NO -DPLUGIN_FEDERATED=NO -DWITH_MARIABACKUP=OFF -DWITH_ASAN=YES -DMYSQL_MAINTAINER_MODE=OFF"
+      cmake_options="$ENV_CMAKE_OPTIONS -DCMAKE_BUILD_TYPE=Debug -DENABLE_GCOV=ON"
       cmake . $cmake_options
       make -j5
       for f in pars0lex.l lexyy.cc pars0grm.cc pars0grm.y ; do
@@ -109,7 +109,7 @@ jobs:
       cd $HOME
       tar zxf $PIPELINE_WORKSPACE/build/build.tar.gz
       cd $HOME/server/mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 main.1st
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0
       cd $HOME
       rm $PIPELINE_WORKSPACE/build/build.tar.gz
       tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz server
@@ -145,7 +145,7 @@ jobs:
       cd $HOME
       tar zxf $PIPELINE_WORKSPACE/build_nm/build.tar.gz
       cd $HOME/server/mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --ps-protocol main.1st
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --ps-protocol
       cd $HOME
       rm $PIPELINE_WORKSPACE/build_nm/build.tar.gz
       tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz server
