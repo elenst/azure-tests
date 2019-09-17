@@ -196,9 +196,11 @@ jobs:
       mv $HOME/server/baseline.revision $BUILD_ARTIFACTSTAGINGDIRECTORY/gcov_baseline_revision_$SERVER_BRANCH
     name: store_baseline
 
-  - publish: $(Build.ArtifactStagingDirectory)
-    artifact: gcov_baseline_revision
-    name: publish_baseline
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: gcov_baseline_revision
+    displayName: 'Publish baseline'
 
 #########
 # Upload to FTP
