@@ -109,7 +109,7 @@ jobs:
       cd $HOME
       tar zxf $PIPELINE_WORKSPACE/build/build.tar.gz
       cd $HOME/server/mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --suite=federated
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --suite=binlog,encryption,federated
       cd $HOME
       rm $PIPELINE_WORKSPACE/build/build.tar.gz
       tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz server
@@ -145,7 +145,7 @@ jobs:
       cd $HOME
       tar zxf $PIPELINE_WORKSPACE/build_nm/build.tar.gz
       cd $HOME/server/mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --ps-protocol --suite=federated
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --ps-protocol --suite=binlog,encryption,federated
       cd $HOME
       rm $PIPELINE_WORKSPACE/build_nm/build.tar.gz
       tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz server
