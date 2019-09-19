@@ -61,13 +61,13 @@ jobs:
       make -j5
       for f in pars0lex.l lexyy.cc pars0grm.cc pars0grm.y ; do
         cp storage/innobase/pars/$f storage/innobase/CMakeFiles/innobase.dir/pars/
-        if -e storage/xtradb/pars/$f ; then
+        if [ -e storage/xtradb/pars/$f ] ; then
           cp storage/xtradb/pars/$f storage/xtradb/CMakeFiles/xtradb.dir/pars/
         fi
       done
       for f in fts0pars.y fts0pars.cc fts0blex.cc fts0blex.l fts0tlex.cc fts0tlex.l ; do
         cp storage/innobase/fts/$f storage/innobase/CMakeFiles/innobase.dir/fts/
-        if -e storage/xtradb/fts/$f ; then
+        if [ -e storage/xtradb/fts/$f ] ; then
           cp storage/xtradb/fts/$f storage/xtradb/CMakeFiles/xtradb.dir/fts/
         fi
       done
