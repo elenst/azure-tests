@@ -29,6 +29,7 @@ steps:
         RUN_ID=${ENV_REAL_JOBNAME}.${TRIAL_NO}
       fi
       echo "##vso[task.setvariable variable=RUN_ID]$RUN_ID"
+
       rm -rf $(Build.ArtifactStagingDirectory)/*
       summary_dir=$(Build.ArtifactStagingDirectory)/summary-$(Build.BuildNumber).$RUN_ID
       details_dir=$(Build.ArtifactStagingDirectory)/data-$(Build.BuildNumber).$RUN_ID
@@ -53,6 +54,14 @@ steps:
         gdb --batch --eval-command="thread apply all bt full" $binary $c >> $details_dir/threads_full
       done
       tar zcf $details_dir/logs.tar.gz $ENV_LOGDIR
+
+      if [ -e $ENV_LOGDIR/trial.log ] ; then
+        result_collection_options="--test-log=$ENV_LOGDIR/trial.log"
+      fi
+      for d in $ENV_LOGDIR/vardir* ; do
+        result_collection_options="$result_collection_options --vardir=$d"
+      done
+
       echo "" >> $summary_dir/test_report
       echo "Test $RUN_ID" >> $summary_dir/test_report
       # First choice: runall prints the status right before exit
@@ -68,10 +77,7 @@ steps:
       echo "Test result:" $res >> $summary_dir/test_report
       export TEST_RESULT=$res
       echo "Trigger ID:" $(System.DefinitionId)-$(Build.BuildId)-$(Build.BuildNumber).$RUN_ID >> $summary_dir/test_report
-      echo "" >> $summary_dir/test_report
-      echo "Query result summary:" >> $summary_dir/test_report
-      perl $ENV_TOOLBOX_DIR/scripts/rqg_statuses_summary.pl $summary_dir/trial.log >> $summary_dir/test_report
-      echo "" >> $summary_dir/test_report
+
       echo "-------------------------------------" >> $summary_dir/test_report
       echo "" >> $summary_dir/test_report
       cp $summary_dir/server.info $repro_dir/repro.info
@@ -89,29 +95,32 @@ steps:
       cat $repro_dir/repro.info >> $summary_dir/test_report
       export TEST_ID=$(Build.BuildId).$RUN_ID
       echo >> $summary_dir/test_report
-      perl $ENV_RQG_HOME/util/check_for_known_bugs.pl --signatures=$ENV_RQG_HOME/data/bug_signatures `find $summary_dir -name mysql*.err*` $summary_dir/stacktraces --last=$summary_dir/trial.log >> $summary_dir/test_report
+      $ENV_TOOLBOX_DIR/scripts/collect_rqg_result_info.sh $result_collection_options > $summary_dir/result_info
+      perl $ENV_RQG_HOME/util/check_for_known_bugs.pl --signatures=$ENV_RQG_HOME/data/bug_signatures $summary_dir/result_info >> $summary_dir/test_report
       echo >> $summary_dir/test_report
-      for f in `find $summary_dir -name mysql*.err*` ; do
-        echo "========== $f ==========" >> $summary_dir/test_report
-        echo "Throttling:" >> $summary_dir/test_report
-        echo `grep -c 'Table .* is marked as crashed and should be repaired' $f` "occurrence(s) of 'Table .* is marked as crashed and should be repaired'" >> $summary_dir/test_report
-        echo `grep -c 'mysqld: The table .* is full' $f` "occurrence(s) of 'mysqld: The table .* is full'" >> $summary_dir/test_report
-        echo `grep -c 'Failed to load table .* which has a foreign key constraint with table .*' $f` "occurrence(s) of 'Failed to load table .* which has a foreign key constraint with table .*'" >> $summary_dir/test_report
-        echo `grep -c "mysqld: Can't find record in" $f` "occurrence(s) of 'mysqld: Can't find record in'" >> $summary_dir/test_report
-        echo "" >> $summary_dir/test_report
-        cat $f | \
-          grep -v -f $ENV_TOOLBOX_DIR/travis/server_warnings.supp | \
-          grep -v "\[Note\]" | \
-          grep -v "\] Query: " | \
-          grep -v 'Table .* is marked as crashed and should be repaired' | \
-          grep -v 'mysqld: The table .* is full' | \
-          grep -v 'Failed to load table .* which has a foreign key constraint with table .*' | \
-          grep -v "mysqld: Can't find record in" | \
-          grep -v "^$" | \
-          grep -v "server_audit: SysLog facility was changed" | \
-          cut -c 1-4096 >> $summary_dir/test_report
-        echo "" >> $summary_dir/test_report
-      done
+      echo "#####################################" >> $summary_dir/test_report
+      cat $summary_dir/result_info >> $summary_dir/test_report
+#      for f in `find $summary_dir -name mysql*.err*` ; do
+#        echo "========== $f ==========" >> $summary_dir/test_report
+#        echo "Throttling:" >> $summary_dir/test_report
+#        echo `grep -c 'Table .* is marked as crashed and should be repaired' $f` "occurrence(s) of 'Table .* is marked as crashed and should be repaired'" >> $summary_dir/test_report
+#        echo `grep -c 'mysqld: The table .* is full' $f` "occurrence(s) of 'mysqld: The table .* is full'" >> $summary_dir/test_report
+#        echo `grep -c 'Failed to load table .* which has a foreign key constraint with table .*' $f` "occurrence(s) of 'Failed to load table .* which has a foreign key constraint with table .*'" >> $summary_dir/test_report
+#        echo `grep -c "mysqld: Can't find record in" $f` "occurrence(s) of 'mysqld: Can't find record in'" >> $summary_dir/test_report
+#        echo "" >> $summary_dir/test_report
+#        cat $f | \
+#          grep -v -f $ENV_TOOLBOX_DIR/travis/server_warnings.supp | \
+#          grep -v "\[Note\]" | \
+#          grep -v "\] Query: " | \
+#         grep -v 'Table .* is marked as crashed and should be repaired' | \
+#          grep -v 'mysqld: The table .* is full' | \
+#          grep -v 'Failed to load table .* which has a foreign key constraint with table .*' | \
+#          grep -v "mysqld: Can't find record in" | \
+#          grep -v "^$" | \
+#          grep -v "server_audit: SysLog facility was changed" | \
+#          cut -c 1-4096 >> $summary_dir/test_report
+#        echo "" >> $summary_dir/test_report
+#      done
       echo "#####################################" >> $summary_dir/test_report
       cat $summary_dir/test_report
     displayName: Test result ${{ parameters.TRIAL_NO }}
