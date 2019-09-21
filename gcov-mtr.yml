@@ -73,6 +73,7 @@ jobs:
       done
       echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $HOME/server/server.info
       echo $cmake_options >> $HOME/server/server.info
+      lcov --directory `pwd` --zerocounters
       cd ..
       rm -rf $BUILD_ARTIFACTSTAGINGDIRECTORY/*
       tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz server
