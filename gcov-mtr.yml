@@ -55,6 +55,8 @@ jobs:
   # Build the server in-source
   - bash: |
       set -x
+      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 50
+      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 50
       cd $HOME/server
       cmake_options="$ENV_CMAKE_OPTIONS -DCMAKE_BUILD_TYPE=Debug -DENABLE_GCOV=ON"
       cmake . $cmake_options
@@ -107,6 +109,8 @@ jobs:
 
   - bash: |
       set -x
+      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 50
+      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 50
       cd $HOME
       tar zxf $PIPELINE_WORKSPACE/build/build.tar.gz
       cd $HOME/server/mysql-test
@@ -144,6 +148,8 @@ jobs:
 
   - bash: |
       cd $HOME
+      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 50
+      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 50
       tar zxf $PIPELINE_WORKSPACE/build_nm/build.tar.gz
       cd $HOME/server/mysql-test
       perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --ps-protocol
@@ -181,6 +187,8 @@ jobs:
 
   - bash: |
       set -x
+      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 50
+      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 50
       lcov --version
       gcov --version
       gcc --version
