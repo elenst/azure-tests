@@ -77,124 +77,28 @@ jobs:
       echo $cmake_options >> $HOME/server/server.info
       lcov --directory `pwd` --zerocounters
       cd ..
-      rm -rf $BUILD_ARTIFACTSTAGINGDIRECTORY/*
-      tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz server
-    displayName: 'Build'
-    name: build_server
-
-  - publish: $(Build.ArtifactStagingDirectory)
-    artifact: build
-
-#########
-- job: MTR_normal
-  pool:
-    vmImage: 'Ubuntu 16.04'
-  timeoutInMinutes: 0
-  dependsOn:
-  - 'Build'
-  strategy:
-    parallel: 1
-
-  steps:
-
-  - template: steps/env.yml
-
-  - template: steps/install-deb-packages.yml
-    parameters:
-      INSTALLATION_SET: 'all'
-      EXTRA_PACKAGES: 'lcov'
-
-  - download: current
-    artifact: build
 
   - bash: |
       set -x
-      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 50
-      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 50
-      cd $HOME
-      tar zxf $PIPELINE_WORKSPACE/build/build.tar.gz
       cd $HOME/server/mysql-test
       perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --suite=main,federated
-      cd $HOME
-      rm $PIPELINE_WORKSPACE/build/build.tar.gz
-      tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz server
     name: mtr_nm
     displayName: 'MTR normal'
 
-  - publish: $(Build.ArtifactStagingDirectory)
-    artifact: build_nm
-
-#########
-- job: MTR_ps
-  pool:
-    vmImage: 'Ubuntu 16.04'
-  timeoutInMinutes: 0
-  dependsOn:
-  - 'MTR_normal'
-  strategy:
-    parallel: 1
-
-  steps:
-
-  - template: steps/env.yml
-
-  - template: steps/install-deb-packages.yml
-    parameters:
-      INSTALLATION_SET: 'all'
-      EXTRA_PACKAGES: 'lcov'
-
-  - download: current
-    artifact: build_nm
-
   - bash: |
-      cd $HOME
-      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 50
-      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 50
-      tar zxf $PIPELINE_WORKSPACE/build_nm/build.tar.gz
+      set -x
       cd $HOME/server/mysql-test
       perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --ps-protocol --suite=main,federated
-      cd $HOME
-      rm $PIPELINE_WORKSPACE/build_nm/build.tar.gz
-      tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz server
     name: mtr_ps
     displayName: 'MTR PS protocol'
 
-  - publish: $(Build.ArtifactStagingDirectory)
-    artifact: build_ps
-
-#########
-- job: GCOV_report
-  pool:
-    vmImage: 'Ubuntu 16.04'
-  timeoutInMinutes: 0
-  strategy:
-    parallel: 1
-  dependsOn:
-  - 'MTR_normal'
-  - 'MTR_ps'
-
-  steps:
-
-  - template: steps/env.yml
-
-  - template: steps/install-deb-packages.yml
-    parameters:
-      INSTALLATION_SET: 'all'
-      EXTRA_PACKAGES: 'lcov'
-
-  - download: current
-    artifact: build_ps
-
   - bash: |
       set -x
-      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 50
-      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 50
       lcov --version
       gcov --version
       gcc --version
       cd $HOME
       git clone https://github.com/elenst/mariadb-toolbox
-      tar zxf $PIPELINE_WORKSPACE/build_ps/build.tar.gz
       cd server
       rm -rf $BUILD_ARTIFACTSTAGINGDIRECTORY/*
       infodir=$BUILD_ARTIFACTSTAGINGDIRECTORY/gcov_info
