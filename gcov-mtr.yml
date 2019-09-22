@@ -61,17 +61,17 @@ jobs:
       cmake_options="$ENV_CMAKE_OPTIONS -DCMAKE_BUILD_TYPE=Debug -DENABLE_GCOV=ON"
       cmake . $cmake_options
       make -j5
-      for f in pars0lex.l lexyy.cc pars0grm.cc pars0grm.y ; do
-        cp storage/innobase/pars/$f storage/innobase/CMakeFiles/innobase.dir/pars/
-        if [ -e storage/xtradb/pars/$f ] ; then
-          cp storage/xtradb/pars/$f storage/xtradb/CMakeFiles/xtradb.dir/pars/
-        fi
-      done
-      for f in fts0pars.y fts0pars.cc fts0blex.cc fts0blex.l fts0tlex.cc fts0tlex.l ; do
-        cp storage/innobase/fts/$f storage/innobase/CMakeFiles/innobase.dir/fts/
-        if [ -e storage/xtradb/fts/$f ] ; then
-          cp storage/xtradb/fts/$f storage/xtradb/CMakeFiles/xtradb.dir/fts/
-        fi
+      #for f in pars0lex.l lexyy.cc pars0grm.cc pars0grm.y ; do
+      #  cp storage/innobase/pars/$f storage/innobase/CMakeFiles/innobase.dir/pars/
+      #  if [ -e storage/xtradb/pars/$f ] ; then
+      #    cp storage/xtradb/pars/$f storage/xtradb/CMakeFiles/xtradb.dir/pars/
+      #  fi
+      #done
+      #for f in fts0pars.y fts0pars.cc fts0blex.cc fts0blex.l fts0tlex.cc fts0tlex.l ; do
+      #  cp storage/innobase/fts/$f storage/innobase/CMakeFiles/innobase.dir/fts/
+      #  if [ -e storage/xtradb/fts/$f ] ; then
+      #    cp storage/xtradb/fts/$f storage/xtradb/CMakeFiles/xtradb.dir/fts/
+      #  fi
       done
       echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $HOME/server/server.info
       echo $cmake_options >> $HOME/server/server.info
@@ -114,7 +114,7 @@ jobs:
       cd $HOME
       tar zxf $PIPELINE_WORKSPACE/build/build.tar.gz
       cd $HOME/server/mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --suite=main,federated
       cd $HOME
       rm $PIPELINE_WORKSPACE/build/build.tar.gz
       tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz server
@@ -152,7 +152,7 @@ jobs:
       sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 50
       tar zxf $PIPELINE_WORKSPACE/build_nm/build.tar.gz
       cd $HOME/server/mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --ps-protocol
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --ps-protocol --suite=main,federated
       cd $HOME
       rm $PIPELINE_WORKSPACE/build_nm/build.tar.gz
       tar zcf $BUILD_ARTIFACTSTAGINGDIRECTORY/build.tar.gz server
