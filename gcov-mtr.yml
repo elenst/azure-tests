@@ -72,7 +72,7 @@ jobs:
       #  if [ -e storage/xtradb/fts/$f ] ; then
       #    cp storage/xtradb/fts/$f storage/xtradb/CMakeFiles/xtradb.dir/fts/
       #  fi
-      done
+      #done
       echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $HOME/server/server.info
       echo $cmake_options >> $HOME/server/server.info
       lcov --directory `pwd` --zerocounters
