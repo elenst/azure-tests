@@ -143,5 +143,5 @@ jobs:
     name: 'Upload_new_baseline_to_FTP'
     artifactName: gcov_baseline_revision
     dependencies:
-    - 'GCOV_report'
+    - 'Build'
     condition: succeeded()
