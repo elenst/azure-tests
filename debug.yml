@@ -26,10 +26,12 @@ jobs:
       for i in /etc/alternatives/*; do 
         LANG=C update-alternatives --display "${i#/etc/alternatives/}"
       done 2>/dev/null
-      #sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 50
-      #sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 50
-      #gcc --version
-      #g++ --version
+      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 50
+      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 50
+      sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-6 50
+      gcc --version
+      g++ --version
+      gcov --version
 
 ########################################################################
 # Experiments with templates (disabled now by condition: false)
