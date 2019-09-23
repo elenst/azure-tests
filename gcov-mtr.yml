@@ -78,7 +78,7 @@ jobs:
       echo $cmake_options >> $HOME/server/server.info
       lcov --directory `pwd` --zerocounters
       cd $HOME/server/mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --suite=main,federated
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0
       lcov --version
       gcov --version
       gcc --version
