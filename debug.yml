@@ -23,10 +23,13 @@ jobs:
       which clang
       ls -l /usr/bin/gcc*
       ls -l /usr/gin/g++*
-      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 50
-      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 50
-      gcc --version
-      g++ --version
+      for i in /etc/alternatives/*; do 
+        LANG=C update-alternatives --display "${i#/etc/alternatives/}"
+      done 2>/dev/null
+      #sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 50
+      #sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 50
+      #gcc --version
+      #g++ --version
 
 ########################################################################
 # Experiments with templates (disabled now by condition: false)
