@@ -12,6 +12,7 @@ jobs:
 - job: Build
   pool:
     vmImage: 'Ubuntu 16.04'
+  container: ubuntu:18.04
   timeoutInMinutes: 0
   strategy:
     parallel: 1
@@ -78,7 +79,7 @@ jobs:
       echo $cmake_options >> $HOME/server/server.info
       lcov --directory `pwd` --zerocounters
       cd $HOME/server/mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --suite=main,federated
       lcov --version
       gcov --version
       gcc --version
