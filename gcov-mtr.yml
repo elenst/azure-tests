@@ -77,24 +77,8 @@ jobs:
       echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $HOME/server/server.info
       echo $cmake_options >> $HOME/server/server.info
       lcov --directory `pwd` --zerocounters
-      cd ..
-
-  - bash: |
-      set -x
       cd $HOME/server/mysql-test
       perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --suite=main,federated
-    name: mtr_nm
-    displayName: 'MTR normal'
-
-  - bash: |
-      set -x
-      cd $HOME/server/mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --ps-protocol --suite=main,federated
-    name: mtr_ps
-    displayName: 'MTR PS protocol'
-
-  - bash: |
-      set -x
       lcov --version
       gcov --version
       gcc --version
