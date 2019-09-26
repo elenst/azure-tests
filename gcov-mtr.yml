@@ -81,23 +81,7 @@ jobs:
       cd ..
       lcov --directory `pwd` --zerocounters
       cd mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder federated.net_thd_crash-12725,X federated.net_thd_crash-12725,old main.log_errchk main.mysqladmin main.mysqld--defaults-file
-      cd ..
-      lcov --directory `pwd` --zerocounters
-      cd mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder federated.net_thd_crash-12725,X main.log_errchk main.mysqladmin main.mysqld--defaults-file
-      cd ..
-      lcov --directory `pwd` --zerocounters
-      cd mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder federated.net_thd_crash-12725,X main.mysqladmin main.mysqld--defaults-file
-      cd ..
-      lcov --directory `pwd` --zerocounters
-      cd mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder federated.net_thd_crash-12725,X main.mysqld--defaults-file
-      cd ..
-      lcov --directory `pwd` --zerocounters
-      cd mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder federated.net_thd_crash-12725,old main.log_errchk main.mysqladmin main.mysqld--defaults-file
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder federated.net_thd_crash-12725,old main.mysqld--defaults-file
       cd ..
       lcov --directory `pwd` --zerocounters
       cd mysql-test
@@ -105,15 +89,71 @@ jobs:
       cd ..
       lcov --directory `pwd` --zerocounters
       cd mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder main.log_errchk main.mysqladmin main.mysqld--defaults-file
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder federated.net_thd_crash-12725,old main.mysqld--defaults-file
       cd ..
       lcov --directory `pwd` --zerocounters
       cd mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder main.mysqladmin main.mysqld--defaults-file
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder federated.net_thd_crash-12725,old main.mysqld--defaults-file
       cd ..
       lcov --directory `pwd` --zerocounters
       cd mysql-test
-      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder main.log_errchk main.mysqld--defaults-file
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder federated.net_thd_crash-12725,old main.mysqld--defaults-file
+      cd ..
+      lcov --directory `pwd` --zerocounters
+      cd mysql-test
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder federated.net_thd_crash-12725,old main.mysqld--defaults-file
+      cd ..
+      lcov --directory `pwd` --zerocounters
+      cd mysql-test
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder federated.net_thd_crash-12725,old main.mysqld--defaults-file
+      cd ..
+      lcov --directory `pwd` --zerocounters
+      cd mysql-test
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder federated.net_thd_crash-12725,old main.mysqld--defaults-file
+      cd ..
+      lcov --directory `pwd` --zerocounters
+      cd mysql-test
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder federated.net_thd_crash-12725,old main.mysqld--defaults-file
+      cd ..
+      lcov --directory `pwd` --zerocounters
+      cd mysql-test
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder federated.net_thd_crash-12725,old main.mysqld--defaults-file
+      cd ..
+      lcov --directory `pwd` --zerocounters
+      cd mysql-test
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder federated.net_thd_crash-12725,old main.mysqld--defaults-file
+      cd ..
+      lcov --directory `pwd` --zerocounters
+      cd mysql-test
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder main.mysqld--defaults-file
+      cd ..
+      lcov --directory `pwd` --zerocounters
+      cd mysql-test
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder main.mysqld--defaults-file
+      cd ..
+      lcov --directory `pwd` --zerocounters
+      cd mysql-test
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder main.mysqld--defaults-file
+      cd ..
+      lcov --directory `pwd` --zerocounters
+      cd mysql-test
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder main.mysqld--defaults-file
+      cd ..
+      lcov --directory `pwd` --zerocounters
+      cd mysql-test
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder main.mysqld--defaults-file
+      cd ..
+      lcov --directory `pwd` --zerocounters
+      cd mysql-test
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder main.mysqld--defaults-file
+      cd ..
+      lcov --directory `pwd` --zerocounters
+      cd mysql-test
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder main.mysqld--defaults-file
+      cd ..
+      lcov --directory `pwd` --zerocounters
+      cd mysql-test
+      perl mysql-test-run.pl --mem --verbose-restart --force --max-test-fail=0 --retry=0 --noreorder main.mysqld--defaults-file
       lcov --version
       gcov --version
       gcc --version
