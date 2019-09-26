@@ -104,14 +104,18 @@ jobs:
       git clone "https://github.com/elenst/mariadb-toolbox" $TOOLBOX_DIR
       REPRO_DIR=$(System.ArtifactsDirectory)/repro
       mv $(System.ArtifactsDirectory)/test-$(TRIGGERING_ARTIFACT_ID)/repro-$(TRIGGERING_ARTIFACT_ID) $REPRO_DIR
+      cd $BASEDIR/mysql-test
+      default_repro_options="--mem --mysqld=--innodb --mysqld=--default-storage-engine=InnoDB --mysqld=--partition --mysqld=--loose-innodb-stats-persistent=on --mysqld=--character-set-server=utf8 --mysqld=--max-allowed-packet=128M --mysqld=--innodb-buffer-pool-size=128M --mysqld=--innodb-log-file-size=48M --mysqld=--loose-max-statement-time=10 --mysqld=--innodb-lock-wait-timeout=3 --mysqld=--lock-wait-timeout=5 --mysqld=--log_bin_trust_function_creators=OFF --mysqld=--key_buffer_size=128M --mysqld=--performance-schema=OFF --testcase-timeout=120"
+      if ../bin/mysqld --version | grep -E '10.[45]' ; then
+        default_repro_options="$default_repro_options --mysqld=--use_stat_tables=PREFERABLY"
+      fi
       mysqld_repro_options=`grep 'MySQLd options' $REPRO_DIR/repro.info | sed -e "s/MySQLd options://" | sed -e "s/ENV_RQG_HOME/RQG_HOME/g"`
       mtr_repro_options=`grep 'MTR options' $REPRO_DIR/repro.info | sed -e "s/MTR options://"`
-      cd $BASEDIR
-      patch -p 1 < $TOOLBOX_DIR/mtr/mtr_default_server.patch
-      cd mysql-test
+      #cd $BASEDIR
+      #patch -p 1 < $TOOLBOX_DIR/mtr/mtr_default_server.patch
       mkdir suite/bug
       perl $TOOLBOX_DIR/scripts/mysql_log_to_mysqltest.pl $CONVERSION_OPTIONS $REPRO_DIR/mysql.log | sed  -e "s/\(IMMEDIATE\|FROM\) ' \//\1 '' \//g" > $BASEDIR/mysql-test/suite/bug/repro.test
-      echo "perl $TOOLBOX_DIR/scripts/simplify-mtr-test.pl --suitedir=$BASEDIR/mysql-test/suite/bug --testcase=repro $SIMPLIFICATION_OPTIONS --options=\"$mysqld_repro_options $mtr_repro_options $MTR_OPTIONS $MYSQLD_OPTIONS\" \$*" > $REPRO_DIR/simplification_cmd
+      echo "perl $TOOLBOX_DIR/scripts/simplify-mtr-test.pl --suitedir=$BASEDIR/mysql-test/suite/bug --testcase=repro $SIMPLIFICATION_OPTIONS --options=\"$default_repro_options $mysqld_repro_options $mtr_repro_options $MTR_OPTIONS $MYSQLD_OPTIONS\" \$*" > $REPRO_DIR/simplification_cmd
       if [ -n "$_SEARCH_PATTERN" ] ; then
         echo `cat $REPRO_DIR/simplification_cmd` "--output=\"$_SEARCH_PATTERN\"" > $REPRO_DIR/simplification_cmd
       fi
