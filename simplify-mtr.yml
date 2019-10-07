@@ -93,12 +93,11 @@ jobs:
     name: unpack_binaries
     displayName: 'Unpack server binaries'
 
-  # Get tools, extract repro info, convert general log into MTR and run simplification
-  - script: |
-      sudo apt-get update
-      sudo apt-get install -y -q libdbi-perl libdbd-mysql-perl libsnappy1v5 gdb valgrind
-    displayName: 'Install packages'
+  - template: steps/install-deb-packages.yml
+    parameters:
+      INSTALLATION_SET: 'runtime'
 
+  # Get tools, extract repro info, convert general log into MTR and run simplification
   - script: |
       git clone "https://github.com/MariaDB/randgen" --branch=elenst-dev $RQG_HOME
       git clone "https://github.com/elenst/mariadb-toolbox" $TOOLBOX_DIR
@@ -115,7 +114,7 @@ jobs:
       #patch -p 1 < $TOOLBOX_DIR/mtr/mtr_default_server.patch
       mkdir suite/bug
       perl $TOOLBOX_DIR/scripts/mysql_log_to_mysqltest.pl $CONVERSION_OPTIONS $REPRO_DIR/mysql.log | sed  -e "s/\(IMMEDIATE\|FROM\) ' \//\1 '' \//g" > $BASEDIR/mysql-test/suite/bug/repro.test
-      echo "perl $TOOLBOX_DIR/scripts/simplify-mtr-test.pl --suitedir=$BASEDIR/mysql-test/suite/bug --testcase=repro $SIMPLIFICATION_OPTIONS --options=\"$default_repro_options $mysqld_repro_options $mtr_repro_options $MTR_OPTIONS $MYSQLD_OPTIONS\" \$*" > $REPRO_DIR/simplification_cmd
+      echo "perl $TOOLBOX_DIR/scripts/simplify-mtr-test.pl --suitedir=$BASEDIR/mysql-test/suite/bug --testcase=repro $SIMPLIFICATION_OPTIONS --options=\"$mysqld_repro_options $mtr_repro_options $MTR_OPTIONS $MYSQLD_OPTIONS\" \$*" > $REPRO_DIR/simplification_cmd
       if [ -n "$_SEARCH_PATTERN" ] ; then
         echo `cat $REPRO_DIR/simplification_cmd` "--output=\"$_SEARCH_PATTERN\"" > $REPRO_DIR/simplification_cmd
       fi
