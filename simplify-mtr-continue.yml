@@ -67,11 +67,9 @@ jobs:
     name: unpack_binaries
     displayName: 'Unpack server binaries'
 
-  # Get tools, extract repro info, convert general log into MTR and run simplification
-  - script: |
-      sudo apt-get update
-      sudo apt-get install -y -q libdbi-perl libdbd-mysql-perl libsnappy1v5 gdb valgrind
-    displayName: 'Install packages'
+  - template: steps/install-deb-packages.yml
+    parameters:
+      INSTALLATION_SET: 'runtime'
 
   - script: |
       mv $(System.ArtifactsDirectory)/data/build $(System.ArtifactsDirectory)/
