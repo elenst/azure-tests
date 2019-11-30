@@ -52,10 +52,12 @@ jobs:
 
       '002':
         RQG_GRAMMAR: 'conf/runtime/performance_schema.yy'
+        RQG_JOB_OPTIONS: '--gendata-advanced'
         MYSQLD_JOB_OPTIONS: '--mysqld=--performance-schema'
 
       '003':
         RQG_GRAMMAR: 'conf/runtime/information_schema.yy'
+        RQG_JOB_OPTIONS: '--gendata-advanced'
 
       '004':
         RQG_GRAMMAR: 'conf/engines/many_indexes.yy'
@@ -152,6 +154,7 @@ jobs:
 
       '023':
         RQG_GRAMMAR: 'conf/mariadb/functions.yy'
+        RQG_JOB_OPTIONS: '--gendata-advanced'
         RQG_ENGINE: InnoDB,MyISAM,Aria,HEAP
 
       '024':
@@ -273,26 +276,42 @@ jobs:
       '047':
         RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
         RQG_GENDATA: 'conf/mariadb/innodb.zz'
+        RQG_JOB_OPTIONS: '--gendata-advanced'
         RQG_ENGINE: InnoDB
         MYSQLD_JOB_OPTIONS: '--mysqld=--innodb-page-size=8K'
 
       '048':
         RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
         RQG_GENDATA: 'conf/mariadb/innodb.zz'
+        RQG_JOB_OPTIONS: '--gendata-advanced'
         RQG_ENGINE: InnoDB
         MYSQLD_JOB_OPTIONS: '--mysqld=--innodb-page-size=4K'
 
       '049':
         RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
         RQG_GENDATA: 'conf/mariadb/innodb.zz'
+        RQG_JOB_OPTIONS: '--gendata-advanced'
         RQG_ENGINE: InnoDB
         MYSQLD_JOB_OPTIONS: '--mysqld=--innodb-page-size=32K --mysqld=--innodb-buffer-pool-size=2G'
 
       '050':
         RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
         RQG_GENDATA: 'conf/mariadb/innodb.zz'
+        RQG_JOB_OPTIONS: '--gendata-advanced'
         RQG_ENGINE: InnoDB
         MYSQLD_JOB_OPTIONS: '--mysqld=--innodb-page-size=64K --mysqld=--innodb-buffer-pool-size=2G'
+
+      '051':
+        RQG_GRAMMAR: 'conf/mariadb/optimizer.yy'
+        RQG_GENDATA: '--gendata-advanced'
+        RQG_JOB_OPTIONS: '--skip-gendata'
+        RQG_ENGINE: InnoDB
+
+      '052':
+        RQG_GRAMMAR: 'conf/mariadb/optimizer.yy'
+        RQG_GENDATA: '--gendata-advanced'
+        RQG_JOB_OPTIONS: '--skip-gendata'
+        RQG_ENGINE: MyISAM,Aria
 
   steps:
 
