@@ -88,6 +88,12 @@ jobs:
         echo "Simplification command has been adjusted:"
         cat $REPRO_DIR/simplification_cmd
       fi
+      if [ -n "$DB_HOST" ] ; then
+        id=`date '+%s'
+        test_id="${TRIGGERING_BUILD_ID}"
+        search_pattern=`cat $REPRO_DIR/repro.notes | grep -A 1 "while searching for pattern" | tail -n 1`
+        $BASEDIR/bin/mysql --host=$DB_HOST --port=$DB_PORT --user=$DB_USER -p$DBP -e "REPLACE INTO regression.repro_status (id, host, test_id, screen, search_pattern, status) VALUES ($id,\'azure30\',\'$test_id\',\'$(Build.BuildId)\', \'$search_pattern\', \'Simplification continued\')"
+      fi
       . $REPRO_DIR/simplification_cmd $SIMPLIFICATION_OPTIONS
       res=$?
       cp suite/bug/repro.test $(Build.ArtifactStagingDirectory)/first_test.test
@@ -106,13 +112,25 @@ jobs:
       echo "RESULT: $res"
       echo "#######################################################################"
       echo ""
-      if [ "$res" == "1" ] ; then
+      if [ "$res" == "0" ] ; then
+        status="SUCCEEDED"
+      elif [ "$res" == "1" ] ; then
         echo "##vso[task.complete result=Failed]Could not reproduce the failure"
+        status="FAILED"
       elif [ "$res" == "2" ] ; then
         echo "##vso[task.complete result=SucceededWithIssues]The process ended due to approaching timeout"
+        status="Part-SUCCEEDED"
+      fi
+      if [ -n "$DB_HOST" ] ; then
+        $BASEDIR/bin/mysql --host=$DB_HOST --port=$DB_PORT --user=$DB_USER -p$DBP -e "REPLACE INTO regression.repro_status (id, host, test_id, screen, search_pattern, status) VALUES ($id,\'azure30\',\'$test_id\',\'$(Build.BuildId)\', \'$search_pattern\', \'$status\')"
       fi
     name: simplify
     displayName: 'Prepare and run simplification'
+    env:
+      DB_HOST: $(DbHost)
+      DB_PORT: $(DbPort)
+      DB_USER: $(DbUser)
+      DBP: $(DbPwd)
 
   - task: PublishBuildArtifacts@1
     inputs:
