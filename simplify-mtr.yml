@@ -162,16 +162,11 @@ jobs:
         echo "##vso[task.complete result=SucceededWithIssues]The process ended due to approaching timeout"
         status="Part-SUCCEEDED"
       fi
-      if [ -n "$DB_HOST" ] ; then
-        $BASEDIR/bin/mysql --host=$DB_HOST --port=$DB_PORT --user=$DB_USER -p$DBP -e "REPLACE INTO regression.repro_status (id, host, test_id, screen, search_pattern, status) VALUES ($id,\'azure29\',\'$test_id\',\'$(Build.BuildId)\', \'$_SEARCH_PATTERN\', \'$status\')"
+      if [ -n "$(DbHost)" ] ; then
+        $BASEDIR/bin/mysql --host=$(DbHost) --port=$(DbPort) --user=$(DbUser) -p$(DbPwd) -e "REPLACE INTO regression.repro_status (id, host, test_id, screen, search_pattern, status) VALUES ($id,\'azure29\',\'$test_id\',\'$(Build.BuildId)\', \'$_SEARCH_PATTERN\', \'$status\')"
       fi
     name: simplify
     displayName: 'Prepare and run simplification'
-    env:
-      DB_HOST: $(DbHost)
-      DB_PORT: $(DbPort)
-      DB_USER: $(DbUser)
-      DBP: $(DbPwd)
 
   - task: PublishBuildArtifacts@1
     inputs:
