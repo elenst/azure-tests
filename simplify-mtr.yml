@@ -125,7 +125,7 @@ jobs:
       if [ -n "$DB_HOST" ] ; then
         id=`date '+%s'`
         test_id="${TRIGGERING_BUILD_ID}.${TRIGGERING_TEST_ID}"
-        $BASEDIR/bin/mysql --host=$DB_HOST --port=$DB_PORT --user=$DB_USER -p$DBP -e "REPLACE INTO regression.repro_status (id, host, test_id, screen, search_pattern, status) VALUES ($id,\'azure29\',\'$test_id\',\'$(Build.BuildId)\', \'$_SEARCH_PATTERN\', \'Simplification started\')"
+        $BASEDIR/bin/mysql --host=$DB_HOST --port=$DB_PORT --user=$DB_USER -p$DBP -e "REPLACE INTO regression.repro_status (id, host, test_id, screen, search_pattern, status) VALUES ($id,'azure29','$test_id','$(Build.BuildId)', '$_SEARCH_PATTERN', 'Simplification started')"
       fi
       . $REPRO_DIR/simplification_cmd
       res=$?
@@ -163,7 +163,7 @@ jobs:
         status="Part-SUCCEEDED"
       fi
       if [ -n "$DB_HOST" ] ; then
-        $BASEDIR/bin/mysql --host=$DB_HOST --port=$DB_PORT --user=$DB_USER -p$DBP -e "REPLACE INTO regression.repro_status (id, host, test_id, screen, search_pattern, status) VALUES ($id,\'azure29\',\'$test_id\',\'$(Build.BuildId)\', \'$_SEARCH_PATTERN\', \'$status\')"
+        $BASEDIR/bin/mysql --host=$DB_HOST --port=$DB_PORT --user=$DB_USER -p$DBP -e "REPLACE INTO regression.repro_status (id, host, test_id, screen, search_pattern, status) VALUES ($id,'azure29','$test_id','$(Build.BuildId)', '$_SEARCH_PATTERN', '$status')"
       fi
     name: simplify
     displayName: 'Prepare and run simplification'
