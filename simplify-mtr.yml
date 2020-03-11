@@ -58,13 +58,7 @@ jobs:
       echo "Conversion options:    " $CONVERSION_OPTIONS
       echo "Simplification options:" $SIMPLIFICATION_OPTIONS
       echo "MTR options:           " $MTR_OPTIONS
-      echo "DB Port:               " $DB_PORT
     displayName: 'Check configuration'
-    env:
-      DB_HOST: $(DbHost)
-      DB_PORT: $(DbPort)
-      DB_USER: $(DbUser)
-      DBP: $(DbPwd)
 
 # Test info goes to a different dir, as we will only need a portion of it to republish
   - task: DownloadBuildArtifacts@0
@@ -131,7 +125,7 @@ jobs:
       if [ -n "$DB_HOST" ] ; then
         id=`date '+%s'`
         test_id="${TRIGGERING_BUILD_ID}.${TRIGGERING_TEST_ID}"
-        $BASEDIR/bin/mysql --host=$DBHOST --port=$DBPORT --user=$DBUSER -p$DBPWD -e "REPLACE INTO regression.repro_status (id, host, test_id, screen, search_pattern, status) VALUES ($id,\'azure29\',\'$test_id\',\'$(Build.BuildId)\', \'$_SEARCH_PATTERN\', \'Simplification started\')"
+        $BASEDIR/bin/mysql --host=$DB_HOST --port=$DB_PORT --user=$DB_USER -p$DBP -e "REPLACE INTO regression.repro_status (id, host, test_id, screen, search_pattern, status) VALUES ($id,\'azure29\',\'$test_id\',\'$(Build.BuildId)\', \'$_SEARCH_PATTERN\', \'Simplification started\')"
       fi
       . $REPRO_DIR/simplification_cmd
       res=$?
@@ -168,11 +162,16 @@ jobs:
         echo "##vso[task.complete result=SucceededWithIssues]The process ended due to approaching timeout"
         status="Part-SUCCEEDED"
       fi
-      if [ -n "$DBHOST" ] ; then
-        $BASEDIR/bin/mysql --host=$DBHOST --port=$DBPORT --user=$DBUSER -p$DBPWD -e "REPLACE INTO regression.repro_status (id, host, test_id, screen, search_pattern, status) VALUES ($id,\'azure29\',\'$test_id\',\'$(Build.BuildId)\', \'$_SEARCH_PATTERN\', \'$status\')"
+      if [ -n "$DB_HOST" ] ; then
+        $BASEDIR/bin/mysql --host=$DB_HOST --port=$DB_PORT --user=$DB_USER -p$DBP -e "REPLACE INTO regression.repro_status (id, host, test_id, screen, search_pattern, status) VALUES ($id,\'azure29\',\'$test_id\',\'$(Build.BuildId)\', \'$_SEARCH_PATTERN\', \'$status\')"
       fi
     name: simplify
     displayName: 'Prepare and run simplification'
+    env:
+      DB_HOST: $(DbHost)
+      DB_PORT: $(DbPort)
+      DB_USER: $(DbUser)
+      DBP: $(DbPwd)
 
   - task: PublishBuildArtifacts@1
     inputs:
