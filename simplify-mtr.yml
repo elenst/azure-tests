@@ -58,8 +58,13 @@ jobs:
       echo "Conversion options:    " $CONVERSION_OPTIONS
       echo "Simplification options:" $SIMPLIFICATION_OPTIONS
       echo "MTR options:           " $MTR_OPTIONS
-      echo "DB Port:               " $DBPORT
+      echo "DB Port:               " $DB_PORT
     displayName: 'Check configuration'
+    env:
+      DB_HOST: $(DbHost)
+      DB_PORT: $(DbPort)
+      DB_USER: $(DbUser)
+      DBP: $(DbPwd)
 
 # Test info goes to a different dir, as we will only need a portion of it to republish
   - task: DownloadBuildArtifacts@0
