@@ -1,0 +1,361 @@
+########################################################################
+# RQG tests focused on different data generation templates.
+# The grammar is generic, additional ones are to be defined
+# in the pipellines as needed, as well as the engine(s)
+########################################################################
+
+trigger: none
+
+variables:
+
+#  CMAKE_BUILD_TYPE: ''
+#  CMAKE_OPTIONS: ''
+#
+#  RQG_DURATION: 400
+#  RQG_THREADS: 6
+#  RQG_VIEWS: '--views'
+#
+
+  RQG_GRAMMAR: 'conf/mariadb/generic-dml.yy'
+
+jobs:
+
+#########
+# Download or build server
+- template: jobs/prepare-server.yml
+  parameters:
+    name: 'Download_or_Build_Server'
+
+#########
+# Upload to FTP
+- template: jobs/upload-to-ftp.yml
+  parameters:
+    dependencies:
+    - 'Download_or_Build_Server'
+    condition: and(succeeded(), ne(dependencies.Download_or_Build_Server.outputs['ftp_download.BINARIES_FROM_FTP'], 'true'))
+
+#########
+- job: Test
+  timeoutInMinutes: 60
+  dependsOn: Download_or_Build_Server
+  pool:
+    vmImage: 'Ubuntu 16.04'
+
+  strategy:
+    matrix:
+
+      '001':
+        RQG_GENDATA: 'conf/engines/maria/maria.zz'
+
+      '002':
+        RQG_GENDATA: 'conf/engines/engine_stress.zz'
+
+      '003':
+        RQG_GENDATA: 'conf/engines/falcon/falcon_pagesize2K.zz'
+
+      '004':
+        RQG_GENDATA: 'conf/engines/falcon/falcon_backlog.zz'
+
+      '005':
+        RQG_GENDATA: 'conf/engines/falcon/falcon_data_types.zz'
+
+      '006':
+        RQG_GENDATA: 'conf/engines/falcon/falcon_pagesize32K.zz'
+
+      '007':
+        RQG_GENDATA: 'conf/engines/falcon/falcon_data_types_no_year_time.zz'
+
+      '008':
+        RQG_GENDATA: 'conf/engines/falcon/falcon_recovery.zz'
+
+      '009':
+        RQG_GENDATA: 'conf/engines/falcon/falcon_chill_thaw.zz'
+
+      '010':
+        RQG_GENDATA: 'conf/engines/falcon/falcon_blobs.zz'
+
+      '011':
+        RQG_GENDATA: 'cconf/engines/falcon/falcon_replication.zz'
+
+      '012':
+        RQG_GENDATA: 'conf/engines/innodb/full_text_search.zz'
+
+      '013':
+        RQG_GENDATA: 'conf/engines/tiny_inserts.zz'
+
+      '014':
+        RQG_GENDATA: 'conf/engines/many_indexes.zz'
+
+      '015':
+        RQG_GENDATA: 'conf/engines/handler.zz'
+
+      '016':
+        RQG_GENDATA: 'conf/engines/varchar.zz'
+
+      '017':
+        RQG_GENDATA: 'conf/runtime/connect_kill_data.zz'
+
+      '018':
+        RQG_GENDATA: 'conf/runtime/metadata_stability.zz'
+
+      '019':
+        RQG_GENDATA: 'conf/runtime/WL5004_data.zz'
+
+      '020':
+        RQG_GENDATA: 'conf/runtime/concurrency_1.zz'
+
+      '021':
+        RQG_GENDATA: 'conf/runtime/percona/AL-19549.zz'
+
+      '022':
+        RQG_GENDATA: 'conf/runtime/percona/percona_qa.zz'
+
+      '023':
+        RQG_GENDATA: 'conf/runtime/percona/AL-19549-part.zz'
+
+      '024':
+        RQG_GENDATA: 'conf/runtime/percona/percona_qa_part.zz'
+
+      '025':
+        RQG_GENDATA: 'conf/runtime/alter_online.zz'
+
+      '026':
+        RQG_GENDATA: 'conf/transactions/combinations.zz'
+
+      '027':
+        RQG_GENDATA: 'conf/transactions/transactions.zz'
+
+      '028':
+        RQG_GENDATA: 'conf/partitioning/partition_pruning.zz'
+
+      '029':
+        RQG_GENDATA: 'conf/examples/example.zz'
+
+      '030':
+        RQG_GENDATA: 'conf/dyncol/dyncol_dml.zz'
+
+      '031':
+        RQG_GENDATA: 'conf/percona/translog_percona.zz'
+
+      '032':
+        RQG_GENDATA: 'conf/percona/percona_no_blob.zz'
+
+      '033':
+        RQG_GENDATA: 'conf/percona/many_indexes_percona.zz'
+
+      '034':
+        RQG_GENDATA: 'conf/percona/percona.zz'
+
+      '035':
+        RQG_GENDATA: 'conf/percona/outer_join_percona.zz'
+
+      '036':
+        RQG_GENDATA: 'conf/percona/query_cache_strip_comments.zz'
+
+      '037':
+        RQG_GENDATA: 'conf/percona/innodb_dict_size_limit.zz'
+
+      '038':
+        RQG_GENDATA: 'conf/percona/bug826632.zz'
+
+      '039':
+        RQG_GENDATA: 'conf/replication/replication-6.0.zz'
+
+      '040':
+        RQG_GENDATA: 'conf/replication/replication-dml_data.zz'
+
+      '041':
+        RQG_GENDATA: 'conf/replication/replication_single_engine_pk.zz'
+
+      '042':
+        RQG_GENDATA: 'conf/replication/rpl_transactions.zz'
+
+      '043':
+        RQG_GENDATA: 'conf/replication/replication-5.1.zz'
+
+      '044':
+        RQG_GENDATA: 'conf/replication/WL5092_data.zz'
+
+      '045':
+        RQG_GENDATA: 'conf/replication/replication_single_engine.zz'
+
+      '046':
+        RQG_GENDATA: 'conf/replication/rpl_transactions_nopk.zz'
+
+      '047':
+        RQG_GENDATA: 'conf/replication/replication-ddl_data.zz'
+
+      '048':
+        RQG_GENDATA: 'conf/replication/replication_innodb_myisam.zz'
+
+      '049':
+        RQG_GENDATA: 'conf/percona_qa/AL-19549/AL-19549.zz'
+
+      '050':
+        RQG_GENDATA: 'conf/percona_qa/percona_qa.zz'
+
+      '051':
+        RQG_GENDATA: 'conf/percona_qa/BT-16274/BT-16274.zz'
+
+      '052':
+        RQG_GENDATA: 'conf/percona_qa/34411/34411.zz'
+
+      '053':
+        RQG_GENDATA: 'conf/drizzle/translog_drizzle.zz'
+
+      '054':
+        RQG_GENDATA: 'conf/drizzle/drizzle.zz'
+
+      '055':
+        RQG_GENDATA: 'conf/drizzle/range_access_drizzle.zz'
+
+      '056':
+        RQG_GENDATA: 'conf/drizzle/varchar_drizzle.zz'
+
+      '057':
+        RQG_GENDATA: 'conf/drizzle/translog_ordering.zz'
+
+      '058':
+        RQG_GENDATA: 'conf/drizzle/outer_join_drizzle.zz'
+
+      '059':
+        RQG_GENDATA: 'conf/drizzle/drizzledump_migrate.zz'
+
+      '060':
+        RQG_GENDATA: 'conf/drizzle/combinations_drizzle.zz'
+
+      '061':
+        RQG_GENDATA: 'conf/drizzle/many_indexes_drizzle.zz'
+
+      '062':
+        RQG_GENDATA: 'conf/temporal/temporal_functions-wl946.zz'
+
+      '063':
+        RQG_GENDATA: 'conf/temporal/temporal_functions.zz'
+
+      '064':
+        RQG_GENDATA: 'conf/temporal/temporal_ranges.zz'
+
+      '065':
+        RQG_GENDATA: 'conf/temporal/current_timestamp.zz'
+
+      '066':
+        RQG_GENDATA: 'conf/temporal/current_timestamp_6.zz'
+
+      '067':
+        RQG_GENDATA: 'conf/mariadb/gtid_stress.zz'
+
+      '068':
+        RQG_GENDATA: 'conf/mariadb/innodb.zz'
+
+      '069':
+        RQG_GENDATA: 'conf/mariadb/upgrade/innodb.zz'
+
+      '070':
+        RQG_GENDATA: 'conf/mariadb/upgrade/innodb-page-compression.zz'
+
+      '071':
+        RQG_GENDATA: 'conf/mariadb/upgrade/innodb-partition.zz'
+
+      '072':
+        RQG_GENDATA: 'conf/mariadb/upgrade/innodb-page-compression-partition.zz'
+
+      '073':
+        RQG_GENDATA: 'conf/mariadb/optimizer_basic.zz'
+
+      '074':
+        RQG_GENDATA: 'conf/mariadb/innodb_upgrade_compression.zz'
+
+      '075':
+        RQG_GENDATA: 'conf/mariadb/innodb_upgrade.zz'
+
+      '076':
+        RQG_GENDATA: 'conf/mariadb/oltp-aria.zz'
+
+      '077':
+        RQG_GENDATA: 'conf/mariadb/optimizer_no_indexes.zz'
+
+      '078':
+        RQG_GENDATA: 'conf/mariadb/multi_update.zz'
+
+      '079':
+        RQG_GENDATA: 'conf/mariadb/optimizer.zz'
+
+      '080':
+        RQG_GENDATA: 'conf/mariadb/oltp.zz'
+
+      '081':
+        RQG_GENDATA: 'conf/mariadb/innodb_compression_encryption.zz'
+
+      '082':
+        RQG_GENDATA: 'conf/galera/galera_stress.zz'
+
+      '083':
+        RQG_GENDATA: 'conf/optimizer/blobs.zz'
+
+      '084':
+        RQG_GENDATA: 'conf/optimizer/range_access2.zz'
+
+      '085':
+        RQG_GENDATA: 'conf/optimizer/outer_join.zz'
+
+      '086':
+        RQG_GENDATA: 'conf/optimizer/range_access.zz'
+
+      '087':
+        RQG_GENDATA: 'conf/backup/invariant.zz'
+
+      '088':
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '089':
+        RQG_JOB_OPTIONS: '--gendata'
+
+      '090':
+        RQG_JOB_OPTIONS: "--skip-gendata --mysqld=--init-file=$ENV_RQG_HOME/conf/optimizer/updateable_views.init"
+
+      '091':
+        RQG_JOB_OPTIONS: "--skip-gendata --mysqld=--init-file=$ENV_RQG_HOME/conf/osm/osm-schema.sql"
+
+      '092':
+        RQG_JOB_OPTIONS: "--skip-gendata --mysqld=--init-file=$ENV_RQG_HOME/conf/osm/andorra.sql"
+
+      '093':
+        RQG_JOB_OPTIONS: "--skip-gendata --mysqld=--init-file=$ENV_RQG_HOME/conf/smf/smf2.sql"
+
+      '094':
+        RQG_JOB_OPTIONS: "--skip-gendata --mysqld=--init-file=$ENV_RQG_HOME/conf/mariadb/world.sql"
+
+      '095':
+        RQG_JOB_OPTIONS: "--skip-gendata --mysqld=--init-file=$ENV_RQG_HOME/conf/optimizer/world.sql"
+
+  steps:
+
+  - template: steps/env.yml
+
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      artifactName: 'build'
+      downloadPath: $(Build.ArtifactStagingDirectory)
+    displayName: 'Download build from artifacts'
+
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: '$(Build.ArtifactStagingDirectory)/build/build-*.tar.gz'
+      destinationFolder: $(env.BASEDIR)
+    displayName: 'Extract build'
+
+  - template: steps/install-deb-packages.yml
+    parameters:
+      INSTALLATION_SET: 'runtime'
+
+  - template: steps/clone-test-tools.yml
+
+  - template: steps/run-rqg-test.yml
+
+#########
+# Print summary
+- template: jobs/test-report.yml
+  parameters:
+    dependencies:
+    - Test
