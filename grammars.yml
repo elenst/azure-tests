@@ -1,0 +1,917 @@
+########################################################################
+# RQG tests focused on different grammars.
+# Specific gendata templates are provided where the grammars expect them.
+# Main usage is combining it with one or a few redefines
+# for integration testing in the small
+########################################################################
+
+trigger: none
+
+variables:
+  RQG_ENGINE: InnoDB,MyISAM,Aria
+
+jobs:
+
+#########
+# Download or build server
+- template: jobs/prepare-server.yml
+  parameters:
+    name: 'Download_or_Build_Server'
+
+#########
+# Upload to FTP
+- template: jobs/upload-to-ftp.yml
+  parameters:
+    dependencies:
+    - 'Download_or_Build_Server'
+    condition: and(succeeded(), ne(dependencies.Download_or_Build_Server.outputs['ftp_download.BINARIES_FROM_FTP'], 'true'))
+
+#########
+- job: Test
+  timeoutInMinutes: 60
+  dependsOn: Download_or_Build_Server
+  pool:
+    vmImage: 'Ubuntu 16.04'
+
+  strategy:
+    matrix:
+
+      '001':
+        RQG_GRAMMAR: 'conf/engines/many_indexes.yy'
+        RQG_GENDATA: 'conf/engines/many_indexes.zz'
+
+      '002':
+        RQG_GRAMMAR: 'conf/engines/varchar.yy'
+        RQG_GENDATA: 'conf/engines/varchar.zz'
+
+      '003':
+        RQG_GRAMMAR: 'conf/engines/maria/maria_stress.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '004':
+        RQG_GRAMMAR: 'conf/engines/maria/maria_dml_alter.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '005':
+        RQG_GRAMMAR: 'conf/engines/maria/maria_bulk_insert.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '006':
+        RQG_GRAMMAR: 'conf/engines/maria/maria_mostly_selects.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '007':
+        RQG_GRAMMAR: 'conf/engines/tiny_inserts.yy'
+        RQG_GENDATA: 'conf/engines/tiny_inserts.zz'
+
+      '008':
+        RQG_GRAMMAR: 'conf/engines/falcon/falcon_limit.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '009':
+        RQG_GRAMMAR: 'conf/engines/falcon/falcon_select_autocommit.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '010':
+        RQG_GRAMMAR: 'conf/engines/falcon/falcon_backlog.yy'
+        RQG_GENDATA: 'conf/engines/falcon/falcon_backlog.zz'
+
+      '011':
+        RQG_GRAMMAR: 'conf/engines/falcon/falcon_data_types_no_year_time.yy'
+        RQG_GENDATA: 'conf/engines/falcon/falcon_data_types_no_year_time.zz'
+
+      '012':
+        RQG_GRAMMAR: 'conf/engines/falcon/falcon_nolimit_int.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '013':
+        RQG_GRAMMAR: 'conf/engines/falcon/falcon_replication.yy'
+        RQG_GENDATA: 'conf/engines/falcon/falcon_replication.zz'
+
+      '014':
+        RQG_GRAMMAR: 'conf/engines/falcon/falcon_recovery.yy'
+        RQG_GENDATA: 'conf/engines/falcon/falcon_recovery.zz'
+
+      '015':
+        RQG_GRAMMAR: 'conf/engines/falcon/limit_compare.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '016':
+        RQG_GRAMMAR: 'conf/engines/falcon/falcon_blobs.yy'
+        RQG_GENDATA: 'conf/engines/falcon/falcon_blobs.zz'
+
+      '017':
+        RQG_GRAMMAR: 'conf/engines/falcon/falcon_nolimit.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '018':
+        RQG_GRAMMAR: 'conf/engines/falcon/falcon_data_types.yy'
+        RQG_GENDATA: 'conf/engines/falcon/falcon_data_types.zz'
+
+      '019':
+        RQG_GRAMMAR: 'conf/engines/falcon/falcon_pagesize.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '020':
+        RQG_GRAMMAR: 'conf/engines/falcon/falcon_ddl.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '021':
+        RQG_GRAMMAR: 'conf/engines/falcon/falcon_online_alter.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '022':
+        RQG_GRAMMAR: 'conf/engines/falcon/falcon_chill_thaw.yy'
+        RQG_GENDATA: 'conf/engines/falcon/falcon_chill_thaw.zz'
+
+      '023':
+        RQG_GRAMMAR: 'conf/engines/innodb/full_text_search.yy'
+        RQG_GENDATA: 'conf/engines/innodb/full_text_search.zz'
+
+      '024':
+        RQG_GRAMMAR: 'conf/engines/handler.yy'
+        RQG_GENDATA: 'conf/engines/handler.zz'
+
+      '025':
+        RQG_GRAMMAR: 'conf/engines/blobs.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '026':
+        RQG_GRAMMAR: 'conf/engines/engine_stress.yy'
+        RQG_GENDATA: 'conf/engines/engine_stress.zz'
+
+      '027':
+        RQG_GRAMMAR: 'conf/engines/heap/heap_dml_single.yy'
+        RQG_JOB_OPTIONS: "--skip-gendata --gendata-advanced --mysqld=--init-file=$ENV_RQG_HOME/conf/engines/heap/heap_dml_single.init"
+
+      '028':
+        RQG_GRAMMAR: 'conf/engines/heap/heap_ddl_multi.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '029':
+        RQG_GRAMMAR: 'conf/engines/concurrent.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '030':
+        RQG_GRAMMAR: 'conf/runtime/WL5004_sql_custom.yy'
+        RQG_GENDATA: 'conf/runtime/WL5004_data.zz'
+
+      '031':
+        RQG_GRAMMAR: 'conf/runtime/concurrency_1.yy'
+        RQG_GENDATA: 'conf/runtime/concurrency_1.zz'
+
+      '032':
+        RQG_GRAMMAR: 'conf/runtime/information_schema.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '033':
+        RQG_GRAMMAR: 'conf/runtime/performance_schema.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+        MYSQLD_JOB_OPTIONS: '--mysqld=--performance-schema'
+
+      '034':
+        RQG_GRAMMAR: 'conf/runtime/create_drop.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '035':
+        RQG_GRAMMAR: 'conf/runtime/alter_online.yy'
+        RQG_GENDATA: 'conf/runtime/alter_online.zz'
+
+      '036':
+        RQG_GRAMMAR: 'conf/runtime/percona/AL-19549.yy'
+        RQG_GENDATA: 'conf/runtime/percona/AL-19549.zz'
+
+      '037':
+        RQG_GRAMMAR: 'conf/runtime/percona/5.6.yy'
+        RQG_GENDATA: 'conf/runtime/percona/percona_qa.zz'
+
+      '038':
+        RQG_GRAMMAR: 'conf/runtime/metadata_stability.yy'
+        RQG_GENDATA: 'conf/runtime/metadata_stability.zz'
+
+      '039':
+        RQG_GRAMMAR: 'conf/runtime/WL5004_sql.yy'
+        RQG_GENDATA: 'conf/runtime/WL5004_data.zz'
+
+      '040':
+        RQG_GRAMMAR: 'conf/runtime/connect_kill_sql.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '041':
+        RQG_GRAMMAR: 'conf/runtime/signal_resignal.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '042':
+        RQG_GRAMMAR: 'conf/transactions/repeatable_read.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '043':
+        RQG_GRAMMAR: 'conf/transactions/combinations.yy'
+        RQG_GENDATA: 'conf/transactions/combinations.zz'
+
+      '044':
+        RQG_GRAMMAR: 'conf/transactions/transactions-flat.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '045':
+        RQG_GRAMMAR: 'conf/transactions/transactions.yy'
+        RQG_GENDATA: 'conf/transactions/transactions.zz'
+
+      '046':
+        RQG_GRAMMAR: 'conf/transactions/transaction_durability.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '047':
+        RQG_GRAMMAR: 'conf/dbt3/dbt3-joins.yy'
+        RQG_JOB_OPTIONS: "--skip-gendata --gendata-advanced --mysqld=--init-file=$ENV_RQG_HOME/conf/dbt3/dbt3-s0.0001.dump"
+
+      '048':
+        RQG_GRAMMAR: 'conf/dbt3/dbt3-dml.yy'
+        RQG_JOB_OPTIONS: "--skip-gendata --gendata-advanced --mysqld=--init-file=$ENV_RQG_HOME/conf/dbt3/dbt3-s0.0001.dump"
+
+      '049':
+        RQG_GRAMMAR: 'conf/dbt3/dbt3-ranges.yy'
+        RQG_JOB_OPTIONS: "--skip-gendata --gendata-advanced --mysqld=--init-file=$ENV_RQG_HOME/conf/dbt3/dbt3-s0.0001.dump"
+
+      '050':
+        RQG_GRAMMAR: 'conf/partitioning/partitions-ddl.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '051':
+        RQG_GRAMMAR: 'conf/partitioning/partitions_procedures_triggers.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '052':
+        RQG_GRAMMAR: 'conf/partitioning/partitions_hash_key_less_rand.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '053':
+        RQG_GRAMMAR: 'conf/partitioning/partitions_redefine.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '054':
+        RQG_GRAMMAR: 'conf/partitioning/partitions_range_var_nb.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '055':
+        RQG_GRAMMAR: 'conf/partitioning/partitions-wl4571.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '056':
+        RQG_GRAMMAR: 'conf/partitioning/partitions_less_rand.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '057':
+        RQG_GRAMMAR: 'conf/partitioning/partitions_list_less_rand.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '058':
+        RQG_GRAMMAR: 'conf/partitioning/partitions-99-hash.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '059':
+        RQG_GRAMMAR: 'conf/partitioning/partitions_range_less_rand.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '060':
+        RQG_GRAMMAR: 'conf/partitioning/partitions-99-range.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '061':
+        RQG_GRAMMAR: 'conf/partitioning/partitions.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '062':
+        RQG_GRAMMAR: 'conf/partitioning/partition_pruning.yy'
+        RQG_GENDATA: 'conf/partitioning/partition_pruning.zz'
+
+      '063':
+        RQG_GRAMMAR: 'conf/examples/flightstats.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '064':
+        RQG_GRAMMAR: 'conf/examples/example.yy'
+        RQG_GENDATA: 'conf/examples/example.zz'
+
+      '065':
+        RQG_GRAMMAR: 'conf/dyncol/dyncol_dml.yy'
+        RQG_GENDATA: 'conf/dyncol/dyncol_dml.zz'
+
+      '066':
+        RQG_GRAMMAR: 'conf/gis/gis.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '067':
+        RQG_GRAMMAR: 'conf/gis/linestring.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '068':
+        RQG_GRAMMAR: 'conf/percona/translog_concurrent1.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '069':
+        RQG_GRAMMAR: 'conf/percona/trx_crash_commit_before.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '070':
+        RQG_GRAMMAR: 'conf/percona/trx_crash_commit_after_prepare.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '071':
+        RQG_GRAMMAR: 'conf/percona/bug892274.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '072':
+        RQG_GRAMMAR: 'conf/percona/many_indexes_percona.yy'
+        RQG_GENDATA: 'conf/percona/many_indexes_percona.zz'
+
+      '073':
+        RQG_GRAMMAR: 'conf/percona/optimizer_subquery_percona.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '074':
+        RQG_GRAMMAR: 'conf/percona/trx_half_binlogged_transaction.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '075':
+        RQG_GRAMMAR: 'conf/percona/outer_join_percona.yy'
+        RQG_GENDATA: 'conf/percona/outer_join_percona.zz'
+
+      '076':
+        RQG_GRAMMAR: 'conf/percona/translog_concurrent3.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '077':
+        RQG_GRAMMAR: 'conf/percona/translog_concurrent2.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '078':
+        RQG_GRAMMAR: 'conf/percona/query_cache_strip_comments.yy'
+        RQG_GENDATA: 'conf/percona/query_cache_strip_comments.zz'
+
+      '079':
+        RQG_GRAMMAR: 'conf/percona/trx_crash_commit_after_log.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '080':
+        RQG_GRAMMAR: 'conf/percona/innodb_dict_size_limit.yy'
+        RQG_GENDATA: 'conf/percona/innodb_dict_size_limit.zz'
+
+      '081':
+        RQG_GRAMMAR: 'conf/percona/trx_crash_commit_before_unlog.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '082':
+        RQG_GRAMMAR: 'conf/percona/trx_crash_commit_after.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '083':
+        RQG_GRAMMAR: 'conf/percona/trx_randDebugCrash.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '084':
+        RQG_GRAMMAR: 'conf/replication/replication_simple.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '085':
+        RQG_GRAMMAR: 'conf/replication/replication-ddl_sql.yy'
+        RQG_GENDATA: 'conf/replication/replication-ddl_data.zz'
+
+      '086':
+        RQG_GRAMMAR: 'conf/replication/WL5092_sql_1.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '087':
+        RQG_GRAMMAR: 'conf/replication/replication-dml_sql.yy'
+        RQG_GENDATA: 'conf/replication/replication-dml_data.zz'
+
+      '088':
+        RQG_GRAMMAR: 'conf/replication/rpl_transactions.yy'
+        RQG_GENDATA: 'conf/replication/rpl_transactions.zz'
+
+      '089':
+        RQG_GRAMMAR: 'conf/replication/replication_basic.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '090':
+        RQG_GRAMMAR: 'conf/replication/WL5092_sql_2.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '091':
+        RQG_GRAMMAR: 'conf/replication/replication.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '092':
+        RQG_GRAMMAR: 'conf/i18n/collations.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '093':
+        RQG_GRAMMAR: 'conf/smf/smf2.yy'
+        RQG_JOB_OPTIONS: "--skip-gendata --gendata-advanced --mysqld=--init-file=$ENV_RQG_HOME/conf/smf/smf2.sql"
+
+      '094':
+        RQG_GRAMMAR: 'conf/hivol/hivol_fbase_small.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '095':
+        RQG_GRAMMAR: 'conf/hivol/hivol_film.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '096':
+        RQG_GRAMMAR: 'conf/percona_qa/AL-19549/AL-19549.yy'
+        RQG_GENDATA: 'conf/percona_qa/AL-19549/AL-19549.zz'
+
+      '097':
+        RQG_GRAMMAR: 'conf/percona_qa/5.5/5.5.yy'
+        RQG_GENDATA: 'conf/percona_qa/5.5/5.5.zz1'
+
+      '098':
+        RQG_GRAMMAR: 'conf/percona_qa/5.5/5.5.yy'
+        RQG_GENDATA: 'conf/percona_qa/5.5/5.5.zz2'
+
+      '099':
+        RQG_GRAMMAR: 'conf/percona_qa/5.5/5.5.yy'
+        RQG_GENDATA: 'conf/percona_qa/5.5/5.5.zz3'
+
+      '100':
+        RQG_GRAMMAR: 'conf/percona_qa/BT-16274/BT-16274.yy'
+        RQG_GENDATA: 'conf/percona_qa/BT-16274/BT-16274.zz'
+
+      '101':
+        RQG_GRAMMAR: 'conf/percona_qa/5.6/5.6.yy'
+        RQG_GENDATA: 'conf/percona_qa/5.6/5.6.zz1'
+
+      '102':
+        RQG_GRAMMAR: 'conf/percona_qa/5.6/5.6.yy'
+        RQG_GENDATA: 'conf/percona_qa/5.6/5.6.zz2'
+
+      '103':
+        RQG_GRAMMAR: 'conf/percona_qa/5.6/5.6.yy'
+        RQG_GENDATA: 'conf/percona_qa/5.6/5.6.zz3'
+
+      '104':
+        RQG_GRAMMAR: 'conf/percona_qa/percona_qa.yy'
+        RQG_GENDATA: 'conf/percona_qa/percona_qa.zz'
+
+      '105':
+        RQG_GRAMMAR: 'conf/percona_qa/34411/34411.yy'
+        RQG_GRAMMAR: 'conf/percona_qa/34411/34411.zz'
+
+      '106':
+        RQG_GRAMMAR: 'conf/drizzle/subquery_semijoin_nested_drizzle.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '107':
+        RQG_GRAMMAR: 'conf/drizzle/subquery_materialization_drizzle.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '108':
+        RQG_GRAMMAR: 'conf/drizzle/bug680669.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '109':
+        RQG_GRAMMAR: 'conf/drizzle/drizzle.yy'
+        RQG_GENDATA: 'conf/drizzle/drizzle.zz'
+
+      '109':
+        RQG_GRAMMAR: 'conf/drizzle/data_dict_concurrent_drizzle.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '110':
+        RQG_GRAMMAR: 'conf/drizzle/outer_join_portable_drizzle.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '111':
+        RQG_GRAMMAR: 'conf/drizzle/translog_concurrent1.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '112':
+        RQG_GRAMMAR: 'conf/drizzle/drizzledump_migrate.yy'
+        RQG_GENDATA: 'conf/drizzle/drizzledump_migrate.zz'
+
+      '113':
+        RQG_GRAMMAR: 'conf/drizzle/proclist_drizzle.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '114':
+        RQG_GRAMMAR: 'conf/drizzle/outer_join_data_dictionary_drizzle.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '115':
+        RQG_GRAMMAR: 'conf/drizzle/translog_concurrent3.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '116':
+        RQG_GRAMMAR: 'conf/drizzle/range_access_drizzle.yy'
+        RQG_GENDATA: 'conf/drizzle/range_access_drizzle.zz'
+
+      '117':
+        RQG_GRAMMAR: 'conf/drizzle/subquery_semijoin_drizzle.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '118':
+        RQG_GRAMMAR: 'conf/drizzle/translog_concurrent2.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '119':
+        RQG_GRAMMAR: 'conf/drizzle/limit_compare_drizzle.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '120':
+        RQG_GRAMMAR: 'conf/drizzle/proclist_subquery_drizzle.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '121':
+        RQG_GRAMMAR: 'conf/drizzle/translog_ordering.yy'
+        RQG_GENDATA: 'conf/drizzle/translog_ordering.zz'
+
+      '122':
+        RQG_GRAMMAR: 'conf/drizzle/drizzledump.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '123':
+        RQG_GRAMMAR: 'conf/drizzle/optimizer_subquery_data_dictionary_drizzle.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '124':
+        RQG_GRAMMAR: 'conf/drizzle/subquery_drizzle.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '125':
+        RQG_GRAMMAR: 'conf/drizzle/optimizer_subquery_drizzle.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '126':
+        RQG_GRAMMAR: 'conf/drizzle/outer_join_drizzle.yy'
+        RQG_GENDATA: 'conf/drizzle/outer_join_drizzle.zz'
+
+      '127':
+        RQG_GRAMMAR: 'conf/drizzle/collations_drizzle.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '128':
+        RQG_GRAMMAR: 'conf/drizzle/many_indexes_drizzle.yy'
+        RQG_GENDATA: 'conf/drizzle/many_indexes_drizzle.zz'
+
+      '129':
+        RQG_GRAMMAR: 'conf/temporal/current_timestamp.yy'
+        RQG_GENDATA: 'conf/temporal/current_timestamp.zz'
+
+      '130':
+        RQG_GRAMMAR: 'conf/temporal/current_timestamp_6.yy'
+        RQG_GENDATA: 'conf/temporal/current_timestamp_6.zz'
+
+      '131':
+        RQG_GRAMMAR: 'conf/temporal/temporal_functions.yy'
+        RQG_GENDATA: 'conf/temporal/temporal_functions.zz'
+
+      '131':
+        RQG_GRAMMAR: 'conf/temporal/temporal_replication.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '132':
+        RQG_GRAMMAR: 'conf/temporal/temporal_ranges.yy'
+        RQG_GENDATA: 'conf/temporal/temporal_ranges.zz'
+
+      '133':
+        RQG_GRAMMAR: 'conf/mariadb/functions-pre-10.3.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '134':
+        RQG_GRAMMAR: 'conf/mariadb/instant_add.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '135':
+        RQG_GRAMMAR: 'conf/mariadb/optimizer.yy'
+        RQG_GENDATA: 'conf/mariadb/optimizer.zz'
+
+      '136':
+        RQG_GRAMMAR: 'conf/mariadb/redefine_analyze_at_runtime.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '137':
+        RQG_GRAMMAR: 'conf/mariadb/multi_update.yy'
+        RQG_GENDATA: 'conf/mariadb/multi_update.zz'
+
+      '138':
+        RQG_GRAMMAR: 'conf/mariadb/10.0-features-redefine.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '139':
+        RQG_GRAMMAR: 'conf/mariadb/sp.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '140':
+        RQG_GRAMMAR: 'conf/mariadb/functions.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '141':
+        RQG_GRAMMAR: 'conf/mariadb/gtid_stress.yy'
+        RQG_GENDATA: 'conf/mariadb/gtid_stress.zz'
+
+      '142':
+        RQG_GRAMMAR: 'conf/mariadb/bulk_insert.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '143':
+        RQG_GRAMMAR: 'conf/mariadb/json.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '144':
+        RQG_GRAMMAR: 'conf/mariadb/oltp.yy'
+        RQG_GENDATA: 'conf/mariadb/oltp.zz'
+
+      '145':
+        RQG_GRAMMAR: 'conf/mariadb/redefine_create_user.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '146':
+        RQG_GRAMMAR: 'conf/mariadb/redefine_set_session_vars.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '147':
+        RQG_GRAMMAR: 'conf/mariadb/hidden_columns.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '148':
+        RQG_GRAMMAR: 'conf/mariadb/xa.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '149':
+        RQG_GRAMMAR: 'conf/mariadb/redefine_multiple_triggers.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '150':
+        RQG_GRAMMAR: 'conf/mariadb/redefine_random_keys.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '151':
+        RQG_GRAMMAR: 'conf/mariadb/analyze-tables-at-start.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '152':
+        RQG_GRAMMAR: 'conf/mariadb/alter_table.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '153':
+        RQG_GRAMMAR: 'conf/mariadb/innodb_compression_encryption.yy'
+        RQG_GENDATA: 'conf/mariadb/innodb_compression_encryption.zz'
+
+      '154':
+        RQG_GRAMMAR: 'conf/mariadb/optimizer_basic.yy'
+        RQG_GENDATA: 'conf/mariadb/optimizer_basic.zz'
+
+      '155':
+        RQG_GRAMMAR: 'conf/mariadb/modules/sql_errlog.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '156':
+        RQG_GRAMMAR: 'conf/mariadb/modules/alter_table_indexes.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '157':
+        RQG_GRAMMAR: 'conf/mariadb/modules/application_periods.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '158':
+        RQG_GRAMMAR: 'conf/mariadb/modules/sql_mode.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '159':
+        RQG_GRAMMAR: 'conf/mariadb/modules/parser_changes.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '160':
+        RQG_GRAMMAR: 'conf/mariadb/modules/indexes_and_constraints.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '161':
+        RQG_GRAMMAR: 'conf/mariadb/modules/event.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '162':
+        RQG_GRAMMAR: 'conf/mariadb/modules/disks.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '163':
+        RQG_GRAMMAR: 'conf/mariadb/modules/user_variables.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '164':
+        RQG_GRAMMAR: 'conf/mariadb/modules/alter_table_columns.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '165':
+        RQG_GRAMMAR: 'conf/mariadb/modules/locks-10.4-extra.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '166':
+        RQG_GRAMMAR: 'conf/mariadb/modules/query_response_time.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '167':
+        RQG_GRAMMAR: 'conf/mariadb/modules/acl.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '168':
+        RQG_GRAMMAR: 'conf/mariadb/modules/server_audit.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '169':
+        RQG_GRAMMAR: 'conf/mariadb/modules/metadata_lock_info.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '170':
+        RQG_GRAMMAR: 'conf/mariadb/modules/dynamic_variables.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '171':
+        RQG_GRAMMAR: 'conf/mariadb/modules/optimizer_trace.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '172':
+        RQG_GRAMMAR: 'conf/mariadb/modules/locales.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '173':
+        RQG_GRAMMAR: 'conf/mariadb/modules/admin.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '174':
+        RQG_GRAMMAR: 'conf/mariadb/modules/userstat.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '175':
+        RQG_GRAMMAR: 'conf/mariadb/modules/foreign_keys.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '176':
+        RQG_GRAMMAR: 'conf/mariadb/modules/locks.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '177':
+        RQG_GRAMMAR: 'conf/mariadb/bugs/bug1008293-2.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '178':
+        RQG_GRAMMAR: 'conf/mariadb/bugs/mdev14021.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '179':
+        RQG_GRAMMAR: 'conf/mariadb/bugs/bug1008293-1.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '180':
+        RQG_GRAMMAR: 'conf/mariadb/bugs/mdev13918.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '181':
+        RQG_GRAMMAR: 'conf/mariadb/federated.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '182':
+        RQG_GRAMMAR: 'conf/mariadb/oltp-transactional.yy'
+        RQG_GENDATA: 'conf/mariadb/oltp.zz'
+
+      '183':
+        RQG_GRAMMAR: 'conf/mariadb/range_access.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '184':
+        RQG_GRAMMAR: 'conf/mariadb/generic-dml.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '185':
+        RQG_GRAMMAR: 'conf/mariadb/versioning.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '186':
+        RQG_GRAMMAR: 'conf/mariadb/redefine_temporary_tables.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '187':
+        RQG_GRAMMAR: 'conf/mariadb/oltp-readonly.yy'
+        RQG_GENDATA: 'conf/mariadb/oltp.zz'
+
+      '188':
+        RQG_GRAMMAR: 'conf/mariadb/oltp_and_ddl.yy'
+        RQG_GENDATA: 'conf/mariadb/oltp.zz'
+
+      '189':
+        RQG_GRAMMAR: 'conf/mariadb/sequences.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '190':
+        RQG_GRAMMAR: 'conf/galera/galera_stress.yy'
+        RQG_GENDATA: 'conf/galera/galera_stress.zz'
+
+      '191':
+        RQG_GRAMMAR: 'conf/optimizer/range_access2.yy'
+        RQG_GENDATA: 'conf/optimizer/range_access2.zz'
+
+      '192':
+        RQG_GRAMMAR: 'conf/optimizer/archive/subquery_materialization.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '193':
+        RQG_GRAMMAR: 'conf/optimizer/archive/subquery_semijoin.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '194':
+        RQG_GRAMMAR: 'conf/optimizer/archive/subquery_semijoin_nested.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '195':
+        RQG_GRAMMAR: 'conf/optimizer/outer_join_portable.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '196':
+        RQG_GRAMMAR: 'conf/optimizer/optimizer_subquery_portable.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '197':
+        RQG_GRAMMAR: 'conf/optimizer/virtual_columns.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '198':
+        RQG_GRAMMAR: 'conf/optimizer/updateable_views.yy'
+        RQG_JOB_OPTIONS: "--skip-gendata --gendata-advanced --mysqld=--init-file=$ENV_RQG_HOME/conf/optimizer/updateable_views.init"
+
+      '199':
+        RQG_GRAMMAR: 'conf/optimizer/optimizer_subquery_semijoin.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '200':
+        RQG_GRAMMAR: 'conf/optimizer/outer_join.yy'
+        RQG_GENDATA: 'conf/optimizer/outer_join.zz'
+
+      '201':
+        RQG_GRAMMAR: 'conf/optimizer/optimizer_access_exp.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '202':
+        RQG_GRAMMAR: 'conf/optimizer/multi_update_delete.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '203':
+        RQG_GRAMMAR: 'conf/optimizer/optimizer_subquery.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '204':
+        RQG_GRAMMAR: 'conf/optimizer/range_access.yy'
+        RQG_GENDATA: 'conf/optimizer/range_access.zz'
+
+      '205':
+        RQG_GRAMMAR: 'conf/optimizer/optimizer_no_subquery_portable.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '206':
+        RQG_GRAMMAR: 'conf/optimizer/optimizer_subquery_no_outer_join.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '207':
+        RQG_GRAMMAR: 'conf/backup/invariant.yy'
+        RQG_GENDATA: 'conf/backup/invariant.zz'
+
+      '208':
+        RQG_GRAMMAR: 'conf/backup/backup_interop.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '209':
+        RQG_GRAMMAR: 'conf/backup/backup_simple.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '210':
+        RQG_GRAMMAR: 'conf/backup/backup_obj.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+  steps:
+
+  - template: steps/env.yml
+
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      artifactName: 'build'
+      downloadPath: $(Build.ArtifactStagingDirectory)
+    displayName: 'Download build from artifacts'
+
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: '$(Build.ArtifactStagingDirectory)/build/build-*.tar.gz'
+      destinationFolder: $(env.BASEDIR)
+    displayName: 'Extract build'
+
+  - template: steps/install-deb-packages.yml
+    parameters:
+      INSTALLATION_SET: 'runtime'
+
+  - template: steps/clone-test-tools.yml
+
+  - template: steps/run-rqg-test.yml
+
+#########
+# Print summary
+- template: jobs/test-report.yml
+  parameters:
+    dependencies:
+    - Test
