@@ -75,7 +75,7 @@ jobs:
         RQG_GENDATA: 'conf/engines/falcon/falcon_blobs.zz'
 
       '011':
-        RQG_GENDATA: 'cconf/engines/falcon/falcon_replication.zz'
+        RQG_GENDATA: 'conf/engines/falcon/falcon_replication.zz'
 
       '012':
         RQG_GENDATA: 'conf/engines/innodb/full_text_search.zz'
