@@ -455,7 +455,7 @@ jobs:
 
       '105':
         RQG_GRAMMAR: 'conf/percona_qa/34411/34411.yy'
-        RQG_GRAMMAR: 'conf/percona_qa/34411/34411.zz'
+        RQG_GENDATA: 'conf/percona_qa/34411/34411.zz'
 
       '106':
         RQG_GRAMMAR: 'conf/drizzle/subquery_semijoin_nested_drizzle.yy'
@@ -472,10 +472,6 @@ jobs:
       '109':
         RQG_GRAMMAR: 'conf/drizzle/drizzle.yy'
         RQG_GENDATA: 'conf/drizzle/drizzle.zz'
-
-      '109':
-        RQG_GRAMMAR: 'conf/drizzle/data_dict_concurrent_drizzle.yy'
-        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
 
       '110':
         RQG_GRAMMAR: 'conf/drizzle/outer_join_portable_drizzle.yy'
@@ -564,10 +560,6 @@ jobs:
       '131':
         RQG_GRAMMAR: 'conf/temporal/temporal_functions.yy'
         RQG_GENDATA: 'conf/temporal/temporal_functions.zz'
-
-      '131':
-        RQG_GRAMMAR: 'conf/temporal/temporal_replication.yy'
-        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
 
       '132':
         RQG_GRAMMAR: 'conf/temporal/temporal_ranges.yy'
@@ -884,6 +876,15 @@ jobs:
       '210':
         RQG_GRAMMAR: 'conf/backup/backup_obj.yy'
         RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '211':
+        RQG_GRAMMAR: 'conf/drizzle/data_dict_concurrent_drizzle.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
+      '212':
+        RQG_GRAMMAR: 'conf/temporal/temporal_replication.yy'
+        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+
 
   steps:
 
