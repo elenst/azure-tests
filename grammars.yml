@@ -309,13 +309,13 @@ jobs:
         RQG_GRAMMAR: 'conf/percona/translog_concurrent1.yy'
         RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
 
-      '069':
-        RQG_GRAMMAR: 'conf/percona/trx_crash_commit_before.yy'
-        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+#      '069':
+#        RQG_GRAMMAR: 'conf/percona/trx_crash_commit_before.yy'
+#        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
 
-      '070':
-        RQG_GRAMMAR: 'conf/percona/trx_crash_commit_after_prepare.yy'
-        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+#      '070':
+#        RQG_GRAMMAR: 'conf/percona/trx_crash_commit_after_prepare.yy'
+#        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
 
       '071':
         RQG_GRAMMAR: 'conf/percona/bug892274.yy'
@@ -329,9 +329,9 @@ jobs:
         RQG_GRAMMAR: 'conf/percona/optimizer_subquery_percona.yy'
         RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
 
-      '074':
-        RQG_GRAMMAR: 'conf/percona/trx_half_binlogged_transaction.yy'
-        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+#      '074':
+#        RQG_GRAMMAR: 'conf/percona/trx_half_binlogged_transaction.yy'
+#        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
 
       '075':
         RQG_GRAMMAR: 'conf/percona/outer_join_percona.yy'
@@ -349,25 +349,25 @@ jobs:
         RQG_GRAMMAR: 'conf/percona/query_cache_strip_comments.yy'
         RQG_GENDATA: 'conf/percona/query_cache_strip_comments.zz'
 
-      '079':
-        RQG_GRAMMAR: 'conf/percona/trx_crash_commit_after_log.yy'
-        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+#      '079':
+#        RQG_GRAMMAR: 'conf/percona/trx_crash_commit_after_log.yy'
+#        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
 
       '080':
         RQG_GRAMMAR: 'conf/percona/innodb_dict_size_limit.yy'
         RQG_GENDATA: 'conf/percona/innodb_dict_size_limit.zz'
 
-      '081':
-        RQG_GRAMMAR: 'conf/percona/trx_crash_commit_before_unlog.yy'
-        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+#      '081':
+#        RQG_GRAMMAR: 'conf/percona/trx_crash_commit_before_unlog.yy'
+#        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
 
-      '082':
-        RQG_GRAMMAR: 'conf/percona/trx_crash_commit_after.yy'
-        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+#      '082':
+#        RQG_GRAMMAR: 'conf/percona/trx_crash_commit_after.yy'
+#        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
 
-      '083':
-        RQG_GRAMMAR: 'conf/percona/trx_randDebugCrash.yy'
-        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
+#      '083':
+#        RQG_GRAMMAR: 'conf/percona/trx_randDebugCrash.yy'
+#        RQG_JOB_OPTIONS: '--skip-gendata --gendata-advanced'
 
       '084':
         RQG_GRAMMAR: 'conf/replication/replication_simple.yy'
