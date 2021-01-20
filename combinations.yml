@@ -68,7 +68,7 @@ jobs:
         perl ./combinations.pl \
           --basedir=$ENV_BASEDIR \
           --workdir=$ENV_LOGDIR \
-          --combinations=$ENV_RQG_COMBINATIONS \
+          --config=$ENV_RQG_COMBINATIONS \
           --force \
           --trials=1
         #
