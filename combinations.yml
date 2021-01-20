@@ -155,11 +155,3 @@ jobs:
       DB_PORT: $(DbPort)
       DB_USER: $(DbUser)
       DBP: $(DbPwd)
-
-
-#########
-# Print summary
-- template: jobs/test-report.yml
-  parameters:
-    dependencies:
-    - Test
