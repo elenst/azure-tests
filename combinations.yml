@@ -163,6 +163,10 @@ jobs:
       DB_USER: $(DbUser)
       DBP: $(DbPwd)
 
-  - template: steps/store-combination-results.yml
-    parameters:
-      artifacts: $ARTIFACTS
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: test-$(Build.BuildNumber).$(System.JobPositionInPhase)
+    displayName: Store test result $(System.JobPositionInPhase)
+    condition: always()
+    continueOnError: true
