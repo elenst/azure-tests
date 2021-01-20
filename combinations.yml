@@ -161,7 +161,7 @@ jobs:
       DB_USER: $(DbUser)
       DBP: $(DbPwd)
 
-  ${{ each dir in $(Build.ArtifactStagingDirectory)/*}}:
+  ${{ each dir in $ARTIFACTS/*}}:
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: $(Build.ArtifactStagingDirectory)/$dir
