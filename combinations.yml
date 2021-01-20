@@ -63,6 +63,7 @@ jobs:
       cd $ENV_RQG_HOME
       export ASAN_OPTIONS="abort_on_error=1,disable_coredump=0"
       TRIAL_NO=0
+      ARTIFACTS=""
       rm -rf $(Build.ArtifactStagingDirectory)/*
       while [ `date +'%s'` -lt $((end_time-300)) ]
       do
@@ -85,8 +86,8 @@ jobs:
         #
         RUN_ID=$(System.JobPositionInPhase).$TRIAL_NO
         echo "##vso[task.setvariable variable=RUN_ID]$RUN_ID"
-        echo "##vso[task.setvariable variable=ARTIFACTS;isOutput=true]$(Build.ArtifactStagingDirectory)"
         mkdir $(Build.ArtifactStagingDirectory)/$RUN_ID
+        ARTIFACTS="$ARTIFACTS $(Build.ArtifactStagingDirectory)/$RUN_ID"
         summary_dir=$(Build.ArtifactStagingDirectory)/$RUN_ID/summary-$(Build.BuildNumber).$RUN_ID
         details_dir=$(Build.ArtifactStagingDirectory)/$RUN_ID/data-$(Build.BuildNumber).$RUN_ID
         repro_dir=$(Build.ArtifactStagingDirectory)/$RUN_ID/repro-$(Build.BuildNumber).$RUN_ID
@@ -153,6 +154,7 @@ jobs:
         cat $summary_dir/result_info >> $summary_dir/test_report
         echo "#####################################" >> $summary_dir/test_report
         cat $summary_dir/test_report
+        echo "##vso[task.setvariable variable=ARTIFACTS;isOutput=true]$(Build.ArtifactStagingDirectory)"
       done  
     displayName: Combinations
     env:
@@ -161,9 +163,6 @@ jobs:
       DB_USER: $(DbUser)
       DBP: $(DbPwd)
 
-  ${{ each dir in $ARTIFACTS/*}}:
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: $(Build.ArtifactStagingDirectory)/$dir
-      artifactName: test-$(Build.BuildNumber).$(System.JobPositionInPhase).$dir
-    displayName: Store test result
+  - template: steps/store-combination-results.yml
+    parameters:
+      artifacts: $ARTIFACTS

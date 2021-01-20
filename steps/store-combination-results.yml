@@ -1,0 +1,18 @@
+########################################################################
+# Collect, store and print test result info
+########################################################################
+
+parameters:
+  - name: "artifacts"
+    type: object
+    default: {}
+  continueOnError: true
+  TRIAL_NO: ''
+
+steps:
+  - ${{ each artifact in parameters.artifacts }}:
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathtoPublish: $artifact
+        artifactName: test-$artifact
+      displayName: Store test result
