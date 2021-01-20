@@ -65,7 +65,7 @@ jobs:
       TRIAL_NO=1
       while [ `date +'%s'` -lt $((end_time-300)) ]
       do
-        perl ./runall-combinations.pl \
+        perl ./combinations.pl \
           --basedir=$ENV_BASEDIR \
           --workdir=$ENV_LOGDIR \
           --combinations=$ENV_RQG_COMBINATIONS \
