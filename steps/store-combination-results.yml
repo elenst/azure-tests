@@ -6,8 +6,6 @@ parameters:
   - name: "artifacts"
     type: object
     default: {}
-  continueOnError: true
-  TRIAL_NO: ''
 
 steps:
   - ${{ each artifact in parameters.artifacts }}:
