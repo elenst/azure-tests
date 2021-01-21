@@ -178,7 +178,7 @@ jobs:
           echo "##vso[task.complete result=Skipped]Too little time left"
         fi
       displayName: Combination ${{ loop }}
-      name: combination
+      name: combination_${{ loop }}
       condition: always()
       env:
         DB_HOST: $(DbHost)
