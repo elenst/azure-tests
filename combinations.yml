@@ -69,6 +69,7 @@ jobs:
           TRIAL_NO=${{ loop }}
           echo "Trial $TRIAL_NO"
           echo "##vso[task.setvariable variable=TRIAL_NO;isOutput=true]$TRIAL_NO"
+          rm -rf $ENV_LOGDIR
           mkdir -p $ENV_LOGDIR
           set -xo pipefail
           cd $ENV_RQG_HOME
