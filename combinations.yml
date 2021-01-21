@@ -114,7 +114,6 @@ jobs:
             gdb --batch --eval-command="thread apply all bt" $binary $c >> $details_dir/threads
             gdb --batch --eval-command="thread apply all bt full" $binary $c >> $details_dir/threads_full
           done
-          tar zcf $details_dir/logs.tar.gz $ENV_LOGDIR
           if [ -e $ENV_LOGDIR/trial.log ] ; then
             result_collection_options="--test-log=$ENV_LOGDIR/trial.log"
           fi
@@ -166,7 +165,7 @@ jobs:
           if [ "$test_result" != "0" ] ; then
             if [ "$match_search_result" != "0" ] ; then
               echo "##vso[task.complete result=Failed]Failure without matches"
-              echo "##vso[task.setvariable variable=STORE_BINARIES;isOutput=true]true"
+              tar zcf $details_dir/logs.tar.gz $ENV_LOGDIR
             else
               echo "##vso[task.complete result=SucceededWithIssues]Failure with matches"
             fi
@@ -178,7 +177,6 @@ jobs:
           echo "##vso[task.complete result=Skipped]Too little time left"
         fi
       displayName: Combination ${{ loop }}
-      name: combination_${{ loop }}
       condition: always()
       env:
         DB_HOST: $(DbHost)
@@ -191,5 +189,5 @@ jobs:
         pathtoPublish: $(Build.ArtifactStagingDirectory)
         artifactName: test-$(Build.BuildNumber).$(System.JobPositionInPhase).${{ loop }}
       displayName: Store test result ${{ loop }}
-      condition: eq(variables['combination.STORE_BINARIES'], 'true')
+      condition: always()
       continueOnError: true
