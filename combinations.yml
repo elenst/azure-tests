@@ -61,7 +61,7 @@ jobs:
 
   # If we get to more than 50 within the limit of 6 hours,
   # likely something is wrong anyway so that the tests are ending too quickly
-  - template: steps/run-rqg-combination.yml
+  - ${{ each loop in parameters.loops }}:
     - script: |
         if [ `date +'%s'` -lt $((ENV_END_TIME-600)) ] ; then
           TRIAL_NO=${{ loop }}
