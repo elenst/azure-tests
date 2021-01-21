@@ -159,13 +159,13 @@ jobs:
           echo "#####################################" >> $summary_dir/test_report
           cat $summary_dir/test_report
           #
-      if [ "$test_result" != "0" ] ; then
-        if [ "$match_search_result" != "0" ] ; then
-          echo "##vso[task.complete result=Failed]Failure without matches"
-        else
-          echo "##vso[task.complete result=SucceededWithIssues]Failure with matches"
-        fi
-      fi
+          if [ "$test_result" != "0" ] ; then
+            if [ "$match_search_result" != "0" ] ; then
+              echo "##vso[task.complete result=Failed]Failure without matches"
+            else
+              echo "##vso[task.complete result=SucceededWithIssues]Failure with matches"
+            fi
+          fi
         else
           echo "##vso[task.complete result=Skipped]Too little time left"
         fi
