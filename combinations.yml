@@ -61,9 +61,10 @@ jobs:
 
   # If we get to more than 50 within the limit of 6 hours,
   # likely something is wrong anyway so that the tests are ending too quickly
-  - ${{ each TRIAL_NO in parameters.loops }}:
+  - ${{ each loop in parameters.loops }}:
     - script: |
         if [ `date +'%s'` -lt $((ENV_END_TIME-600)) ] ; then
+          TRIAL_NO=${{ loop }}
           echo "Trial $TRIAL_NO"
           echo "##vso[task.setvariable variable=TRIAL_NO;isOutput=true]$TRIAL_NO"
           mkdir -p $ENV_LOGDIR
@@ -78,6 +79,7 @@ jobs:
             --force \
             --discard-logs \
             --trials=1
+          test_result=$?
           #
           echo "#"
           echo "# Result collection"
@@ -150,12 +152,20 @@ jobs:
           echo >> $summary_dir/test_report
           $ENV_TOOLBOX_DIR/scripts/collect_rqg_result_info.sh $result_collection_options > $summary_dir/result_info
           perl $ENV_RQG_HOME/util/check_for_known_bugs.pl --signatures=$ENV_RQG_HOME/data/bug_signatures $summary_dir/result_info >> $summary_dir/test_report
+          match_search_result=$?
           echo >> $summary_dir/test_report
           echo "#####################################" >> $summary_dir/test_report
           cat $summary_dir/result_info >> $summary_dir/test_report
           echo "#####################################" >> $summary_dir/test_report
           cat $summary_dir/test_report
-          echo "##vso[task.setvariable variable=ARTIFACTS;isOutput=true]$(Build.ArtifactStagingDirectory)"
+          #
+      if [ "$test_result" != "0" ] ; then
+        if [ "$match_search_result" != "0" ] ; then
+          echo "##vso[task.complete result=Failed]Failure without matches"
+        else
+          echo "##vso[task.complete result=SucceededWithIssues]Failure with matches"
+        fi
+      fi
         else
           echo "##vso[task.complete result=Skipped]Too little time left"
         fi
