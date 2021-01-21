@@ -177,6 +177,7 @@ jobs:
           echo "##vso[task.complete result=Skipped]Too little time left"
         fi
       displayName: Combination ${{ loop }}
+      condition: always()
       env:
         DB_HOST: $(DbHost)
         DB_PORT: $(DbPort)
