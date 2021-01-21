@@ -54,19 +54,18 @@ jobs:
 
   - template: steps/clone-test-tools.yml
 
+  # If we get to more than 50 within the limit of 6 hours,
+  # likely something is wrong anyway so that the tests are ending too quickly
+  - ${{ each TRIAL_NO in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 }}
   - script: |
-      start_time=`date +'%s'`
-      end_time=$((start_time+ENV_RQG_DURATION))
-      echo "JobName: $ENV_REAL_JOBNAME, start time"
-      mkdir -p $ENV_LOGDIR
-      set -xo pipefail
-      cd $ENV_RQG_HOME
-      export ASAN_OPTIONS="abort_on_error=1,disable_coredump=0"
-      TRIAL_NO=0
-      ARTIFACTS=""
-      rm -rf $(Build.ArtifactStagingDirectory)/*
-      while [ `date +'%s'` -lt $((end_time-300)) ]
-      do
+      if [ `date +'%s'` -lt $((ENV_END_TIME-600)) ] ; then
+        echo "Trial $TRIAL_NO"
+        echo "##vso[task.setvariable variable=TRIAL_NO;isOutput=true]$TRIAL_NO"
+        mkdir -p $ENV_LOGDIR
+        set -xo pipefail
+        cd $ENV_RQG_HOME
+        export ASAN_OPTIONS="abort_on_error=1,disable_coredump=0"
+        rm -rf $(Build.ArtifactStagingDirectory)/*
         perl ./combinations.pl \
           --basedir=$ENV_BASEDIR \
           --workdir=$ENV_LOGDIR \
@@ -81,13 +80,10 @@ jobs:
         #
         mv $ENV_LOGDIR/trial1.log $ENV_LOGDIR/trial.log
         mv $ENV_LOGDIR/current1_1 $ENV_LOGDIR/vardir
-        TRIAL_NO=$(($TRIAL_NO+1))
-        echo "##vso[task.setvariable variable=TRIAL_NO]$TRIAL_NO"
         #
         RUN_ID=$(System.JobPositionInPhase).$TRIAL_NO
         echo "##vso[task.setvariable variable=RUN_ID]$RUN_ID"
         mkdir $(Build.ArtifactStagingDirectory)/$RUN_ID
-        ARTIFACTS="$ARTIFACTS $(Build.ArtifactStagingDirectory)/$RUN_ID"
         summary_dir=$(Build.ArtifactStagingDirectory)/$RUN_ID/summary-$(Build.BuildNumber).$RUN_ID
         details_dir=$(Build.ArtifactStagingDirectory)/$RUN_ID/data-$(Build.BuildNumber).$RUN_ID
         repro_dir=$(Build.ArtifactStagingDirectory)/$RUN_ID/repro-$(Build.BuildNumber).$RUN_ID
@@ -155,8 +151,11 @@ jobs:
         echo "#####################################" >> $summary_dir/test_report
         cat $summary_dir/test_report
         echo "##vso[task.setvariable variable=ARTIFACTS;isOutput=true]$(Build.ArtifactStagingDirectory)"
-      done  
+      else
+        echo "##vso[task.complete result=Skipped]Too little time left"
+      fi
     displayName: Combinations
+    name: combinations
     env:
       DB_HOST: $(DbHost)
       DB_PORT: $(DbPort)
@@ -166,7 +165,7 @@ jobs:
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: $(Build.ArtifactStagingDirectory)
-      artifactName: test-$(Build.BuildNumber).$(System.JobPositionInPhase)
+      artifactName: test-$(Build.BuildNumber).$(System.JobPositionInPhase).$(COMBINATIONS_TRIAL_NO)
     displayName: Store test result $(System.JobPositionInPhase)
-    condition: always()
+    condition: failed()
     continueOnError: true
