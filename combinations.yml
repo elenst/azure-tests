@@ -166,6 +166,7 @@ jobs:
           if [ "$test_result" != "0" ] ; then
             if [ "$match_search_result" != "0" ] ; then
               echo "##vso[task.complete result=Failed]Failure without matches"
+              echo "##vso[task.setvariable variable=STORE_BINARIES;isOutput=true]true"
             else
               echo "##vso[task.complete result=SucceededWithIssues]Failure with matches"
             fi
@@ -177,6 +178,7 @@ jobs:
           echo "##vso[task.complete result=Skipped]Too little time left"
         fi
       displayName: Combination ${{ loop }}
+      name: combination
       condition: always()
       env:
         DB_HOST: $(DbHost)
@@ -189,5 +191,5 @@ jobs:
         pathtoPublish: $(Build.ArtifactStagingDirectory)
         artifactName: test-$(Build.BuildNumber).$(System.JobPositionInPhase).${{ loop }}
       displayName: Store test result ${{ loop }}
-      condition: failed()
+      condition: eq(variables['combination.STORE_BINARIES'], 'true')
       continueOnError: true
