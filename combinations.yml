@@ -169,8 +169,6 @@ jobs:
         else
           echo "##vso[task.complete result=Skipped]Too little time left"
         fi
-      displayName: Combinations
-      name: combinations
       env:
         DB_HOST: $(DbHost)
         DB_PORT: $(DbPort)
