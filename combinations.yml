@@ -167,8 +167,10 @@ jobs:
             fi
           fi
         else
+          echo "Skipping the test, too little time left"
           echo "##vso[task.complete result=Skipped]Too little time left"
         fi
+      displayName: Combination ${{ loop }}
       env:
         DB_HOST: $(DbHost)
         DB_PORT: $(DbPort)
@@ -178,7 +180,7 @@ jobs:
     - task: PublishBuildArtifacts@1
       inputs:
         pathtoPublish: $(Build.ArtifactStagingDirectory)
-        artifactName: test-$(Build.BuildNumber).$(System.JobPositionInPhase).$(COMBINATIONS_TRIAL_NO)
-      displayName: Store test result $(System.JobPositionInPhase)
+        artifactName: test-$(Build.BuildNumber).$(System.JobPositionInPhase).${{ loop }}
+      displayName: Store test result ${{ loop }}
       condition: failed()
       continueOnError: true
