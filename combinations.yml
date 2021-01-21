@@ -81,6 +81,7 @@ jobs:
             --trials=1
           test_result=$?
           #
+          set +x
           echo "#"
           echo "# Result collection"
           echo "#"
@@ -165,6 +166,8 @@ jobs:
             else
               echo "##vso[task.complete result=SucceededWithIssues]Failure with matches"
             fi
+          else
+            echo "##vso[task.complete result=Succeeded]Pass"
           fi
         else
           echo "Skipping the test, too little time left"
