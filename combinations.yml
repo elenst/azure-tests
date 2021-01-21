@@ -91,10 +91,9 @@ jobs:
           #
           RUN_ID=$(System.JobPositionInPhase).$TRIAL_NO
           echo "##vso[task.setvariable variable=RUN_ID]$RUN_ID"
-          mkdir $(Build.ArtifactStagingDirectory)/$RUN_ID
-          summary_dir=$(Build.ArtifactStagingDirectory)/$RUN_ID/summary-$(Build.BuildNumber).$RUN_ID
-          details_dir=$(Build.ArtifactStagingDirectory)/$RUN_ID/data-$(Build.BuildNumber).$RUN_ID
-          repro_dir=$(Build.ArtifactStagingDirectory)/$RUN_ID/repro-$(Build.BuildNumber).$RUN_ID
+          summary_dir=$(Build.ArtifactStagingDirectory)/summary-$(Build.BuildNumber).$RUN_ID
+          details_dir=$(Build.ArtifactStagingDirectory)/data-$(Build.BuildNumber).$RUN_ID
+          repro_dir=$(Build.ArtifactStagingDirectory)/repro-$(Build.BuildNumber).$RUN_ID
           mkdir -p $summary_dir $details_dir $repro_dir
           cp $ENV_LOGDIR/trial.log $ENV_RQG_HOME/rqg.info $ENV_BASEDIR/server.info $ENV_TOOLBOX_DIR/toolbox.info $summary_dir/
           cp --parents `find $ENV_LOGDIR -name mysql*err* | xargs` $summary_dir/
