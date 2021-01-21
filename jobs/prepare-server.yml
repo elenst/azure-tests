@@ -50,14 +50,14 @@ jobs:
       echo "##vso[task.setvariable variable=REVISION;isOutput=true]$rev"
     name: headrev
     displayName: Get head revision
-    condition: and(succeeded(), eq(variables['env.SERVER_REVISION'],''))
+    condition: and(succeeded(), eq(variables['env.SERVER_REVNO'],''))
     env:
       PAR_SERVER_REPO: '${{ parameters.SERVER_REPO }}'
 
   # Check if the server with this revision and cmake options
   # has already been built and stored
   - bash: |
-      server_revision=${ENV_SERVER_REVISION:-$HEADREV_REVISION}
+      server_revision=${ENV_SERVER_REVNO:-$HEADREV_REVISION}
       cmake_options_hash=`echo "$ENV_CMAKE_OPTIONS" | md5sum | awk '{print $1}'`
       filename=build-$ENV_SERVER_BRANCH-$server_revision-$cmake_options_hash
       echo "Bintar filename to search for: $filename"
@@ -91,12 +91,12 @@ jobs:
       fi
       shopt -u nocasematch
       # In case of head revision, we don't need to clone the whole history
-      if [ -z "$ENV_SERVER_REVISION" ] || [ "$HEADREV_REVISION" == "$ENV_SERVER_REVISION" ] ; then
+      if [ -z "$ENV_SERVER_REVNO" ] || [ "$HEADREV_REVISION" == "$ENV_SERVER_REVNO" ] ; then
         git clone $PAR_SERVER_REPO --depth=1 --branch=$ENV_SERVER_BRANCH $srcdir
       else
         git clone $PAR_SERVER_REPO --branch=$ENV_SERVER_BRANCH $srcdir
         cd $srcdir
-        git checkout $ENV_SERVER_REVISION
+        git checkout $ENV_SERVER_REVNO
       fi
       set -x
       # Prepare mysqltest for further reproducing

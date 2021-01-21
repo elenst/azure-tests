@@ -9,7 +9,7 @@ trigger: none
 # variables:
 
 #  SERVER_BRANCH: ''
-#  SERVER_REVISION: ''
+#  SERVER_REVNO: ''
 #  CMAKE_OPTIONS: ''
 #  RQG_OPTIONS: ''
 #  RQG_BRANCH: 'elenst-dev'
@@ -30,7 +30,7 @@ jobs:
           echo ""
         fi
         echo "SERVER_BRANCH:    $SERVER_BRANCH"
-        echo "SERVER_REVISION:  SERVER_REVISION"
+        echo "SERVER_REVNO:     $SERVER_REVNO"
         echo "CMAKE_OPTIONS:    $CMAKE_OPTIONS"
         echo "RQG_OPTIONS:      $RQG_OPTIONS"
         echo "RQG_BRANCH:       $RQG_BRANCH"

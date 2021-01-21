@@ -36,9 +36,9 @@ jobs:
   - template: steps/env.yml
 
   - bash: |
-      server_ref=${ENV_SERVER_REVISION:-$ENV_SERVER_BRANCH}
+      server_ref=${ENV_SERVER_REVNO:-$ENV_SERVER_BRANCH}
       if [ -z "$server_ref" ]; then
-        echo "##vso[task.complete result=Failed]Neither \"SERVER_BRANCH\" nor \"SERVER_REVISION\" have been specified"
+        echo "##vso[task.complete result=Failed]Neither \"SERVER_BRANCH\" nor \"SERVER_REVNO\" have been specified"
       fi
       infodir=$HOME/gcov_info
       mkdir $infodir
