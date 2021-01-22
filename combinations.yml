@@ -65,6 +65,7 @@ jobs:
   # likely something is wrong anyway so that the tests are ending too quickly
   - ${{ each loop in parameters.loops }}:
     - script: |
+        rm -rf $(Build.ArtifactStagingDirectory)/*
         if [ `date +'%s'` -lt $((ENV_END_TIME-600)) ] ; then
           TRIAL_NO=${{ loop }}
           echo "Trial $TRIAL_NO"
@@ -74,7 +75,6 @@ jobs:
           set -xo pipefail
           cd $ENV_RQG_HOME
           export ASAN_OPTIONS="abort_on_error=1,disable_coredump=0"
-          rm -rf $(Build.ArtifactStagingDirectory)/*
           perl ./combinations.pl \
             --basedir=$ENV_BASEDIR \
             --workdir=$ENV_LOGDIR \
