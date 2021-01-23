@@ -36,8 +36,9 @@ jobs:
   pool:
     vmImage: 'Ubuntu 16.04'
 
+  # Leave some room for reproducing
   strategy:
-    parallel: 10
+    parallel: 8
 
   steps:
 
