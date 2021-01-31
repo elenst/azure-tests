@@ -6,8 +6,8 @@
 
 trigger: none
 
-# If we manage to run more than 100 runs within less-than-6 hour limit,
-# something is wrong anyway (tests fail too quickly)
+# If we manage to run many more than 50 runs within less-than-6 hour limit,
+# it probably means tests fail too quickly
 parameters:
   - name : loops
     type : object
@@ -16,12 +16,7 @@ parameters:
       11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
       21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
       31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-      41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-      51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
-      61, 62, 63, 64, 65, 66, 67, 68, 69, 70,
-      71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
-      81, 82, 83, 84, 85, 86, 87, 88, 89, 90,
-      91, 92, 93, 94, 95, 96, 97, 98, 99, 100
+      41, 42, 43, 44, 45, 46, 47, 48, 49, 50
     ]
 
 jobs:
@@ -113,7 +108,10 @@ jobs:
           cp $ENV_LOGDIR/trial.log $ENV_RQG_HOME/rqg.info $ENV_BASEDIR/server.info $ENV_TOOLBOX_DIR/toolbox.info $summary_dir/
           cp --parents `find $ENV_LOGDIR -name mysql*err* | xargs` $summary_dir/
           cp --parents `find $ENV_LOGDIR -name mbackup*log* | xargs` $summary_dir/
-          cp $ENV_LOGDIR/vardir/mysql.log $repro_dir/
+          if [ -e $ENV_LOGDIR/vardir/mysql.log ] ; then
+            gzip $ENV_LOGDIR/vardir/mysql.log
+            mv $ENV_LOGDIR/vardir/mysql.log.gz $repro_dir/
+          fi
           for c in `find $ENV_LOGDIR -name core*` ; do
             echo "#################### $c ####################" >> $summary_dir/stacktraces
             echo "#################### $c ####################" >> $details_dir/threads
@@ -200,6 +198,6 @@ jobs:
       inputs:
         pathtoPublish: $(Build.ArtifactStagingDirectory)
         artifactName: test-$(Build.BuildNumber).$(System.JobPositionInPhase).${{ loop }}
-      displayName: Store test result ${{ loop }}
+      displayName: Store test result
       condition: failed()
       continueOnError: true
