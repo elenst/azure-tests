@@ -92,6 +92,8 @@ steps:
       export TEST_ID=$(Build.BuildId).$RUN_ID
       echo >> $summary_dir/test_report
       $ENV_TOOLBOX_DIR/scripts/collect_rqg_result_info.sh $result_collection_options > $summary_dir/result_info
+      echo "" >> $summary_dir/result_info
+      echo "Trigger ID:" $(System.DefinitionId)-$(Build.BuildId)-$(Build.BuildNumber).$RUN_ID >> $summary_dir/result_info
       perl $ENV_RQG_HOME/util/check_for_known_bugs.pl --signatures=$ENV_RQG_HOME/data/bug_signatures $summary_dir/result_info >> $summary_dir/test_report
       echo >> $summary_dir/test_report
       echo "#####################################" >> $summary_dir/test_report
