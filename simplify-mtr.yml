@@ -21,7 +21,7 @@ jobs:
 - job: Simplify
   timeoutInMinutes: 0
   pool:
-    vmImage: 'Ubuntu 16.04'
+    vmImage: 'Ubuntu 20.04'
   strategy:
     parallel: 1
 
