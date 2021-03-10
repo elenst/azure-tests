@@ -164,10 +164,11 @@ jobs:
           echo >> $summary_dir/test_report
           $ENV_TOOLBOX_DIR/scripts/collect_rqg_result_info.sh $result_collection_options > $summary_dir/result_info
           echo "----" >> $summary_dir/result_info
-          echo "Trigger ID:" $(System.DefinitionId)-$(Build.BuildId)-$(Build.BuildNumber).$RUN_ID >> $summary_dir/result_info
           export SERVER_REVNO=`head -1 $summary_dir/server.info | awk '{print $2}'`
-          perl $ENV_RQG_HOME/util/check_for_known_bugs.pl --signatures=$ENV_RQG_HOME/data/bug_signatures $summary_dir/result_info >> $summary_dir/test_report
+          perl $ENV_RQG_HOME/util/check_for_known_bugs.pl --signatures=$ENV_RQG_HOME/data/bug_signatures $summary_dir/result_info >> $summary_dir/result_info
           match_search_result=$?
+          echo "----" >> $summary_dir/result_info
+          echo "Trigger ID:" $(System.DefinitionId)-$(Build.BuildId)-$(Build.BuildNumber).$RUN_ID >> $summary_dir/result_info
           echo >> $summary_dir/test_report
           echo "#####################################" >> $summary_dir/test_report
           cat $summary_dir/result_info >> $summary_dir/test_report
