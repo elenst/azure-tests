@@ -201,5 +201,5 @@ jobs:
         pathtoPublish: $(Build.ArtifactStagingDirectory)
         artifactName: test-$(Build.BuildNumber).$(System.JobPositionInPhase).${{ loop }}
       displayName: Store test result
-      condition: failed()
+      condition: not(succeeded())
       continueOnError: true
