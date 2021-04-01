@@ -11,7 +11,7 @@
 ########################################################################
 
 parameters:
-  vmImage: 'Ubuntu 16.04'
+  vmImage: 'Ubuntu 20.04'
   condition: succeeded()
 
   serverBranch: '10.4'

@@ -3,7 +3,7 @@
 ########################################################################
 
 parameters:
-  vmImage: 'Ubuntu 16.04'
+  vmImage: 'Ubuntu 20.04'
   name: 'Download_or_Build_Server'
   condition: succeeded()
   dependencies: []

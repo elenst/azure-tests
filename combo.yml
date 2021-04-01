@@ -41,7 +41,7 @@ jobs:
   timeoutInMinutes: 60
   dependsOn: Download_or_Build_Server
   pool:
-    vmImage: 'Ubuntu 16.04'
+    vmImage: 'Ubuntu 20.04'
 
   strategy:
     matrix:

@@ -26,7 +26,7 @@ jobs:
 #########
 - job: GCOV
   pool:
-    vmImage: 'Ubuntu 16.04'
+    vmImage: 'Ubuntu 20.04'
   timeoutInMinutes: 0
   strategy:
     parallel: 1
