@@ -84,12 +84,6 @@ jobs:
   - bash: |
       srcdir=$HOME/src
       builddir=$HOME/out-of-source
-      shopt -s nocasematch
-      if [[ $ENV_CMAKE_OPTIONS =~ WITH_ASAN=YES|WITH_ASAN=ON ]] ; then
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 50
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 50
-      fi
-      shopt -u nocasematch
       # In case of head revision, we don't need to clone the whole history
       if [ -z "$ENV_SERVER_REVNO" ] || [ "$HEADREV_REVISION" == "$ENV_SERVER_REVNO" ] ; then
         git clone $PAR_SERVER_REPO --depth=1 --branch=$ENV_SERVER_BRANCH $srcdir
