@@ -105,14 +105,17 @@ jobs:
 
   # Get tools, extract repro info, convert general log into MTR and run simplification
   - script: |
+      set -o pipefail
       git clone "https://github.com/MariaDB/randgen" --branch=elenst-dev $RQG_HOME
       git clone "https://github.com/elenst/mariadb-toolbox" $TOOLBOX_DIR
       REPRO_DIR=$(System.ArtifactsDirectory)/repro
       mv $(System.ArtifactsDirectory)/test-$(TRIGGERING_ARTIFACT_ID)/repro-$(TRIGGERING_ARTIFACT_ID) $REPRO_DIR
       cd $BASEDIR/mysql-test
-      default_repro_options="--mem --mysqld=--innodb --mysqld=--default-storage-engine=InnoDB --mysqld=--partition --mysqld=--loose-innodb-stats-persistent=on --mysqld=--character-set-server=utf8 --mysqld=--max-allowed-packet=128M --mysqld=--innodb-buffer-pool-size=128M --mysqld=--innodb-log-file-size=48M --mysqld=--loose-max-statement-time=10 --mysqld=--innodb-lock-wait-timeout=3 --mysqld=--lock-wait-timeout=5 --mysqld=--log_bin_trust_function_creators=OFF --mysqld=--key_buffer_size=128M --mysqld=--performance-schema=OFF --testcase-timeout=120"
-      if ../bin/mysqld --version | grep -E '10.[45]' ; then
+      default_repro_options="--mem --mysqld=--innodb --mysqld=--default-storage-engine=InnoDB --mysqld=--partition --mysqld=--loose-innodb-stats-persistent=on --mysqld=--character-set-server=utf8 --mysqld=--max-allowed-packet=1G --mysqld=--innodb-buffer-pool-size=128M --mysqld=--innodb-log-file-size=48M --mysqld=--loose-max-statement-time=30 --mysqld=--innodb-lock-wait-timeout=5 --mysqld=--lock-wait-timeout=10 --mysqld=--log_bin_trust_function_creators=OFF --mysqld=--key_buffer_size=128M --mysqld=--performance-schema=OFF --testcase-timeout=120 --mysqld=--secure-file-priv=''"
+      if ../bin/mysqld --version | grep -E '10.[456]' ; then
         default_repro_options="$default_repro_options --mysqld=--use_stat_tables=PREFERABLY"
+      elif ../bin/mysqld --version | grep -E '10.[7891]' ; then
+        default_repro_options="$default_repro_options --mysqld=--use_stat_tables=PREFERABLY --mysqld=--histogram-type=DOUBLE_PREC_HB"
       fi
       mysqld_repro_options=`grep 'MySQLd options' $REPRO_DIR/repro.info | sed -e "s/MySQLd options://" | sed -e "s/ENV_RQG_HOME/RQG_HOME/g"`
       mtr_repro_options=`grep 'MTR options' $REPRO_DIR/repro.info | sed -e "s/MTR options://"`
