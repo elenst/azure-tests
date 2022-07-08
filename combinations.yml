@@ -91,7 +91,7 @@ jobs:
             --trials=1
           test_result=$?
           #
-          set +x
+          set -x
           echo "#"
           echo "# Result collection"
           echo "#"
