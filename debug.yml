@@ -5,6 +5,8 @@ trigger: none
 jobs:
 
 - job: check_env_step
+  pool:
+    vmImage: 'Ubuntu 20.04'
   steps:
   - template: steps/env.yml
   - script: printenv
@@ -13,6 +15,8 @@ jobs:
       df -kT
       ulimit -a
       ulimit -Ha
+      uname -a
+      cat /etc/os-release
       cat /proc/cpuinfo
       top -b -n 1
       dpkg -l | grep -E 'cpp|gcc|clang|libasan'
@@ -95,14 +99,14 @@ jobs:
 - template: jobs/prepare-server.yml
   parameters:
     name: 'Download_or_Build_Server'
-#    condition: false
+    condition: false
 #    serverBranch: $(serverBranch)
     CMAKE_OPTIONS: '-DPLUGIN_CASSANDRA=NO -DPLUGIN_CONNECT=NO -DPLUGIN_FEDERATED=NO -DPLUGIN_FEDERATEDX=NO -DPLUGIN_MROONGA=NO -DPLUGIN_ROCKSDB=NO -DPLUGIN_SPHINX=NO -DPLUGIN_SPIDER=NO -DPLUGIN_TOKUDB=NO -DWITH_MARIABACKUP=OFF'
     CMAKE_BUILD_TYPE: Debug
 
 - template: jobs/upload-to-ftp.yml
   parameters:
-#    condition: false
+    condition: false
     dependencies:
     - 'Download_or_Build_Server'
     condition: and(succeeded(), ne(dependencies.Download_or_Build_Server.outputs['ftp_download.BINARIES_FROM_FTP'], 'true'))
