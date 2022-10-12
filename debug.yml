@@ -109,4 +109,4 @@ jobs:
     condition: false
     dependencies:
     - 'Download_or_Build_Server'
-    condition: and(succeeded(), ne(dependencies.Download_or_Build_Server.outputs['ftp_download.BINARIES_FROM_FTP'], 'true'))
+#    condition: and(succeeded(), ne(dependencies.Download_or_Build_Server.outputs['ftp_download.BINARIES_FROM_FTP'], 'true'))
