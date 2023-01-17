@@ -16,6 +16,7 @@ jobs:
       ulimit -a
       ulimit -Ha
       uname -a
+      ls -l /usr/lib/x86_64-linux-gnu/libcurl*
       cat /etc/os-release
       cat /proc/cpuinfo
       top -b -n 1
