@@ -72,7 +72,9 @@ jobs:
       PAR_FTP_DOWNLOAD: '${{ parameters.FTP_DOWNLOAD }}'
     displayName: Download bintar from FTP
     name: ftp_download
-    condition: succeeded()
+    condition: false
+
+#    condition: succeeded()
 
   # If bintar was not found, install libraries, clone and build server
 
