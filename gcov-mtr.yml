@@ -48,7 +48,7 @@ jobs:
       fi
     displayName: 'Prepare and clone'
     env:
-      FTP_DOWNLOAD: 'ftp://perro.askmonty.org/public/azure'
+      FTP_DOWNLOAD: 'ftp://hasky.askmonty.org/public/azure'
       SERVER_REPO: 'https://github.com/MariaDB/server'
     name: prep
 

@@ -7,7 +7,7 @@ parameters:
   name: 'Upload_to_FTP'
   condition: succeeded()
   artifactName: 'build'
-  FTP_URL: 'ftp://perro.askmonty.org'
+  FTP_URL: 'ftp://hasky.askmonty.org'
   FTP_UPLOAD_DIRECTORY: '/private/azure'
   FTP_USER: 'anonymous'
   FTP_PASSWORD: 'foo'

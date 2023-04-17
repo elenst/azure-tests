@@ -9,7 +9,7 @@ parameters:
   dependencies: []
 
   SERVER_REPO: 'https://github.com/MariaDB/server'
-  FTP_DOWNLOAD: 'ftp://perro.askmonty.org/public/azure'
+  FTP_DOWNLOAD: 'ftp://hasky.askmonty.org/public/azure'
   BUILD_ARTIFACT_NAME: 'build'
 
 jobs:
@@ -72,9 +72,7 @@ jobs:
       PAR_FTP_DOWNLOAD: '${{ parameters.FTP_DOWNLOAD }}'
     displayName: Download bintar from FTP
     name: ftp_download
-    condition: false
-
-#    condition: succeeded()
+    condition: succeeded()
 
   # If bintar was not found, install libraries, clone and build server
 
