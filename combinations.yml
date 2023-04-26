@@ -108,10 +108,6 @@ jobs:
           cp $ENV_LOGDIR/trial.log $ENV_RQG_HOME/rqg.info $ENV_BASEDIR/server.info $ENV_TOOLBOX_DIR/toolbox.info $summary_dir/
           cp --parents `find $ENV_LOGDIR -name mysql*err* | xargs` $summary_dir/
           cp --parents `find $ENV_LOGDIR -name mbackup*log* | xargs` $summary_dir/
-          if [ -e $ENV_LOGDIR/vardir/mysql.log ] ; then
-            gzip $ENV_LOGDIR/vardir/mysql.log
-            mv $ENV_LOGDIR/vardir/mysql.log.gz $repro_dir/
-          fi
           for c in `find $ENV_LOGDIR -name core*` ; do
             echo "#################### $c ####################" >> $summary_dir/stacktraces
             echo "#################### $c ####################" >> $details_dir/threads
@@ -145,6 +141,7 @@ jobs:
           echo "Test result:" $res >> $summary_dir/test_report
           export TEST_RESULT=$res
           echo "Trigger ID:" $(System.DefinitionId)-$(Build.BuildId)-$(Build.BuildNumber).$RUN_ID >> $summary_dir/test_report
+          echo "Repro Info:" $(System.DefinitionId)-$(Build.BuildId)-$(Build.BuildNumber).$RUN_ID >> $summary_dir/test_report
           echo "-------------------------------------" >> $summary_dir/test_report
           echo "" >> $summary_dir/test_report
           cp $summary_dir/server.info $repro_dir/repro.info
@@ -155,12 +152,18 @@ jobs:
               mysqld_options="$mysqld_options $o"
             fi
           done
-          echo "" >> $repro_dir/repro.info
-          echo "RQG command line: $rqg_cmd" >> $repro_dir/repro.info
-          echo "MySQLd options: $mysqld_options" >> $repro_dir/repro.info
+          echo "" >> repro.info
+          echo "RQG command line: $rqg_cmd" >> repro.info
+          echo "MySQLd options: $mysqld_options" >> repro.info
           echo `cat $summary_dir/rqg.info` `cat $summary_dir/toolbox.info` >> $summary_dir/test_report
-          cat $repro_dir/repro.info >> $summary_dir/test_report
+          cat repro.info >> $summary_dir/test_report
+          if [ -e $ENV_LOGDIR/vardir/mysql.log ] ; then
+            tar zcf $repro_dir/repro.tar.gz repro.info $ENV_LOGDIR/vardir/mysql.log
+          else
+            tar zcf $repro_dir/repro.tar.gz repro.info $ENV_LOGDIR/vardir/mysql.log
+          fi
           export TEST_ID=$(Build.BuildId).$RUN_ID
+          $ENV_BASEDIR/bin/mysql --host=$DB_HOST --port=$DB_PORT --user=$DB_USER -p$DBP -e "LOAD DATA LOCAL INFILE \"$repro_dir/repro.tar.gz\" REPLACE INTO TABLE regression.repro_data CHARACTER SET BINARY FIELDS TERMINATED BY 'xxxxxthisxxlinexxxshouldxxneverxxeverxxappearxxinxxanyxxfilexxxxxxxxxxxxxxxxxxxxxxxx' ESCAPED BY '' LINES TERMINATED BY 'XXXTHISXXLINEXXSHOULDXXNEVERXXEVERXXAPPEARXXINXXANYXXFILEXXXXXXXXXXXXXXXXXXXX' (data) SET test_id = \"$TEST_ID\""
           echo >> $summary_dir/test_report
           $ENV_TOOLBOX_DIR/scripts/collect_rqg_result_info.sh $result_collection_options > $summary_dir/result_info
           echo "----" >> $summary_dir/result_info
@@ -182,6 +185,7 @@ jobs:
             else
               echo "##vso[task.complete result=SucceededWithIssues]Failure with matches"
             fi
+            $ENV_BASEDIR
           else
             echo "##vso[task.complete result=Succeeded]Pass"
           fi
