@@ -185,7 +185,6 @@ jobs:
             else
               echo "##vso[task.complete result=SucceededWithIssues]Failure with matches"
             fi
-            $ENV_BASEDIR
           else
             echo "##vso[task.complete result=Succeeded]Pass"
           fi
