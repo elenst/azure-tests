@@ -144,7 +144,7 @@ jobs:
           echo "Repro Info:" $(System.DefinitionId)-$(Build.BuildId)-$(Build.BuildNumber).$RUN_ID >> $summary_dir/test_report
           echo "-------------------------------------" >> $summary_dir/test_report
           echo "" >> $summary_dir/test_report
-          cp $summary_dir/server.info $repro_dir/repro.info
+          cp $summary_dir/server.info ./repro.info
           rqg_cmd=`grep -a -A 1 'Final command line' $summary_dir/trial.log | tail -n 1`
           mysqld_options=""
           for o in $rqg_cmd ; do
