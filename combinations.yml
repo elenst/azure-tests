@@ -42,9 +42,8 @@ jobs:
   pool:
     vmImage: 'Ubuntu 20.04'
 
-  # Leave some room for reproducing
   strategy:
-    parallel: 8
+    parallel: 10
 
   steps:
 
