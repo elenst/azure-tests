@@ -40,6 +40,10 @@ jobs:
   steps:
 
   - template: steps/env.yml
+    parameters:
+      ${{ each pair in parameters }}:
+        ${{ if ne(pair.key, 'name') }}:
+          ${{ pair.key }}: ${{ pair.value }}
 
   - task: DownloadBuildArtifacts@0
     inputs:
