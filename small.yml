@@ -77,7 +77,6 @@ jobs:
             --basedir=$ENV_BASEDIR \
             --workdir=$ENV_LOGDIR \
             --config=$ENV_RQG_COMBINATIONS \
-            --force \
             --discard-logs \
             --trials=1
           test_result=$?
@@ -87,7 +86,7 @@ jobs:
           echo "# Result collection"
           echo "#"
           #
-          mv $ENV_LOGDIR/trial1.log $ENV_LOGDIR/trial.log
+          mv $ENV_LOGDIR/current1_1/trial.log $ENV_LOGDIR/trial.log
           mv $ENV_LOGDIR/current1_1 $ENV_LOGDIR/vardir
           #
           RUN_ID=$(System.JobPositionInPhase).$TRIAL_NO
@@ -161,7 +160,7 @@ jobs:
           export SERVER_REVNO=`head -1 $summary_dir/server.info | awk '{print $2}'`
           echo "----" >> $summary_dir/result_info
           echo "Trigger ID:" $(System.DefinitionId)-$(Build.BuildId)-$(Build.BuildNumber).$RUN_ID >> $summary_dir/result_info
-          perl $ENV_RQG_HOME/util/check_for_known_bugs.pl --signatures=$ENV_RQG_HOME/data/bug_signatures $summary_dir/result_info >> $summary_dir/result_info
+          perl $ENV_RQG_HOME/util/check_for_known_bugs.pl --signatures=$ENV_RQG_HOME/util/bug_signatures $summary_dir/result_info >> $summary_dir/result_info
           match_search_result=$?
           echo >> $summary_dir/test_report
           echo "#####################################" >> $summary_dir/test_report
