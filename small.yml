@@ -40,7 +40,6 @@ jobs:
   steps:
 
   - template: steps/env.yml
-    parameters:
 
   - task: DownloadBuildArtifacts@0
     inputs:
