@@ -37,7 +37,7 @@ jobs:
 
 #########
 - job: Test
-  timeoutInMinutes: 0
+  timeoutInMinutes: 330
   dependsOn: Download_or_Build_Server
   pool:
     vmImage: 'Ubuntu 20.04'
