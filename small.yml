@@ -42,7 +42,7 @@ jobs:
   - template: steps/env.yml
     parameters:
       ${{ each pair in parameters }}:
-        ${{ if ne(pair.key, 'name') }}:
+        ${{ if notIn(pair.key, 'dependencies','name','condition') }}:
           ${{ pair.key }}: ${{ pair.value }}
 
   - task: DownloadBuildArtifacts@0
