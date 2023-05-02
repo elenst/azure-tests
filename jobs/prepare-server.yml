@@ -102,6 +102,7 @@ jobs:
       cmake $srcdir $ENV_CMAKE_OPTIONS -DCMAKE_INSTALL_PREFIX=$ENV_BASEDIR
       make -j5
       make install
+      rm -rf $ENV_BASEDIR/mysql-test $ENV_BASEDIR/mariadb-test
       cd $srcdir
       echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_BASEDIR/server.info
       echo $ENV_CMAKE_OPTIONS >> $ENV_BASEDIR/server.info
