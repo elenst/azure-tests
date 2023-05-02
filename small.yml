@@ -118,7 +118,7 @@ jobs:
           done
           echo "" >> $summary_dir/test_report
           echo "Test $RUN_ID" >> $summary_dir/test_report
-          res=`grep -a 'Test run ends with exit status' $summary_dir/trial.log | sed -e 's/.*will exit with exit status STATUS_\([A-Z_]*\).*/\1/'`
+          res=`grep -a 'Test run ends with exit status' $summary_dir/trial.log | sed -e 's/.*Test run ends with exit status STATUS_\([A-Z_]*\).*/\1/'`
           echo "Test result:" $res >> $summary_dir/test_report
           export TEST_RESULT=$res
           echo "Trigger ID:" $(System.DefinitionId)-$(Build.BuildId)-$(Build.BuildNumber).$RUN_ID >> $summary_dir/test_report
