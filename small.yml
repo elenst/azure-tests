@@ -118,16 +118,7 @@ jobs:
           done
           echo "" >> $summary_dir/test_report
           echo "Test $RUN_ID" >> $summary_dir/test_report
-          # First choice: runall prints the status right before exit
-          res=`grep -a 'runall.* will exit with exit status' $summary_dir/trial.log | sed -e 's/.*will exit with exit status STATUS_\([A-Z_]*\).*/\1/'`
-          # Second choice: runall prints the status of GenTest after GenTest exited. It doesn't include final checks
-          if [ -z "$res" ] ; then
-            res=`grep -a 'GenTest exited with exit status' $summary_dir/trial.log | sed -e 's/.*exited with exit status STATUS_\([A-Z_]*\).*/\1/'`
-          fi
-          # Last choice: GenTest prints the status before exiting
-          if [ -z "$res" ] ; then
-            res=`grep -a 'GenTest will exit with exit status' $summary_dir/trial.log | sed -e 's/.*will exit with exit status STATUS_\([A-Z_]*\).*/\1/'`
-          fi
+          res=`grep -a 'Test run ends with exit status' $summary_dir/trial.log | sed -e 's/.*will exit with exit status STATUS_\([A-Z_]*\).*/\1/'`
           echo "Test result:" $res >> $summary_dir/test_report
           export TEST_RESULT=$res
           echo "Trigger ID:" $(System.DefinitionId)-$(Build.BuildId)-$(Build.BuildNumber).$RUN_ID >> $summary_dir/test_report
@@ -147,10 +138,12 @@ jobs:
           echo "MySQLd options: $mysqld_options" >> repro.info
           echo `cat $summary_dir/rqg.info` `cat $summary_dir/toolbox.info` >> $summary_dir/test_report
           cat repro.info >> $summary_dir/test_report
-          if [ -e $ENV_LOGDIR/vardir/mysql.log ] ; then
+          if [ -e $ENV_LOGDIR/vardir/s1/mysql.log ] ; then
+            tar zcf $repro_dir/repro.tar.gz repro.info $ENV_LOGDIR/vardir/s1/mysql.log
+          elif [ -e $ENV_LOGDIR/vardir/mysql.log ] ; then
             tar zcf $repro_dir/repro.tar.gz repro.info $ENV_LOGDIR/vardir/mysql.log
           else
-            tar zcf $repro_dir/repro.tar.gz repro.info $ENV_LOGDIR/vardir/mysql.log
+            tar zcf $repro_dir/repro.tar.gz repro.info
           fi
           export TEST_ID=$(Build.BuildId).$RUN_ID
           $ENV_BASEDIR/bin/mysql --host=$DB_HOST --port=$DB_PORT --user=$DB_USER -p$DBP -e "LOAD DATA LOCAL INFILE \"$repro_dir/repro.tar.gz\" REPLACE INTO TABLE regression.repro_data CHARACTER SET BINARY FIELDS TERMINATED BY 'xxxxxthisxxlinexxxshouldxxneverxxeverxxappearxxinxxanyxxfilexxxxxxxxxxxxxxxxxxxxxxxx' ESCAPED BY '' LINES TERMINATED BY 'XXXTHISXXLINEXXSHOULDXXNEVERXXEVERXXAPPEARXXINXXANYXXFILEXXXXXXXXXXXXXXXXXXXX' (data) SET test_id = \"$TEST_ID\""
