@@ -86,7 +86,7 @@ jobs:
           echo "# Result collection"
           echo "#"
           #
-          mv $ENV_LOGDIR/current1_1/trial.log $ENV_LOGDIR/trial.log
+          mv $ENV_LOGDIR/current1_1/trial1.log $ENV_LOGDIR/trial.log
           mv $ENV_LOGDIR/current1_1 $ENV_LOGDIR/vardir
           #
           RUN_ID=$(System.JobPositionInPhase).$TRIAL_NO
