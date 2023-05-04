@@ -169,7 +169,14 @@ jobs:
           export SERVER_REVNO=`head -1 $summary_dir/server.info | awk '{print $2}'`
           echo "----" >> $summary_dir/result_info
           echo "Trigger ID:" $(System.DefinitionId)-$(Build.BuildId)-$(Build.BuildNumber).$RUN_ID >> $summary_dir/result_info
-          perl $ENV_RQG_HOME/util/check_for_known_bugs.pl --signatures=$ENV_RQG_HOME/data/bug_signatures $summary_dir/result_info >> $summary_dir/result_info
+          if [ -e $ENV_RQG_HOME/util/bug_signatures ] ; then
+            signatures=$ENV_RQG_HOME/util/bug_signatures
+          elif [ -e $ENV_RQG_HOME/data/bug_signatures ] ; then
+            signatures=$ENV_RQG_HOME/data/bug_signatures
+          else
+            echo "ERROR: Could not find bug signatures"
+          fi
+          perl $ENV_RQG_HOME/util/check_for_known_bugs.pl --signatures=$signatures $summary_dir/result_info >> $summary_dir/result_info
           match_search_result=$?
           echo >> $summary_dir/test_report
           echo "#####################################" >> $summary_dir/test_report
