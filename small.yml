@@ -146,7 +146,6 @@ jobs:
             tar zcf $repro_dir/repro.tar.gz repro.info
           fi
           export TEST_ID=$(Build.BuildId).$RUN_ID
-          $ENV_BASEDIR/bin/mysql --host=$DB_HOST --port=$DB_PORT --user=$DB_USER -p$DBP -e "LOAD DATA LOCAL INFILE \"$repro_dir/repro.tar.gz\" REPLACE INTO TABLE regression.repro_data CHARACTER SET BINARY FIELDS TERMINATED BY 'xxxxxthisxxlinexxxshouldxxneverxxeverxxappearxxinxxanyxxfilexxxxxxxxxxxxxxxxxxxxxxxx' ESCAPED BY '' LINES TERMINATED BY 'XXXTHISXXLINEXXSHOULDXXNEVERXXEVERXXAPPEARXXINXXANYXXFILEXXXXXXXXXXXXXXXXXXXX' (data) SET test_id = \"$TEST_ID\""
           echo >> $summary_dir/test_report
           $ENV_TOOLBOX_DIR/scripts/collect_rqg_result_info.sh $result_collection_options > $summary_dir/result_info
           echo "----" >> $summary_dir/result_info
@@ -163,6 +162,7 @@ jobs:
           #
           if [ "$test_result" != "0" ] ; then
             if [ "$match_search_result" != "0" ] ; then
+              $ENV_BASEDIR/bin/mysql --host=$DB_HOST --port=$DB_PORT --user=$DB_USER -p$DBP -e "LOAD DATA LOCAL INFILE \"$repro_dir/repro.tar.gz\" REPLACE INTO TABLE regression.repro_data CHARACTER SET BINARY FIELDS TERMINATED BY 'xxxxxthisxxlinexxxshouldxxneverxxeverxxappearxxinxxanyxxfilexxxxxxxxxxxxxxxxxxxxxxxx' ESCAPED BY '' LINES TERMINATED BY 'XXXTHISXXLINEXXSHOULDXXNEVERXXEVERXXAPPEARXXINXXANYXXFILEXXXXXXXXXXXXXXXXXXXX' (data) SET test_id = \"$TEST_ID\""
               echo "##vso[task.complete result=Failed]Failure without matches"
               tar zcf $details_dir/logs.tar.gz $ENV_LOGDIR
             else
