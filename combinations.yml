@@ -127,8 +127,12 @@ jobs:
           done
           echo "" >> $summary_dir/test_report
           echo "Test $RUN_ID" >> $summary_dir/test_report
-          # First choice: runall prints the status right before exit
-          res=`grep -a 'runall.* will exit with exit status' $summary_dir/trial.log | sed -e 's/.*will exit with exit status STATUS_\([A-Z_]*\).*/\1/'`
+          # First choice: run prints the status right before exit
+          res=`grep -a 'Test run ends with exit status' $summary_dir/trial.log | sed -e 's/.*Test run ends with exit status STATUS_\([A-Z_]*\).*/\1/'`
+          # First choice, alternative: or runall
+          if [ -z "$res" ] ; then
+            res=`grep -a 'runall.* will exit with exit status' $summary_dir/trial.log | sed -e 's/.*will exit with exit status STATUS_\([A-Z_]*\).*/\1/'`
+          fi
           # Second choice: runall prints the status of GenTest after GenTest exited. It doesn't include final checks
           if [ -z "$res" ] ; then
             res=`grep -a 'GenTest exited with exit status' $summary_dir/trial.log | sed -e 's/.*exited with exit status STATUS_\([A-Z_]*\).*/\1/'`
