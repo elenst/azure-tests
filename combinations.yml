@@ -161,10 +161,12 @@ jobs:
           echo "MySQLd options: $mysqld_options" >> repro.info
           echo `cat $summary_dir/rqg.info` `cat $summary_dir/toolbox.info` >> $summary_dir/test_report
           cat repro.info >> $summary_dir/test_report
-          if [ -e $ENV_LOGDIR/vardir/mysql.log ] ; then
+          if [ -e $ENV_LOGDIR/vardir/s1/mysql.log ] ; then
+            tar zcf $repro_dir/repro.tar.gz repro.info $ENV_LOGDIR/vardir/s1/mysql.log
+          elif [ -e $ENV_LOGDIR/vardir/mysql.log ] ; then
             tar zcf $repro_dir/repro.tar.gz repro.info $ENV_LOGDIR/vardir/mysql.log
           else
-            tar zcf $repro_dir/repro.tar.gz repro.info $ENV_LOGDIR/vardir/mysql.log
+            tar zcf $repro_dir/repro.tar.gz repro.info
           fi
           export TEST_ID=$(Build.BuildId).$RUN_ID
           echo >> $summary_dir/test_report
