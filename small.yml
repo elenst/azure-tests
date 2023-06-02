@@ -132,6 +132,8 @@ jobs:
           for o in $rqg_cmd ; do
             if expr match "$o" "--mysqld" > /dev/null ; then
               mysqld_options="$mysqld_options $o"
+            elif [ "$o" == "--ps-protocol" ] ; then
+              mysqld_options="$mysqld_options $o"
             fi
           done
           echo "" >> repro.info
