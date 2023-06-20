@@ -79,6 +79,7 @@ jobs:
           echo "##vso[task.setvariable variable=TRIAL_NO;isOutput=true]$TRIAL_NO"
           rm -rf $ENV_LOGDIR
           mkdir -p $ENV_LOGDIR
+          server_version=`$ENV_BASEDIR/bin/mariadbd --version | grep ' Ver ' | sed -e 's/.* Ver \([1-9][0-9]*\.[0-9]*\).*/\1/'`
           set -xo pipefail
           cd $ENV_RQG_HOME
           export ASAN_OPTIONS="abort_on_error=1,disable_coredump=0"
@@ -86,6 +87,7 @@ jobs:
             --basedir=$ENV_BASEDIR \
             --workdir=$ENV_LOGDIR \
             --config=$ENV_RQG_COMBINATIONS \
+            --config-version=$server_version \
             --force \
             --discard-logs \
             --trials=1
