@@ -12,7 +12,7 @@ parameters:
   EXTRA_PACKAGES: ''
 
   BUILD_PACKAGES: 'libpam0g-dev libgnutls* gnutls-bin libaio-dev apt-utils build-essential cmake python-dev sudo git devscripts equivs libcurl4-openssl-dev ccache python3 python3-pip curl libssl-dev libzstd-dev libevent-dev dpatch gawk gdb libboost-dev libcrack2-dev libjudy-dev libnuma-dev libsnappy-dev libxml2-dev unixodbc-dev uuid-dev fakeroot iputils-ping libncurses5-dev libbison-dev valgrind liblzo2-dev liblz4-dev liblzma-dev libbz2-dev libcurl4-openssl-dev curl'
-  RUNTIME_PACKAGES: 'libaio1 libdbi-perl libdbd-mysql-perl libsnappy1v5 libzstd1 gdb valgrind liblzo2-2 liblz4-1 liblzma5 libbz2-dev galera-4 curl libcrack2'
+  RUNTIME_PACKAGES: 'libaio1 libdbi-perl libdbd-mysql-perl libsnappy1v5 libzstd1 gdb valgrind liblzo2-2 liblz4-1 liblzma5 libbz2-dev galera-4 curl libcrack2 libjudydebian1'
   
 steps:
   - script: |
