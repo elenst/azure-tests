@@ -28,6 +28,7 @@ steps:
         packages="$PAR_BUILD_PACKAGES $PAR_RUNTIME_PACKAGES"
         ;;
       esac
+      sudo sh -c "echo \"deb [signed-by=/etc/apt/keyrings/mariadb-keyring.pgp] https://deb.mariadb.org/11.2/ubuntu focal main\" >> /etc/apt/sources.list"
       sudo apt-get update
       sudo apt-get install -y -q $packages $PAR_EXTRA_PACKAGES
       sudo sh -c "echo 0 > /proc/sys/kernel/yama/ptrace_scope"
