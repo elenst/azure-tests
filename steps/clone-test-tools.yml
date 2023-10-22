@@ -10,9 +10,17 @@ steps:
       set -x
       curdir=`pwd`
       if [ -z "$ENV_TOOLBOX_REVISION" ] ; then
-        git clone "https://github.com/elenst/mariadb-toolbox" --depth=1 --branch=$ENV_TOOLBOX_BRANCH $ENV_TOOLBOX_DIR
+        for i in 1 2 3 4 5 ; do
+          git clone "https://github.com/elenst/mariadb-toolbox" --depth=1 --branch=$ENV_TOOLBOX_BRANCH $ENV_TOOLBOX_DIR && break
+          rm -rf $ENV_TOOLBOX_DIR
+          sleep 1
+        done
       else
-        git clone "https://github.com/elenst/mariadb-toolbox" --branch=$ENV_TOOLBOX_BRANCH $ENV_TOOLBOX_DIR
+        for i in 1 2 3 4 5 ; do
+          git clone "https://github.com/elenst/mariadb-toolbox" --branch=$ENV_TOOLBOX_BRANCH $ENV_TOOLBOX_DIR && break
+          sleep 1
+          rm -rf $ENV_TOOLBOX_DIR
+        done
         cd $ENV_TOOLBOX_DIR
         git checkout $ENV_TOOLBOX_REVISION
       fi
@@ -20,9 +28,17 @@ steps:
       echo $ENV_TOOLBOX_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_TOOLBOX_DIR/toolbox.info
       cd $curdir
       if [ -z "$ENV_RQG_REVISION" ] ; then
-        git clone "https://github.com/MariaDB/randgen" --depth=1 --branch=$ENV_RQG_BRANCH $ENV_RQG_HOME
+        for i in 1 2 3 4 5 ; do
+          git clone "https://github.com/MariaDB/randgen" --depth=1 --branch=$ENV_RQG_BRANCH $ENV_RQG_HOME && break
+          rm -rf $ENV_RQG_HOME
+          sleep 1
+        done
       else
-        git clone "https://github.com/MariaDB/randgen" --branch=$ENV_RQG_BRANCH $ENV_RQG_HOME
+        for i in 1 2 3 4 5 ; do
+          git clone "https://github.com/MariaDB/randgen" --branch=$ENV_RQG_BRANCH $ENV_RQG_HOME && break
+          rm -rf $ENV_RQG_HOME
+          sleep 1
+        done
         cd $ENV_RQG_HOME
         git checkout $ENV_RQG_REVISION
       fi
