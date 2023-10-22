@@ -86,9 +86,17 @@ jobs:
       builddir=$HOME/out-of-source
       # In case of head revision, we don't need to clone the whole history
       if [ -z "$ENV_SERVER_REVNO" ] || [ "$HEADREV_REVISION" == "$ENV_SERVER_REVNO" ] ; then
-        git clone $PAR_SERVER_REPO --depth=1 --branch=$ENV_SERVER_BRANCH $srcdir
+        for i in 1 2 3 4 5 ; do
+          git clone $PAR_SERVER_REPO --depth=1 --branch=$ENV_SERVER_BRANCH $srcdir && break
+          sleep 1
+          rm -rf $srcdir
+        done
       else
-        git clone $PAR_SERVER_REPO --branch=$ENV_SERVER_BRANCH $srcdir
+        for i in 1 2 3 4 5 ; do
+          git clone $PAR_SERVER_REPO --branch=$ENV_SERVER_BRANCH $srcdir && break
+          sleep 1
+          rm -rf $srcdir
+        done
         cd $srcdir
         git checkout $ENV_SERVER_REVNO
       fi
