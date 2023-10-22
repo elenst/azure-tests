@@ -26,6 +26,7 @@ jobs:
 - template: jobs/prepare-server.yml
   parameters:
     name: 'Build_Server'
+    vmImage: "Ubuntu 22.04"
 
 #########
 - job: Test

@@ -27,6 +27,7 @@ jobs:
 - template: jobs/prepare-server.yml
   parameters:
     name: 'Download_or_Build_Server'
+    vmImage: "Ubuntu 20.04"
 
 #########
 # Upload to FTP
@@ -341,5 +342,6 @@ jobs:
 # Print summary
 - template: jobs/test-report.yml
   parameters:
+    vmImage: "Ubuntu 20.04"
     dependencies:
     - Test
