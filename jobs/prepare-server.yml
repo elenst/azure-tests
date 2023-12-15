@@ -63,11 +63,7 @@ jobs:
       echo "Bintar filename to search for: $filename"
       echo "##vso[task.setvariable variable=BINTAR_NAME;isOutput=true]$filename"
       cd $(Build.ArtifactStagingDirectory)
-      if wget $PAR_FTP_DOWNLOAD/$filename.tar.gz ; then
-        echo "##vso[task.setvariable variable=BINARIES_FROM_FTP;isOutput=true]true"
-      else
-        echo "##vso[task.complete result=Skipped]Could not find bintar $filename"
-      fi
+      echo "##vso[task.complete result=Skipped]Decided not to search for bintar $filename"
     env:
       PAR_FTP_DOWNLOAD: '${{ parameters.FTP_DOWNLOAD }}'
     displayName: Download bintar from FTP
