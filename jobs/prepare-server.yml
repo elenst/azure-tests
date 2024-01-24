@@ -8,7 +8,6 @@ parameters:
   condition: succeeded()
   dependencies: []
 
-  SERVER_REPO: 'https://github.com/MariaDB/server'
   FTP_DOWNLOAD: 'ftp://hasky.askmonty.org/public/azure'
   BUILD_ARTIFACT_NAME: 'build'
 
@@ -34,59 +33,32 @@ jobs:
 
   # Make sure that required parameters are defined
   - bash: |
+      if [ -z "$ENV_SERVER_REPO" ]; then
+        echo "##vso[task.complete result=Failed]Missing value of \"SERVER_REPO\""
+      fi
       if [ -z "$ENV_SERVER_BRANCH" ]; then
         echo "##vso[task.complete result=Failed]Missing value of \"SERVER_BRANCH\""
       fi
-    displayName: Check for required parameters
-  # If server revision is not defined, find the head revision
-  # for the given branch on Github
-  - bash: |
-      set -x
-      rev=`git ls-remote $PAR_SERVER_REPO $ENV_SERVER_BRANCH | cut -c 1-8`
-      if [ -z "$rev" ]; then
-        echo "##vso[task.complete result=Failed]Could not find head revision for branch $ENV_SERVER_BRANCH"
+      if [ -z "$ENV_SERVER_REVNO" ]; then
+        echo "##vso[task.complete result=Failed]Missing value of \"SERVER_REVNO\""
       fi
-      echo Head revision for branch $ENV_SERVER_BRANCH: $rev
-      echo "##vso[task.setvariable variable=HEADREV_REVISION;isOutput=true]$rev"
-    name: headrev
-    displayName: Get head revision
-    condition: and(succeeded(), eq(variables['env.SERVER_REVNO'],''))
-    env:
-      PAR_SERVER_REPO: '${{ parameters.SERVER_REPO }}'
+    displayName: Check for required parameters
 
-  # Check if the server with this revision and cmake options
-  # has already been built and stored
-  - bash: |
-      set -x
-      server_revision=${ENV_SERVER_REVNO:-$HEADREV_REVISION}
-      cmake_options_hash=`echo "$ENV_CMAKE_OPTIONS" | md5sum | awk '{print $1}'`
-      filename=build-$ENV_SERVER_BRANCH-$server_revision-$cmake_options_hash
-      echo "Bintar filename to search for: $filename"
-      echo "##vso[task.setvariable variable=BINTAR_NAME;isOutput=true]$filename"
-      cd $(Build.ArtifactStagingDirectory)
-      echo "##vso[task.complete result=Skipped]Decided not to search for bintar $filename"
-    env:
-      PAR_FTP_DOWNLOAD: '${{ parameters.FTP_DOWNLOAD }}'
-    displayName: Download bintar from FTP
-    name: ftp_download
-    condition: succeeded()
-
-  # If bintar was not found, install libraries, clone and build server
+  # Install libraries, clone and build server
 
   - template: ../steps/install-deb-packages.yml
     parameters:
       INSTALLATION_SET: 'build'
-      condition: and(succeeded(), ne(variables['ftp_download.BINARIES_FROM_FTP'], 'true'))
+      condition: succeeded()
 
   - bash: |
       set -x
-      server_revision=${ENV_SERVER_REVNO:-$HEADREV_REVISION}
       srcdir=$HOME/src
       builddir=$HOME/out-of-source
       rm -rf $srcdir
       git init $srcdir
       cd $srcdir
-      git fetch $PAR_SERVER_REPO $server_revision
+      git fetch $ENV_SERVER_REPO $ENV_SERVER_REVNO
       git checkout FETCH_HEAD
       sed -i -e 's/define DEFAULT_MAX_CONN        64/define DEFAULT_MAX_CONN        256/' client/mysqltest.cc
       grep DEFAULT_MAX_CONN client/mysqltest.cc
@@ -99,9 +71,7 @@ jobs:
       cd $srcdir
       echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_BASEDIR/server.info
       echo $ENV_CMAKE_OPTIONS >> $ENV_BASEDIR/server.info
-    env:
-      PAR_SERVER_REPO: '${{ parameters.SERVER_REPO }}'
-    condition: and(succeeded(), ne(variables['ftp_download.BINARIES_FROM_FTP'], 'true'))
+    condition: succeeded()
     displayName: 'Clone and build server'
     name: build_server
 
@@ -112,10 +82,10 @@ jobs:
       includeRootFolder: false
       archiveType: 'tar'
       tarCompression: 'gz'
-      archiveFile:  $(Build.ArtifactStagingDirectory)/$(ftp_download.BINTAR_NAME).tar.gz
+      archiveFile:  $(Build.ArtifactStagingDirectory)/$(env.SERVER_BRANCH)-${env.SERVER_REVNO}.tar.gz
     displayName: 'Create bintar'
     name: create_bintar
-    condition: and(succeeded(), ne(variables['ftp_download.BINARIES_FROM_FTP'], 'true'))
+    condition: succeeded()
 
   # Store bintar as a build artifact
   # (in any case, be it downloaded or freshly built)

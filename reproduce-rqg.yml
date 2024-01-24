@@ -47,14 +47,6 @@ jobs:
     name: 'Download_or_Build_Server'
 
 #########
-# Upload to FTP
-- template: jobs/upload-to-ftp.yml
-  parameters:
-    dependencies:
-    - 'Download_or_Build_Server'
-    condition: and(succeeded(), ne(dependencies.Download_or_Build_Server.outputs['ftp_download.BINARIES_FROM_FTP'], 'true'))
-
-#########
 - job: Test
   timeoutInMinutes: 0
   dependsOn: Download_or_Build_Server
