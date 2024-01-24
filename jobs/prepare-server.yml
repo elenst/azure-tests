@@ -58,7 +58,7 @@ jobs:
       rm -rf $srcdir
       git init $srcdir
       cd $srcdir
-      git fetch $ENV_SERVER_REPO $ENV_SERVER_REVNO
+      git fetch $ENV_SERVER_REPO $ENV_SERVER_REVNO_FULL
       git checkout FETCH_HEAD
       sed -i -e 's/define DEFAULT_MAX_CONN        64/define DEFAULT_MAX_CONN        256/' client/mysqltest.cc
       grep DEFAULT_MAX_CONN client/mysqltest.cc
