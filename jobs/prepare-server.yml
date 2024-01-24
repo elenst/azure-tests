@@ -38,7 +38,6 @@ jobs:
         echo "##vso[task.complete result=Failed]Missing value of \"SERVER_BRANCH\""
       fi
     displayName: Check for required parameters
-
   # If server revision is not defined, find the head revision
   # for the given branch on Github
   - bash: |
@@ -47,7 +46,7 @@ jobs:
         echo "##vso[task.complete result=Failed]Could not find head revision for branch $ENV_SERVER_BRANCH"
       fi
       echo Head revision for branch $ENV_SERVER_BRANCH: $rev
-      echo "##vso[task.setvariable variable=REVISION;isOutput=true]$rev"
+      echo "##vso[task.setvariable variable=HEADREV_REVISION;isOutput=true]$rev"
     name: headrev
     displayName: Get head revision
     condition: and(succeeded(), eq(variables['env.SERVER_REVNO'],''))
@@ -57,7 +56,7 @@ jobs:
   # Check if the server with this revision and cmake options
   # has already been built and stored
   - bash: |
-      server_revision=${ENV_SERVER_REVNO:-$HEADREV_REVISION}
+      server_revision=${ENV_SERVER_REVNO:-$ENV_HEADREV_REVISION}
       cmake_options_hash=`echo "$ENV_CMAKE_OPTIONS" | md5sum | awk '{print $1}'`
       filename=build-$ENV_SERVER_BRANCH-$server_revision-$cmake_options_hash
       echo "Bintar filename to search for: $filename"
@@ -79,12 +78,13 @@ jobs:
 
   - bash: |
       set -x
+      server_revision=${ENV_SERVER_REVNO:-$ENV_HEADREV_REVISION}
       srcdir=$HOME/src
       builddir=$HOME/out-of-source
       rm -rf $srcdir
       git init $srcdir
       cd $srcdir
-      git fetch $PAR_SERVER_REPO $ENV_SERVER_REVNO
+      git fetch $PAR_SERVER_REPO $server_revision
       git checkout FETCH_HEAD
       sed -i -e 's/define DEFAULT_MAX_CONN        64/define DEFAULT_MAX_CONN        256/' client/mysqltest.cc
       grep DEFAULT_MAX_CONN client/mysqltest.cc
