@@ -41,7 +41,7 @@ jobs:
 
   # If server revision is not defined, find the head revision
   # for the given branch on Github
-  - bash: | 
+  - bash: |
       rev=`git ls-remote $PAR_SERVER_REPO $ENV_SERVER_BRANCH | cut -c 1-8`
       if [ -z "$rev" ]; then
         echo "##vso[task.complete result=Failed]Could not find head revision for branch $ENV_SERVER_BRANCH"
@@ -78,27 +78,14 @@ jobs:
       condition: and(succeeded(), ne(variables['ftp_download.BINARIES_FROM_FTP'], 'true'))
 
   - bash: |
+      set -x
       srcdir=$HOME/src
       builddir=$HOME/out-of-source
-      # In case of head revision, we don't need to clone the whole history
-      if [ -z "$ENV_SERVER_REVNO" ] || [ "$HEADREV_REVISION" == "$ENV_SERVER_REVNO" ] ; then
-        for i in 1 2 3 4 5 ; do
-          git clone $PAR_SERVER_REPO --depth=1 --branch=$ENV_SERVER_BRANCH $srcdir && break
-          sleep 1
-          rm -rf $srcdir
-        done
-      else
-        for i in 1 2 3 4 5 ; do
-          git clone $PAR_SERVER_REPO --branch=$ENV_SERVER_BRANCH $srcdir && break
-          sleep 1
-          rm -rf $srcdir
-        done
-        cd $srcdir
-        git checkout $ENV_SERVER_REVNO
-      fi
-      set -x
-      # Prepare mysqltest for further reproducing
+      rm -rf $srcdir
+      git init $srcdir
       cd $srcdir
+      git fetch $PAR_SERVER_REPO $ENV_SERVER_REVNO
+      git checkout FETCH_HEAD
       sed -i -e 's/define DEFAULT_MAX_CONN        64/define DEFAULT_MAX_CONN        256/' client/mysqltest.cc
       grep DEFAULT_MAX_CONN client/mysqltest.cc
       mkdir $builddir
