@@ -46,21 +46,16 @@ steps:
       echo $ENV_RQG_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_RQG_HOME/rqg.info
       #
       sudo mkdir -p /usr/local/bin/
-      if ! curl ftp://ftp.askmonty.org/public/minio/minio-linux-amd64 --output ~/minio ; then
+      if ! curl curl -O https://buildbot.mariadb.net/archive/minio-linux-amd64.tar.gz --output ~/minio.tar.gz ; then
         echo "ERROR: Could not download MinIO server"
-        echo "Check if it is available at http://dl.min.io/server/minio/release and store as ftp://ftp.askmonty.org/public/minio/minio-linux-amd64"
         exit 1
       fi
-      chmod a+x ~/minio
-      sudo mv ~/minio /usr/local/bin/
+      cd ~/
+      tar zxf ./minio.tar.gz
+      chmod a+x ./minio ./mc
+      sudo mv ./minio ./mc /usr/local/bin/
+      cd -
       MINIO_ACCESS_KEY=minio MINIO_SECRET_KEY=minioadmin minio server /tmp/shared 2>&1 &
-      if ! curl ftp://ftp.askmonty.org/public/minio/mc-linux-amd64 --output ~/mc ; then
-        echo "ERROR: Could not download MinIO client"
-        echo "Check if it is available at http://dl.min.io/client/mc/release/ and store as ftp://ftp.askmonty.org/public/minio/mc-linux-amd64"
-        exit 1
-      fi
-      chmod a+x ~/mc
-      sudo mv ~/mc /usr/local/bin/
       # Try a few times in case the server hasn't finished initializing yet
       res=1
       for i in 1 2 3 4 5 ; do
