@@ -71,6 +71,9 @@ jobs:
       cd $srcdir
       echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_BASEDIR/server.info
       echo $ENV_CMAKE_OPTIONS >> $ENV_BASEDIR/server.info
+      filename=build-$ENV_SERVER_BRANCH-$ENV_SERVER_REVNO
+      echo "Bintar filename to search for: $filename"
+      echo "##vso[task.setvariable variable=BINTAR_NAME;isOutput=true]$filename"
     condition: succeeded()
     displayName: 'Clone and build server'
     name: build_server
@@ -82,7 +85,7 @@ jobs:
       includeRootFolder: false
       archiveType: 'tar'
       tarCompression: 'gz'
-      archiveFile:  $(Build.ArtifactStagingDirectory)/$(env.SERVER_BRANCH)-${env.SERVER_REVNO}.tar.gz
+      archiveFile:  $(Build.ArtifactStagingDirectory)/$(build_server.BINTAR_NAME).tar.gz
     displayName: 'Create bintar'
     name: create_bintar
     condition: succeeded()
