@@ -47,7 +47,7 @@ steps:
       #
       sudo mkdir -p /usr/local/bin/
       res=1
-      if ! curl -O https://buildbot.mariadb.net/archive/minio-linux-amd64.tar.gz --output ~/minio.tar.gz ; then
+      if ! curl https://buildbot.mariadb.net/archive/minio-linux-amd64.tar.gz --output minio.tar.gz --output-dir ~ ; then
         echo "ERROR: Could not download MinIO server"
       else
         cd ~/
