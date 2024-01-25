@@ -179,7 +179,7 @@ jobs:
           else
             echo "ERROR: Could not find bug signatures"
           fi
-          perl $ENV_RQG_HOME/util/check_for_known_bugs.pl --signatures=$signatures $summary_dir/result_info >> $summary_dir/result_info
+          SERVER_BRANCH=$ENV_SERVER_BRANCH perl $ENV_RQG_HOME/util/check_for_known_bugs.pl --signatures=$signatures $summary_dir/result_info >> $summary_dir/result_info
           match_search_result=$?
           echo >> $summary_dir/test_report
           echo "#####################################" >> $summary_dir/test_report
