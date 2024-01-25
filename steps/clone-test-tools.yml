@@ -46,25 +46,25 @@ steps:
       echo $ENV_RQG_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_RQG_HOME/rqg.info
       #
       sudo mkdir -p /usr/local/bin/
-      if ! curl curl -O https://buildbot.mariadb.net/archive/minio-linux-amd64.tar.gz --output ~/minio.tar.gz ; then
-        echo "ERROR: Could not download MinIO server"
-        exit 1
-      fi
-      cd ~/
-      tar zxf ./minio.tar.gz
-      chmod a+x ./minio ./mc
-      sudo mv ./minio ./mc /usr/local/bin/
-      cd -
-      MINIO_ACCESS_KEY=minio MINIO_SECRET_KEY=minioadmin minio server /tmp/shared 2>&1 &
-      # Try a few times in case the server hasn't finished initializing yet
       res=1
-      for i in 1 2 3 4 5 ; do
-        if mc alias set local http://127.0.0.1:9000  minio minioadmin ; then
-          res=0
-          break
-        fi
-        sleep 1
-      done
+      if ! curl -O https://buildbot.mariadb.net/archive/minio-linux-amd64.tar.gz --output ~/minio.tar.gz ; then
+        echo "ERROR: Could not download MinIO server"
+      else
+        cd ~/
+        tar zxf ./minio.tar.gz
+        chmod a+x ./minio ./mc
+        sudo mv ./minio ./mc /usr/local/bin/
+        cd -
+        MINIO_ACCESS_KEY=minio MINIO_SECRET_KEY=minioadmin minio server /tmp/shared 2>&1 &
+        # Try a few times in case the server hasn't finished initializing yet
+        for i in 1 2 3 4 5 ; do
+          if mc alias set local http://127.0.0.1:9000  minio minioadmin ; then
+            res=0
+            break
+          fi
+          sleep 1
+        done
+      fi
       if [ "$res" == "1" ] ; then
         echo "ERROR: Couldn't configure MinIO server"
       fi
