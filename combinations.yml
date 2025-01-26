@@ -26,13 +26,14 @@ jobs:
 - template: jobs/prepare-server.yml
   parameters:
     name: 'Download_or_Build_Server'
+    vmImage: "ubuntu-22.04"
 
 #########
 - job: Test
   timeoutInMinutes: 330
   dependsOn: Download_or_Build_Server
   pool:
-    vmImage: 'Ubuntu 22.04'
+    vmImage: 'ubuntu-22.04'
 
   strategy:
     parallel: 10
