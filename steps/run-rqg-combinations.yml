@@ -1,11 +1,3 @@
-########################################################################
-# RQG integration tests with DML and DDL, different engines.
-# The default set is big bang, but it can be narrowed down through
-# configuration parameters
-########################################################################
-
-trigger: none
-
 # If we manage to run many more than 50 runs within less-than-6 hour limit,
 # it probably means tests fail too quickly
 parameters:
