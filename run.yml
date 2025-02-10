@@ -1,0 +1,63 @@
+########################################################################
+# RQG integration tests with DML and DDL, different engines.
+# The default set is big bang, but it can be narrowed down through
+# configuration parameters
+########################################################################
+
+trigger: none
+
+# If we manage to run many more than 50 runs within less-than-6 hour limit,
+# it probably means tests fail too quickly
+parameters:
+  - name : loops
+    type : object
+    default : [
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+      11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+      21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+      31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+      41, 42, 43, 44, 45, 46, 47, 48, 49, 50
+    ]
+
+jobs:
+
+#########
+# Download or build server
+- template: jobs/prepare-server.yml
+  parameters:
+    name: 'Build_Server'
+    vmImage: "ubuntu-22.04"
+
+#########
+- job: Test
+  timeoutInMinutes: 110
+  dependsOn: Build_Server
+  pool:
+    vmImage: 'ubuntu-22.04'
+
+  strategy:
+    parallel: 10
+
+  steps:
+
+  - template: steps/env.yml
+
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      artifactName: 'build'
+      downloadPath: $(Build.ArtifactStagingDirectory)
+    displayName: 'Download build from artifacts'
+
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: '$(Build.ArtifactStagingDirectory)/build/build-*.tar.gz'
+      destinationFolder: $(env.BASEDIR)
+    displayName: 'Extract build'
+
+  - template: steps/install-deb-packages.yml
+    parameters:
+      INSTALLATION_SET: 'runtime'
+
+  - template: steps/clone-test-tools.yml
+
+  - template: steps/run-rqg-combinations.yml
