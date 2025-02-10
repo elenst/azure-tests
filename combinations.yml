@@ -77,6 +77,10 @@ jobs:
           set -xo pipefail
           cd $ENV_RQG_HOME
           export ASAN_OPTIONS="abort_on_error=1:disable_coredump=0:fast_unwind_on_malloc=0:detect_leaks=1"
+          # Trying https://github.com/google/sanitizers/issues/1342
+          export LSAN_OPTIONS="use_tls=0"
+          # Checking https://github.com/google/sanitizers/issues/1306
+          cat /proc/sys/fs/suid_dumpable
           perl ./combinations.pl \
             --basedir=$ENV_BASEDIR \
             --workdir=$ENV_LOGDIR \
