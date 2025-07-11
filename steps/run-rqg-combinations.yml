@@ -17,7 +17,7 @@ steps:
   - ${{ each loop in parameters.loops }}:
     - script: |
         rm -rf $(Build.ArtifactStagingDirectory)/*
-        sudo sysctl -w 'kernel.core_pattern=core'
+        sudo sysctl -w 'kernel.core_pattern=core.%p'
         if [ `date +'%s'` -lt $((ENV_END_TIME-600)) ] ; then
           TRIAL_NO=${{ loop }}
           echo "Trial $TRIAL_NO"

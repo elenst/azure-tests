@@ -64,7 +64,7 @@ jobs:
   # likely something is wrong anyway so that the tests are ending too quickly
   - ${{ each loop in parameters.loops }}:
     - script: |
-        sudo sysctl -w 'kernel.core_pattern=core'
+        sudo sysctl -w 'kernel.core_pattern=core.%p'
         rm -rf $(Build.ArtifactStagingDirectory)/*
         if [ `date +'%s'` -lt $((ENV_END_TIME-600)) ] ; then
           TRIAL_NO=${{ loop }}
