@@ -13,7 +13,7 @@ steps:
       echo "##vso[task.setvariable variable=number_of_combinations;isOutput=true]${NUMBER_OF_COMBINATIONS}"
     displayName: 'Create and store combinations'
 
-  - ${{ each loop in range(1, variables['number_of_combinations'] + 1) }}:
+  - ${{ each loop in range(1, variables['number_of_combinations']) }}:
     - script: |
         rm -rf $(Build.ArtifactStagingDirectory)/*
         sudo sysctl -w 'kernel.core_pattern=core.%p'
