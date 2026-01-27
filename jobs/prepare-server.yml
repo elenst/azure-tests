@@ -64,13 +64,19 @@ jobs:
       grep DEFAULT_MAX_CONN client/mysqltest.cc
       mkdir $builddir
       cd $builddir
-      cmake $srcdir $ENV_CMAKE_OPTIONS -DCMAKE_INSTALL_PREFIX=$ENV_BASEDIR
+      # Quickly randomize between Rel-ASAN and Debug, regardless pipeline options
+      if [ `echo $((RANDOM % 2))` -eq '0' ] ; then
+        cmake_opts="$ENV_CMAKE_OPTIONS -DWITH_ASAN=YES -DCMAKE_BUILD_TYPE=RelWithDebInfo"
+      else
+        cmake_opts="$ENV_CMAKE_OPTIONS -DWITH_ASAN=NO -DCMAKE_BUILD_TYPE=Debug"
+      fi
+      cmake $srcdir $cmake_opts -DCMAKE_INSTALL_PREFIX=$ENV_BASEDIR
       make -j5
       make install
       rm -rf $ENV_BASEDIR/mysql-test $ENV_BASEDIR/mariadb-test
       cd $srcdir
       echo $ENV_SERVER_BRANCH `git log -1 --abbrev=8 --pretty="%h"` > $ENV_BASEDIR/server.info
-      echo $ENV_CMAKE_OPTIONS >> $ENV_BASEDIR/server.info
+      echo $cmake_opts >> $ENV_BASEDIR/server.info
       filename=build-$ENV_SERVER_BRANCH-$ENV_SERVER_REVNO
       echo "Bintar filename to search for: $filename"
       echo "##vso[task.setvariable variable=BINTAR_NAME;isOutput=true]$filename"
