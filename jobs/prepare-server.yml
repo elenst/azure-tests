@@ -71,7 +71,8 @@ jobs:
         cmake_opts="$ENV_CMAKE_OPTIONS -DWITH_ASAN=NO -DCMAKE_BUILD_TYPE=Debug"
       fi
       cmake $srcdir $cmake_opts -DCMAKE_INSTALL_PREFIX=$ENV_BASEDIR
-      make -j5
+      nCPU=$(grep -c processor /proc/cpuinfo)
+      make -j${nCPU}
       make install
       rm -rf $ENV_BASEDIR/mysql-test $ENV_BASEDIR/mariadb-test
       cd $srcdir
