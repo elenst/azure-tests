@@ -18,6 +18,7 @@ jobs:
 # if not found, then clone and build
 
 - job: ${{ parameters.name }}
+  timeoutInMinutes: 330
   pool:
     vmImage: ${{ parameters.vmImage }}
   condition: ${{ parameters.condition }}

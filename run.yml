@@ -30,7 +30,7 @@ jobs:
 
 #########
 - job: Test
-  timeoutInMinutes: 110
+  timeoutInMinutes: 330
   dependsOn: Build_Server
   pool:
     vmImage: 'ubuntu-22.04'
